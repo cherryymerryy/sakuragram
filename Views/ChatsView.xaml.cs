@@ -25,9 +25,9 @@ namespace CherryMerryGram.Views
             await foreach (var chat in chats)
             {
                 var chatEntry = new ChatEntry();
-                int chatId = unchecked((int)chat.Id);
-                chatEntry.UpdateChat(chatId, chat.Title);
-                ChatList.Items.Add(chatEntry);
+                chatEntry.UpdateChat(chat.Id, chat.Title, chat.LastMessage);
+                chatEntry.ChatPage = Chat;
+                ChatsList.Items.Add(chatEntry);
             }
         }
 

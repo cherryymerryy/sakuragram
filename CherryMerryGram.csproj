@@ -20,7 +20,9 @@
   <ItemGroup>
     <None Remove="Views\AccountView.xaml" />
     <None Remove="Views\ChatsView.xaml" />
+    <None Remove="Views\Chats\Chat.xaml" />
     <None Remove="Views\Chats\ChatEntry.xaml" />
+    <None Remove="Views\Chats\ChatMessage.xaml" />
     <None Remove="Views\HelpView.xaml" />
     <None Remove="Views\LoginView.xaml" />
     <None Remove="Views\SettingsView.xaml" />
@@ -51,6 +53,16 @@
   -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Chats\ChatMessage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Chats\Chat.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\LoginView.xaml">

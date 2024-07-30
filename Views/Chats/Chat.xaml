@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="CherryMerryGram.Views.Chats.Chat"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CherryMerryGram.Views.Chats"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel>
+        <StackPanel x:Name="TopBar" Orientation="Horizontal" VerticalAlignment="Top">
+            <TextBlock x:Name="ChatTitle" />
+        </StackPanel>
+        <ListView x:Name="MessagesList" />
+        <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal" VerticalAlignment="Bottom">
+            <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"/>
+            <Button x:Name="Stickers" Content="Stickers" Width="70" MaxHeight="25" MaxWidth="25" />
+            <Button x:Name="SendMessage" Content="Send" Width="70" MaxHeight="25" MaxWidth="25" Click="SendMessage_OnClick" />
+        </StackPanel>
+    </StackPanel>
+</Page>

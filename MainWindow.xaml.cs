@@ -51,11 +51,11 @@ namespace CherryMerryGram
 					var filesLocation = Path.Combine(AppContext.BaseDirectory, "db");
 					await _client.ExecuteAsync(new TdApi.SetTdlibParameters
 					{
-						ApiId = _config.ApiId,
-						ApiHash = _config.ApiHash,
+						ApiId = Config.Config.ApiId,
+						ApiHash = Config.Config.ApiHash,
 						DeviceModel = "PC",
 						SystemLanguageCode = "en",
-						ApplicationVersion = _config.ApplicationVersion,
+						ApplicationVersion = Config.Config.ApplicationVersion,
 						DatabaseDirectory = filesLocation,
 						FilesDirectory = filesLocation,
 					});

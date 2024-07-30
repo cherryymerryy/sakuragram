@@ -9,8 +9,10 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel>
-        <TextBlock x:Name="textBlock_ChatName" Text="ChatName" />
-        <TextBlock x:Name="textBlock_ChatId" Text="ChatId" />
-    </StackPanel>
+    <Button Width="250px" MaxWidth="490px" MaxHeight="50px" Click="ButtonBase_OnClick">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock x:Name="textBlock_Chat_NameAndId" Text="ChatName (chatId)" />
+            <TextBlock x:Name="textBlock_Chat_LastMessage" Text="LastMessage" />
+        </StackPanel>
+    </Button>
 </Page>

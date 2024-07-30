@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="CherryMerryGram.Views.ChatsView"
+    x:Class="CherryMerryGram.Views.Chats.ChatMessage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:CherryMerryGram.Views"
+    xmlns:local="using:CherryMerryGram.Views.Chats"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel Orientation="Horizontal">
-        <ListView x:Name="ChatsList" Width="500px" />
-        <ListView x:Name="Chat" />
+    <StackPanel Orientation="Vertical">
+        <TextBlock x:Name="Username" Text="@username" />
     </StackPanel>
 </Page>

@@ -8,7 +8,6 @@ namespace CherryMerryGram.Views
 	public sealed partial class AccountView : Page
 	{
 		private static readonly TdClient _client = MainWindow._client;
-        private static MainWindow _app;
         
         private string _displayName;
         private string _username;
@@ -17,8 +16,6 @@ namespace CherryMerryGram.Views
 		public AccountView()
 		{
 			this.InitializeComponent();
-
-            //_app = new MainWindow();
             
             InitializeAllVariables();
         }
@@ -42,7 +39,6 @@ namespace CherryMerryGram.Views
         private async void Button_LogOut_OnClick(object sender, RoutedEventArgs e)
         {
             await _client.ExecuteAsync(new TdApi.LogOut());
-            _app.UpdateWindow();
         }
     }
 }
