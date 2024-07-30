@@ -1,28 +1,48 @@
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using TdLib;
+using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
 
 namespace CherryMerryGram.Views
 {
-    public sealed partial class Account : UserControl
-    {
-        public Account()
+	public sealed partial class AccountView : Page
+	{
+		private static readonly TdClient _client = MainWindow._client;
+        private static MainWindow _app;
+        
+        private string _displayName;
+        private string _username;
+        private TdApi.ProfilePhoto _profilePicture;
+
+		public AccountView()
+		{
+			this.InitializeComponent();
+
+            //_app = new MainWindow();
+            
+            InitializeAllVariables();
+        }
+
+        private async void InitializeAllVariables()
         {
-            this.InitializeComponent();
+            var currentUser = await GetCurrentUser();
+            _displayName = $"{currentUser.FirstName} {currentUser.LastName}";
+            _username = $"{currentUser.Usernames?.ActiveUsernames[0]}";
+            _profilePicture = currentUser.ProfilePhoto;
+
+            textBlock_Username.Text = _username;
+            textBlock_DisplayName.Text = _displayName;
+        }
+
+        private static async Task<TdApi.User> GetCurrentUser()
+        {
+            return await _client.ExecuteAsync(new TdApi.GetMe());
+        }
+
+        private async void Button_LogOut_OnClick(object sender, RoutedEventArgs e)
+        {
+            await _client.ExecuteAsync(new TdApi.LogOut());
+            _app.UpdateWindow();
         }
     }
 }

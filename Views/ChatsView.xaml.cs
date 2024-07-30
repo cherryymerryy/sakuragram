@@ -1,28 +1,55 @@
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using TdLib;
+using CherryMerryGram;
+using CherryMerryGram.Views.Chats;
+using System;
 
 namespace CherryMerryGram.Views
 {
-    public sealed partial class ChatsView : UserControl
+    public sealed partial class ChatsView : Page
     {
+        private static TdClient _client = MainWindow._client;
+
         public ChatsView()
         {
             this.InitializeComponent();
+
+            GenerateChatEntries();
+        }
+
+        private async void GenerateChatEntries()
+        {
+            var chats = GetChats(2000);
+
+            await foreach (var chat in chats)
+            {
+                var chatEntry = new ChatEntry();
+                int chatId = unchecked((int)chat.Id);
+                chatEntry.UpdateChat(chatId, chat.Title);
+                ChatList.Items.Add(chatEntry);
+            }
+        }
+
+        private static async IAsyncEnumerable<TdApi.Chat> GetChats(int limit)
+        {
+            var chats = await _client.ExecuteAsync(new TdApi.GetChats
+            {
+                Limit = limit
+            });
+
+            foreach (var chatId in chats.ChatIds)
+            {
+                var chat = await _client.ExecuteAsync(new TdApi.GetChat
+                {
+                    ChatId = chatId
+                });
+
+                if (chat.Type is TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypeBasicGroup or TdApi.ChatType.ChatTypePrivate)
+                {
+                    yield return chat;
+                }
+            }
         }
     }
 }

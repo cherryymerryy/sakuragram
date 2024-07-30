@@ -5,156 +5,163 @@ using System.Threading.Tasks;
 using TdLib.Bindings;
 using TdLib;
 using System.Threading;
-using static TdLib.TdApi;
+using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Controls;
+using System.Reflection;
+using Microsoft.UI.Xaml.Media.Animation;
+using CherryMerryGram.Config;
 
 namespace CherryMerryGram
 {
-    public sealed partial class MainWindow : Window
-    {
-        private const int ApiId = 1959060;
-        private const string ApiHash = "315144c05dd280c6ea4bf9d353b89a08";
+	public sealed partial class MainWindow : Window
+	{
+		private NavigationViewItem _lastItem;
+		private static Config.Config _config;
 
-        private const string ApplicationVersion = "1.0.0";
+		public static TdClient _client;
+		private static readonly ManualResetEventSlim ReadyToAuthenticate = new();
 
-        private static TdClient _client;
-        private static readonly ManualResetEventSlim ReadyToAuthenticate = new();
+		public static bool _authNeeded;
+        public static bool _passwordNeeded;
 
-        private static bool _authNeeded;
-        private static bool _passwordNeeded;
+		private void PrepareTelegramApi()
+		{
+			using var jsonClient = new TdJsonClient();
 
-        private void PrepareTelegramApi()
-        {
-            using var jsonClient = new TdJsonClient();
+			var json = "";
+			double timeout = 1.0;
 
-            var json = "";
-            double timeout = 1.0;
+			jsonClient.Send(json);
+			var result = jsonClient.Receive(timeout);
 
-            jsonClient.Send(json);
-            var result = jsonClient.Receive(timeout);
+			_config = new Config.Config();
+			_client = new TdClient();
+			_client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
 
-            _client = new TdClient();
-            _client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
+			_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
 
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+			ReadyToAuthenticate.Wait();
+		}
+		
+		private static async Task ProcessUpdates(TdApi.Update update)
+		{
+			switch (update)
+			{
+				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitTdlibParameters }:
+					var filesLocation = Path.Combine(AppContext.BaseDirectory, "db");
+					await _client.ExecuteAsync(new TdApi.SetTdlibParameters
+					{
+						ApiId = _config.ApiId,
+						ApiHash = _config.ApiHash,
+						DeviceModel = "PC",
+						SystemLanguageCode = "en",
+						ApplicationVersion = _config.ApplicationVersion,
+						DatabaseDirectory = filesLocation,
+						FilesDirectory = filesLocation,
+					});
+					break;
 
-            ReadyToAuthenticate.Wait();
-        }
+				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitPhoneNumber }:
+				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitCode }:
+					_authNeeded = true;
+					ReadyToAuthenticate.Set();
+					break;
 
-        private static async Task ProcessUpdates(TdApi.Update update)
-        {
-            switch (update)
-            {
-                case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitTdlibParameters }:
-                    var filesLocation = Path.Combine(AppContext.BaseDirectory, "db");
-                    await _client.ExecuteAsync(new TdApi.SetTdlibParameters
-                    {
-                        ApiId = ApiId,
-                        ApiHash = ApiHash,
-                        DeviceModel = "PC",
-                        SystemLanguageCode = "en",
-                        ApplicationVersion = ApplicationVersion,
-                        DatabaseDirectory = filesLocation,
-                        FilesDirectory = filesLocation,
-                    });
-                    break;
+				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitPassword }:
+					_authNeeded = true;
+					_passwordNeeded = true;
+					ReadyToAuthenticate.Set();
+					break;
 
-                case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitPhoneNumber }:
-                case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitCode }:
-                    _authNeeded = true;
-                    ReadyToAuthenticate.Set();
-                    break;
+				case TdApi.Update.UpdateUser:
+					ReadyToAuthenticate.Set();
+					break;
 
-                case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitPassword }:
-                    _authNeeded = true;
-                    _passwordNeeded = true;
-                    ReadyToAuthenticate.Set();
-                    break;
+				case TdApi.Update.UpdateConnectionState { State: TdApi.ConnectionState.ConnectionStateReady }:
+					break;
 
-                case TdApi.Update.UpdateUser:
-                    ReadyToAuthenticate.Set();
-                    break;
+				default:
+					// ReSharper disable once EmptyStatement
+					;
+					// Add a breakpoint here to see other events
+					break;
+			}
+		}
 
-                case TdApi.Update.UpdateConnectionState { State: TdApi.ConnectionState.ConnectionStateReady }:
-                    break;
+		void CheckAuth()
+		{
+			if (_authNeeded)
+			{ 
+				NavigateToView("LoginView");
+				NavView_Login.IsEnabled = true;
+				NavView_Account.IsEnabled = false;
+				NavView_Chats.IsEnabled = false;
+				NavView_Settings.IsEnabled = false;
+				NavView_Help.IsEnabled = false;
+			}
+			else
+			{ 
+				NavigateToView("ChatsView");
+				NavView_Login.IsEnabled = false;
+				NavView_Account.IsEnabled = true;
+				NavView_Chats.IsEnabled = true;
+				NavView_Settings.IsEnabled = true;
+				NavView_Help.IsEnabled = true;
+			}
+		}
+		
+		public void UpdateWindow()
+		{
+			CheckAuth();
+		}
+		
+		public MainWindow()
+		{
+			this.InitializeComponent();
 
-                default:
-                    // ReSharper disable once EmptyStatement
-                    ;
-                    // Add a breakpoint here to see other events
-                    break;
-            }
-        }
+            Window window = this;
+            window.ExtendsContentIntoTitleBar = true;
 
-        public MainWindow()
-        {
-            this.InitializeComponent();
-            
             PrepareTelegramApi();
+			UpdateWindow();
+		}
 
-            //button_EnterCode.Visibility = Visibility.Collapsed;
-            //textBox_Code.Visibility = Visibility.Collapsed;
-            //button_EnterPassword.Visibility = Visibility.Collapsed;
-            //textBox_Password.Visibility = Visibility.Collapsed;
-            //SendMessageList.Visibility = Visibility.Collapsed;
+		private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e) 
+		{
+
+		}
+
+		private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+		{
+			var item = args.InvokedItemContainer as NavigationViewItem;
+			if (item == null || item == _lastItem)
+				return;
+
+			var clickedView = item.Tag.ToString() ?? "SettingsView";
+
+			if (!NavigateToView(clickedView)) return;
+			_lastItem = item;
+		}
+
+		public bool NavigateToView(string clickedView)
+		{
+			var view = Assembly.GetExecutingAssembly().GetType($"CherryMerryGram.Views.{clickedView}");
+
+			if (string.IsNullOrEmpty(clickedView) || view == null)
+				return false;
+
+			ContentFrame.Navigate(view, null, new EntranceNavigationTransitionInfo());
+			return true;
         }
 
-        private void ContentFrame_NavigationFailed() 
-        { 
-        }
+        private void NavView_Loaded(object sender, RoutedEventArgs e)
+		{
+			
+		}
 
-        private async void buttonLogInClickAsync(object sender, RoutedEventArgs e)
-        {
-            if (sender is null)
-            {
-                throw new ArgumentNullException(nameof(sender));
-            }
+		private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+		{
 
-            await _client.ExecuteAsync(new TdApi.SetAuthenticationPhoneNumber
-            {
-                //PhoneNumber = textBox_PhoneNumber.Text,
-            });
-
-            //button_EnterCode.Visibility = Visibility.Visible;
-            //textBox_Code.Visibility = Visibility.Visible;
-        }
-
-        private async void button_EnterCode_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is null)
-            {
-                throw new ArgumentNullException(nameof(sender));
-            }
-
-            await _client.ExecuteAsync(new TdApi.CheckAuthenticationCode
-            {
-                //Code = textBox_Code.Text
-            });
-
-            if (_passwordNeeded)
-            {
-                //button_EnterPassword.Visibility = Visibility.Visible;
-                //textBox_Password.Visibility = Visibility.Visible;
-            }
-        }
-
-        private async void button_EnterPassword_Click(object sender, RoutedEventArgs e)
-        {
-            await _client.ExecuteAsync(new TdApi.CheckAuthenticationPassword
-            {
-                Password = textBox_Password.Text
-            });
-
-            Auth.Visibility = Visibility.Collapsed;
-            SendMessageList.Visibility = Visibility.Visible;
-        }
-
-        private async void button_SendMessage_Click(object sender, RoutedEventArgs e)
-        {
-            await _client.ExecuteAsync(new TdApi.SendMessage
-            {
-                ChatId = -1002111703440, 
-                InputMessageContent = new TdApi.InputMessageContent.InputMessageText()
-            });
-        }
-    }
+		}
+	}
 }

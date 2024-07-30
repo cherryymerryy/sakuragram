@@ -18,7 +18,10 @@ using Windows.Foundation.Collections;
 
 namespace CherryMerryGram.Views
 {
-    public sealed partial class HelpView : UserControl
+    /// <summary>
+    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// </summary>
+    public sealed partial class HelpView : Page
     {
         public HelpView()
         {

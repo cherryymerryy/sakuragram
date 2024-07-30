@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window
 	x:Class="CherryMerryGram.MainWindow"
+    x:Name="CherryMerryGram"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="using:CherryMerryGram"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
+    
 
 	<NavigationView x:Name="NavView"
-							Header="This is Header Text"
 							PaneDisplayMode="Left"
-							SelectionChanged="NavigationView_SelectionChanged9"
-							IsSettingsVisible="False">
+							IsSettingsVisible="False"
+							ItemInvoked="NavView_ItemInvoked"
+							Loaded="NavView_Loaded"
+							SelectionChanged="NavView_SelectionChanged">
 		<NavigationView.MenuItems>
-			<NavigationViewItem Content="Login" Tag="LoginView" Icon="Home" IsEnabled="False"/>
-			<NavigationViewItem Content="All chats" Tag="ChatsView" Icon="People" />
-			<ListView x:Name="TestListView"/>
+			<NavigationViewItem x:Name="NavView_Login" Content="Login" Tag="LoginView" Icon="Home"/>
+            <NavigationViewItem x:Name="NavView_Chats" Content="All chats" Tag="ChatsView" Icon="People" />
 		</NavigationView.MenuItems>
 		<NavigationView.FooterMenuItems>
-			<NavigationViewItem Content="Account" Tag="AccountView" Icon="Contact" />
-			<NavigationViewItem Content="Settings" Tag="SettingsView" Icon="Setting" />
-			<NavigationViewItem Content="Help" Tag="HelpView" Icon="Help" />
+            <NavigationViewItem x:Name="NavView_Account" Content="Account" Tag="AccountView" Icon="Contact" />
+            <NavigationViewItem x:Name="NavView_Settings" Content="Settings" Tag="SettingsView" Icon="Setting" />
+            <NavigationViewItem x:Name="NavView_Help" Content="Help" Tag="HelpView" Icon="Help" />
 		</NavigationView.FooterMenuItems>
-		<Frame x:Name="ContentFrame" />
+		<Frame x:Name="ContentFrame" NavigationFailed="ContentFrame_NavigationFailed"/>
 	</NavigationView>
 </Window>

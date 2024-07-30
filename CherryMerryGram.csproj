@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
@@ -16,7 +16,9 @@
   <ItemGroup>
     <None Remove="Views\AccountView.xaml" />
     <None Remove="Views\ChatsView.xaml" />
+    <None Remove="Views\Chats\ChatEntry.xaml" />
     <None Remove="Views\HelpView.xaml" />
+    <None Remove="Views\LoginView.xaml" />
     <None Remove="Views\SettingsView.xaml" />
   </ItemGroup>
 
@@ -47,6 +49,11 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\LoginView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\HelpView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -63,6 +70,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\AccountView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Chats\ChatEntry.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
