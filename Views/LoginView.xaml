@@ -12,7 +12,7 @@
 	<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
         <TextBox x:Name="textBox_PhoneNumber" Header="Enter your phone number:" PlaceholderText="Phone number" />
         <TextBox x:Name="textBox_Code" Header="Enter your code:" PlaceholderText="Code" Visibility="Collapsed" />
-        <TextBox x:Name="textBox_Password" Header="Enter your password:" PlaceholderText="Password" Visibility="Collapsed" />
+        <PasswordBox x:Name="textBox_Password" Header="Enter your password:" PlaceholderText="Password" Visibility="Collapsed" PasswordChar="#" />
         <Button x:Name="button_Next" Style="{StaticResource AccentButtonStyle}" Content="Next" Width="200px" Click="button_Next_Click" />
 	</StackPanel>
 </Page>

@@ -20,6 +20,7 @@ namespace CherryMerryGram.Views
 			{
 				case 0:
 					button_Next.IsEnabled = false;
+					textBox_PhoneNumber.IsEnabled = false;
 					await _client.ExecuteAsync(new TdApi.SetAuthenticationPhoneNumber
 					{
 						PhoneNumber = textBox_PhoneNumber.Text,
@@ -31,7 +32,8 @@ namespace CherryMerryGram.Views
 					break;
 				case 1:
 					button_Next.IsEnabled = false;
-					await _client.ExecuteAsync(new TdApi.CheckAuthenticationCode
+					textBox_Code.IsEnabled = false;
+                    await _client.ExecuteAsync(new TdApi.CheckAuthenticationCode
 					{
 						Code = textBox_Code.Text
 					});
@@ -45,9 +47,10 @@ namespace CherryMerryGram.Views
 					break;
 				case 2:
 					button_Next.IsEnabled = false;
-					await _client.ExecuteAsync(new TdApi.CheckAuthenticationPassword
+					textBox_Password.IsEnabled = false;
+                    await _client.ExecuteAsync(new TdApi.CheckAuthenticationPassword
 					{
-						Password = textBox_Password.Text
+						Password = textBox_Password.Password.ToString()
 					});
 					_loginState = 0;
 					button_Next.IsEnabled = true;
