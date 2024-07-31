@@ -20,14 +20,14 @@ namespace CherryMerryGram.Views
 
         private async void GenerateChatEntries()
         {
-            var chats = GetChats(2000);
+            var chats = GetChats(4000);
 
             await foreach (var chat in chats)
             {
                 var chatEntry = new ChatEntry();
-                chatEntry.UpdateChat(chat.Id, chat.Title, chat.LastMessage);
+                chatEntry.UpdateChat(chat);
                 chatEntry.ChatPage = Chat;
-                ChatsList.Items.Add(chatEntry);
+                ChatsList.Children.Add(chatEntry);
             }
         }
 

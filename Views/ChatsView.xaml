@@ -9,8 +9,12 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel Orientation="Horizontal">
-        <ListView x:Name="ChatsList" Width="500px" />
-        <ListView x:Name="Chat" />
+    <StackPanel Orientation="Horizontal" Padding="0, 50, 0, 0">
+        <ScrollView>
+            <StackPanel x:Name="ChatsList" Width="500px" />
+        </ScrollView>
+        <ScrollView>
+            <StackPanel x:Name="Chat" />
+        </ScrollView>
     </StackPanel>
 </Page>

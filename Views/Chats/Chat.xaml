@@ -9,8 +9,9 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel>
+    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <StackPanel x:Name="TopBar" Orientation="Horizontal" VerticalAlignment="Top">
+            <Button x:Name="Back" Content="Back" />
             <TextBlock x:Name="ChatTitle" />
         </StackPanel>
         <ListView x:Name="MessagesList" />

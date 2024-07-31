@@ -14,6 +14,7 @@
             <HyperlinkButton Content="Channel" NavigateUri="https://t.me/cherrymerrygram" Width="100px" />
             <HyperlinkButton Content="Chat" NavigateUri="https://t.me/cherrymerrygramchat" Width="100px" />
             <HyperlinkButton Content="Source code" NavigateUri="https://github.com/cherryymerryy/CherryMerryGram" Width="100px" />
+            <HyperlinkButton x:Name="Version" Content="Version: " NavigateUri="" Width="100px" />
         </StackPanel>
     </StackPanel>
 </Page>

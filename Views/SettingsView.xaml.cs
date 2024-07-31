@@ -1,31 +1,28 @@
-using Microsoft.UI.Xaml;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using Newtonsoft.Json.Linq;
 
 namespace CherryMerryGram.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class SettingsView : Page
     {
         public SettingsView()
         {
             this.InitializeComponent();
+
+            GetLatestVersion();
+        }
+
+        private async Task GetLatestVersion()
+        {
+            using var client = new HttpClient();
+            const string requestUri = "https://api.github.com/repos/cherryymerryy/CherryMerryGram/releases/latest";
+            var response = await client.GetAsync(requestUri);
+            var content = await response.Content.ReadAsStringAsync();
+            dynamic json = JObject.Parse(content);
+            Version.Content = $"Version: {json.tag_name}";
+            Version.NavigateUri = json.html_url;
         }
     }
 }

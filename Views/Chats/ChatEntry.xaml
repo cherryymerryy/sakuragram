@@ -9,10 +9,13 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Button Width="250px" MaxWidth="490px" MaxHeight="50px" Click="ButtonBase_OnClick">
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
-            <TextBlock x:Name="textBlock_Chat_NameAndId" Text="ChatName (chatId)" />
-            <TextBlock x:Name="textBlock_Chat_LastMessage" Text="LastMessage" />
+    <Button Width="490px" MaxWidth="490px" MaxHeight="75px" Click="ButtonBase_OnClick" HorizontalContentAlignment="Left" Margin="5, 5, 5, 5">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+            <Image x:Name="ChatEntry_ProfilePicture" Source="../../Assets/TestImages/CatAvatar.jpg" Width="32px" Height="32px" Margin="5" />
+            <StackPanel Orientation="Vertical">
+                <TextBlock x:Name="textBlock_Chat_NameAndId" Text="ChatName (chatId)" FontSize="14"/>
+                <TextBlock x:Name="textBlock_Chat_LastMessage" Text="LastMessage" FontSize="10" />
+            </StackPanel>
         </StackPanel>
     </Button>
 </Page>
