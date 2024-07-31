@@ -1,7 +1,8 @@
 {
   "profiles": {
     "CherryMerryGram (Package)": {
-      "commandName": "MsixPackage"
+      "commandName": "MsixPackage",
+      
     },
     "CherryMerryGram (Unpackaged)": {
       "commandName": "Project"

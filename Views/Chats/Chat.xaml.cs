@@ -26,7 +26,7 @@ namespace CherryMerryGram.Views.Chats
             await foreach (var message in messages)
             {
                 var messageEntry = new ChatMessage();
-                messageEntry.UpdateMessage(message: message);
+                //messageEntry.UpdateMessage(message: message);
                 MessagesList.Items.Add(messageEntry);
             }
         }
@@ -43,7 +43,7 @@ namespace CherryMerryGram.Views.Chats
 
             foreach (var message in messages.Messages_)
             {
-                yield return message;
+                yield return messages;
             }
         }
         
