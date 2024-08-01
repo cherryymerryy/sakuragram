@@ -9,22 +9,40 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Button Width="490px" MaxWidth="490px" MaxHeight="75px" Click="ButtonBase_OnClick" HorizontalContentAlignment="Left" Margin="5, 5, 5, 5">
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
-            <Border Width="32px"
-                    Height="32px"
+    <Button 
+        Width="490px" 
+        MaxWidth="490px" 
+        MaxHeight="75px" 
+        Click="ButtonBase_OnClick" 
+        HorizontalContentAlignment="Left"
+        VerticalContentAlignment="Center">
+        
+        <StackPanel Orientation="Horizontal">
+            
+            <Border Width="42px"
+                    Height="42px"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     CornerRadius="30"
-                    Margin="5">
+                    Margin="10">
                 <Border.Background>
                     <ImageBrush x:Name="ChatEntry_ProfilePicture" />
                 </Border.Background>
             </Border>
+            
             <StackPanel Orientation="Vertical">
                 <TextBlock x:Name="textBlock_Chat_NameAndId" FontSize="14"/>
                 <TextBlock x:Name="textBlock_Chat_LastMessage" FontSize="10" />
             </StackPanel>
+            
+            <StackPanel HorizontalAlignment="Right" Orientation="Vertical">
+                <Border Background="Black">
+                    <TextBlock x:Name="UnreadMessagesCount" Padding="5" />
+                </Border>
+                <TextBlock x:Name="SendTime" />
+            </StackPanel>
+            
         </StackPanel>
+        
     </Button>
 </Page>

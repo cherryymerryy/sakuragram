@@ -26,6 +26,8 @@ namespace CherryMerryGram.Views.Chats
         {
             _chatId = chat.Id;
             textBlock_Chat_NameAndId.Text = $"{chat.Title} ({chat.Id})";
+            UnreadMessagesCount.Text = chat.UnreadCount > 0 ? chat.UnreadCount.ToString() : string.Empty;
+            SendTime.Text = chat.LastMessage.Date != 0 ? DateTime.FromFileTime(chat.LastMessage.Date).ToString("HH:mm") : string.Empty;
             GetChatPhoto(chat);
             GetLastMessage(chat);
         }

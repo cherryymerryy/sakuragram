@@ -20,6 +20,23 @@ namespace CherryMerryGram.Views.Chats
             ChatId = chatId;
             var chat = _client.GetChatAsync(chatId: chatId);
             ChatTitle.Text = chat.Result.Title;
+            GetMessages(chatId);
+        }
+        
+        private void GetMessages(long chatId)
+        {
+            var messages = _client.ExecuteAsync(new TdApi.GetChatHistory
+            {
+                ChatId = chatId,
+                Limit = 100
+            });
+            
+            foreach (var message in messages.Result.Messages_)
+            {
+                var chatMessage = new ChatMessage();
+                chatMessage.UpdateMessage(message);
+                MessagesList.Items.Add(chatMessage);
+            }
         }
         
         private async void SendMessage_OnClick(object sender, RoutedEventArgs e)
