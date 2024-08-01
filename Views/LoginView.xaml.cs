@@ -50,7 +50,7 @@ namespace CherryMerryGram.Views
 					textBox_Password.IsEnabled = false;
                     await _client.ExecuteAsync(new TdApi.CheckAuthenticationPassword
 					{
-						Password = textBox_Password.Password.ToString()
+						Password = textBox_Password.Password
 					});
 					_loginState = 0;
 					button_Next.IsEnabled = true;

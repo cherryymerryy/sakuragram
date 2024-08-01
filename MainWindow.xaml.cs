@@ -9,7 +9,6 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Controls;
 using System.Reflection;
 using Microsoft.UI.Xaml.Media.Animation;
-using CherryMerryGram.Config;
 
 namespace CherryMerryGram
 {
@@ -53,6 +52,10 @@ namespace CherryMerryGram
 					{
 						ApiId = Config.Config.ApiId,
 						ApiHash = Config.Config.ApiHash,
+						UseFileDatabase = true,
+						UseChatInfoDatabase = true,
+						UseMessageDatabase = true,
+						UseSecretChats = true,
 						DeviceModel = "PC",
 						SystemLanguageCode = "en",
 						ApplicationVersion = Config.Config.ApplicationVersion,

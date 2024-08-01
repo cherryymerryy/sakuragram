@@ -1,12 +1,10 @@
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
-using WinRT;
-using CherryMerryGram;
 
 namespace CherryMerryGram.Views.Chats
 {
@@ -15,27 +13,52 @@ namespace CherryMerryGram.Views.Chats
         public StackPanel ChatPage;
         private static Chat _chatWidget;
 
+        private static readonly TdClient _client = MainWindow._client;
+        
         private long _chatId;
-        private string _chatTitle;
-        private static TdApi.Client _client = MainWindow._client;
         
         public ChatEntry()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         public void UpdateChat(TdApi.Chat chat)
         {
             _chatId = chat.Id;
-            _chatTitle = chat.Title;
-
             textBlock_Chat_NameAndId.Text = $"{chat.Title} ({chat.Id})";
-
-            if (chat.LastMessage.Content is not TdApi.MessageContent.MessageText messageText) return;
-            var text = messageText.Text;
-            textBlock_Chat_LastMessage.Text = text.Text;
+            GetChatPhoto(chat);
+            GetLastMessage(chat);
         }
 
+        private async void GetChatPhoto(TdApi.Chat chat)
+        {
+            try
+            {
+                var chatPhoto = await _client.ExecuteAsync(new TdApi.DownloadFile
+                {
+                    FileId = chat.Photo.Small.Id,
+                    Priority = 1
+                });
+                
+                ChatEntry_ProfilePicture.ImageSource = new BitmapImage(new Uri(chatPhoto.Local.Path));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        private static string GetMessageText(long chatId, long messageId)
+        {
+            if (_client.ExecuteAsync(new TdApi.GetMessage
+                {
+                    ChatId = chatId,
+                    MessageId = messageId
+                }).Result.Content is not TdApi.MessageContent.MessageText message) return null;
+            var messageText = message.Text.Text;
+            return messageText;
+        }
+        
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             if (ChatPage != null && _chatWidget != null)
@@ -45,24 +68,26 @@ namespace CherryMerryGram.Views.Chats
             }
             
             _chatWidget = new Chat();
-            ChatPage.Children.Add(_chatWidget);
-            _chatWidget.UpdateChat(_chatId, _chatTitle);
+            ChatPage?.Children.Add(_chatWidget);
+            _chatWidget.UpdateChat(_chatId);
         }
 
-        private static IEnumerable<string> GetLastMessage(TdApi.Chat chat)
+        private void GetLastMessage(TdApi.Chat chat)
         {
-            switch (chat.LastMessage.DataType)
+            textBlock_Chat_LastMessage.Text = chat.LastMessage.Content switch
             {
-                case "messageText":
-                    yield return chat.LastMessage.Content.ToString();
-                    break;
-                case "messagePhoto":
-                    yield return chat.LastMessage.Content.DataType[4].ToString();
-                    break;
-                case "messageSticker":
-                    yield return chat.LastMessage.Content.DataType[5].ToString();
-                    break;
-            }
+                TdApi.MessageContent.MessageText messageText => messageText.Text.Text,
+                TdApi.MessageContent.MessageAudio messageAudio => $"Audio message ({messageAudio.Audio.Duration})",
+                TdApi.MessageContent.MessageVoiceNote messageVoiceNote => $"Voice message ({messageVoiceNote.VoiceNote.Duration})",
+                TdApi.MessageContent.MessageVideo messageVideo => $"Video message ({messageVideo.Video.Duration} sec)",
+                TdApi.MessageContent.MessagePhoto messagePhoto => 
+                    $"Photo message ({messagePhoto.Photo.Minithumbnail.Width}x{messagePhoto.Photo.Minithumbnail.Height})",
+                TdApi.MessageContent.MessageSticker messageSticker => $"{messageSticker.Sticker.Emoji} Sticker message",
+                TdApi.MessageContent.MessagePoll messagePoll => $"{messagePoll.Poll.Question} Poll message",
+                TdApi.MessageContent.MessagePinMessage messagePinMessage => 
+                    $"(FirstName) pinned {GetMessageText(chat.Id, messagePinMessage.MessageId)}",
+                _ => textBlock_Chat_LastMessage.Text
+            };
         }
     }
 }

@@ -15,7 +15,7 @@ namespace CherryMerryGram.Views.Chats
             this.InitializeComponent();
         }
 
-        public async void UpdateChat(long chatId, string Title)
+        public void UpdateChat(long chatId)
         {
             ChatId = chatId;
             var chat = _client.GetChatAsync(chatId: chatId);
@@ -35,6 +35,8 @@ namespace CherryMerryGram.Views.Chats
                     }
                 }
             });
+            
+            UserMessageInput.Text = "";
         }
     }
 }

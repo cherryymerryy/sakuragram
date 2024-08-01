@@ -11,10 +11,19 @@
 
     <Button Width="490px" MaxWidth="490px" MaxHeight="75px" Click="ButtonBase_OnClick" HorizontalContentAlignment="Left" Margin="5, 5, 5, 5">
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
-            <Image x:Name="ChatEntry_ProfilePicture" Source="../../Assets/TestImages/CatAvatar.jpg" Width="32px" Height="32px" Margin="5" />
+            <Border Width="32px"
+                    Height="32px"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    CornerRadius="30"
+                    Margin="5">
+                <Border.Background>
+                    <ImageBrush x:Name="ChatEntry_ProfilePicture" />
+                </Border.Background>
+            </Border>
             <StackPanel Orientation="Vertical">
-                <TextBlock x:Name="textBlock_Chat_NameAndId" Text="ChatName (chatId)" FontSize="14"/>
-                <TextBlock x:Name="textBlock_Chat_LastMessage" Text="LastMessage" FontSize="10" />
+                <TextBlock x:Name="textBlock_Chat_NameAndId" FontSize="14"/>
+                <TextBlock x:Name="textBlock_Chat_LastMessage" FontSize="10" />
             </StackPanel>
         </StackPanel>
     </Button>

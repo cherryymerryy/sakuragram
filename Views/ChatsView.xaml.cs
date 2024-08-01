@@ -4,6 +4,8 @@ using TdLib;
 using CherryMerryGram;
 using CherryMerryGram.Views.Chats;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CherryMerryGram.Views
 {
@@ -25,8 +27,8 @@ namespace CherryMerryGram.Views
             await foreach (var chat in chats)
             {
                 var chatEntry = new ChatEntry();
-                chatEntry.UpdateChat(chat);
                 chatEntry.ChatPage = Chat;
+                chatEntry.UpdateChat(chat);
                 ChatsList.Children.Add(chatEntry);
             }
         }
