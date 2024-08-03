@@ -9,13 +9,18 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-        <StackPanel x:Name="TopBar" Orientation="Horizontal" VerticalAlignment="Top">
+    <StackPanel>
+        <StackPanel x:Name="TopBar" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top">
             <Button x:Name="Back" Content="Back" />
             <TextBlock x:Name="ChatTitle" />
+            <Button x:Name="Call" Content="Call" Click="Call_OnClick" />
         </StackPanel>
-        <ListView x:Name="MessagesList" />
-        <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal" VerticalAlignment="Bottom">
+        
+        <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <StackPanel x:Name="MessagesList"/>
+        </ScrollViewer>
+        
+        <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
             <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"/>
             <Button x:Name="Stickers" Content="Stickers" Width="70" MaxHeight="25" MaxWidth="25" />
             <Button x:Name="SendMessage" Content="Send" Width="70" MaxHeight="25" MaxWidth="25" Click="SendMessage_OnClick" />

@@ -16,12 +16,24 @@ namespace CherryMerryGram.Views
         public ChatsView()
         {
             this.InitializeComponent();
-
+            
             GenerateChatEntries();
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
+        }
+
+        private Task ProcessUpdates(TdApi.Update update)
+        {
+            switch (update)
+            {
+                case TdApi.Update.UpdateNewMessage: { GenerateChatEntries(); break; }
+            }
+
+            return Task.CompletedTask;
         }
 
         private async void GenerateChatEntries()
         {
+            ChatsList.Children.Clear();
             var chats = GetChats(4000);
 
             await foreach (var chat in chats)

@@ -11,7 +11,7 @@
 
     <StackPanel Orientation="Horizontal" Padding="0, 50, 0, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <ScrollView>
-            <StackPanel x:Name="ChatsList" Width="500px" />
+            <StackPanel x:Name="ChatsList" Width="350" />
         </ScrollView>
         <ScrollView>
             <StackPanel x:Name="Chat" />

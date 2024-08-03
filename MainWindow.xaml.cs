@@ -8,6 +8,7 @@ using System.Threading;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Controls;
 using System.Reflection;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.UI.Xaml.Media.Animation;
 
 namespace CherryMerryGram
@@ -22,7 +23,7 @@ namespace CherryMerryGram
 
 		public static bool _authNeeded;
         public static bool _passwordNeeded;
-
+        
 		private void PrepareTelegramApi()
 		{
 			using var jsonClient = new TdJsonClient();
@@ -32,14 +33,14 @@ namespace CherryMerryGram
 
 			jsonClient.Send(json);
 			var result = jsonClient.Receive(timeout);
-
+			
 			_config = new Config.Config();
 			_client = new TdClient();
 			_client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
 
 			_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
 
-			ReadyToAuthenticate.Wait();
+            ReadyToAuthenticate.Wait();
 		}
 		
 		private static async Task ProcessUpdates(TdApi.Update update)
@@ -65,6 +66,9 @@ namespace CherryMerryGram
 					break;
 
 				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitPhoneNumber }:
+					_authNeeded = true;
+					ReadyToAuthenticate.Set();
+					break;
 				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitCode }:
 					_authNeeded = true;
 					ReadyToAuthenticate.Set();
@@ -91,25 +95,25 @@ namespace CherryMerryGram
 			}
 		}
 
-		void CheckAuth()
+		private void CheckAuth()
 		{
 			if (_authNeeded)
 			{ 
 				NavigateToView("LoginView");
-				NavView_Login.IsEnabled = true;
-				NavView_Account.IsEnabled = false;
-				NavView_Chats.IsEnabled = false;
-				NavView_Settings.IsEnabled = false;
-				NavView_Help.IsEnabled = false;
+				NavViewLogin.IsEnabled = true;
+				NavViewAccount.IsEnabled = false;
+				NavViewChats.IsEnabled = false;
+				NavViewSettings.IsEnabled = false;
+				NavViewHelp.IsEnabled = false;
 			}
 			else
 			{ 
 				NavigateToView("ChatsView");
-				NavView_Login.IsEnabled = false;
-				NavView_Account.IsEnabled = true;
-				NavView_Chats.IsEnabled = true;
-				NavView_Settings.IsEnabled = true;
-				NavView_Help.IsEnabled = true;
+				NavViewLogin.IsEnabled = false;
+				NavViewAccount.IsEnabled = true;
+				NavViewChats.IsEnabled = true;
+				NavViewSettings.IsEnabled = true;
+				NavViewHelp.IsEnabled = true;
 			}
 		}
 		
@@ -166,5 +170,5 @@ namespace CherryMerryGram
 		{
 
 		}
-	}
+    }
 }

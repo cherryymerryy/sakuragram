@@ -9,7 +9,25 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel Orientation="Vertical">
-        <TextBlock x:Name="Username" Text="@username" />
+    <StackPanel Orientation="Horizontal" Margin="0, 5, 0, 5">
+        <Border x:Name="BorderProfilePicture" Width="32" Height="32" CornerRadius="30" Margin="5">
+            <Border.Background>
+                <ImageBrush x:Name="ProfilePicture" />
+            </Border.Background>
+        </Border>
+        <Border MinWidth="150" MaxWidth="300" Width="Auto" DoubleTapped="UIElement_OnDoubleTapped" RightTapped="UIElement_OnRightTapped" Background="Black" CornerRadius="10">
+            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical" Padding="5">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="DisplayName" Text="@username" FontStyle="Oblique" Foreground="Orange" />
+                    <TextBlock x:Name="Status" 
+                               Text="Status" 
+                               FontStyle="Oblique" 
+                               Foreground="Gray" 
+                               HorizontalTextAlignment="Right" 
+                               HorizontalAlignment="Right"/>
+                </StackPanel>
+                <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
     </StackPanel>
 </Page>
