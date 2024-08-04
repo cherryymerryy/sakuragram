@@ -196,7 +196,13 @@ namespace CherryMerryGram.Views.Chats
 
         private void Forward_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            _client.ExecuteAsync(new TdApi.ForwardMessages
+            {
+                ChatId = -4214922794,
+                FromChatId = _chatId,
+                MessageIds = new[] { _messageId },
+                Options = new TdApi.MessageSendOptions()
+            });
         }
 
         private void Edit_OnClick(object sender, RoutedEventArgs e)

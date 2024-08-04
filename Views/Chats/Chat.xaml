@@ -8,14 +8,14 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="10">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0, 10">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
         
-        <Grid VerticalAlignment="Top" Row="0">
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Row="0">
             <Border Background="Gray">
                 <StackPanel x:Name="TopBar" Orientation="Horizontal">
                     <Button x:Name="Back" Content="Back" Click="Back_OnClick" HorizontalAlignment="Left" />
@@ -28,7 +28,7 @@
             </Border>
         </Grid>
         
-        <Grid VerticalAlignment="Top" Row="1">
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Row="1">
             <Border>
                 <Border.Background>
                     <ImageBrush x:Name="ThemeBackground" />
