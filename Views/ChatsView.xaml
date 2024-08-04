@@ -9,12 +9,12 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel Orientation="Horizontal" Padding="0, 50, 0, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <ScrollView>
-            <StackPanel x:Name="ChatsList" Width="350" />
-        </ScrollView>
-        <ScrollView>
-            <StackPanel x:Name="Chat" />
-        </ScrollView>
-    </StackPanel>
+    <Grid Padding="0, 50, 0, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <StackPanel Orientation="Horizontal">
+            <ScrollView>
+                <StackPanel x:Name="ChatsList" Width="350" />
+            </ScrollView>
+            <Grid x:Name="Chat" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </StackPanel>
+    </Grid>
 </Page>

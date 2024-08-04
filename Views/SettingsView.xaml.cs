@@ -10,8 +10,7 @@ namespace CherryMerryGram.Views
         public SettingsView()
         {
             this.InitializeComponent();
-
-            GetLatestVersion();
+            _ = GetLatestVersion();
         }
 
         private async Task GetLatestVersion()

@@ -17,8 +17,8 @@ namespace CherryMerryGram.Views
         {
             this.InitializeComponent();
             
-            GenerateChatEntries();
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
+            GenerateChatEntries(); 
+            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
         }
 
         private Task ProcessUpdates(TdApi.Update update)

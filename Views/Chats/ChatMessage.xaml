@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel Orientation="Horizontal" Margin="0, 5, 0, 5">
+    <StackPanel x:Name="Message" Orientation="Horizontal" Margin="0, 5, 0, 5">
         <Border x:Name="BorderProfilePicture" Width="32" Height="32" CornerRadius="30" Margin="5">
             <Border.Background>
                 <ImageBrush x:Name="ProfilePicture" />
@@ -30,4 +30,19 @@
             </StackPanel>
         </Border>
     </StackPanel>
+    
+    <Page.Resources>
+        <CommandBarFlyout Placement="Right" x:Name="CommandBarFlyout1">
+            <AppBarButton x:Name="Reply" Label="Reply" ToolTipService.ToolTip="Share" Click="Reply_OnClick"/>
+            <AppBarButton x:Name="Forward" Label="Forward" ToolTipService.ToolTip="Save" Click="Forward_OnClick"/>
+            <AppBarButton x:Name="Edit" Label="Edit" ToolTipService.ToolTip="Save" Click="Edit_OnClick"/>
+            <AppBarButton x:Name="Delete" Label="Delete" ToolTipService.ToolTip="Delete" Click="Delete_OnClick"/>
+            <AppBarButton x:Name="Pin" Label="Pin" ToolTipService.ToolTip="Delete" Click="Pin_OnClick"/>
+            <AppBarButton x:Name="MessageLink" Label="Copy message link" ToolTipService.ToolTip="Delete" Click="MessageLink_OnClick"/>
+            <CommandBarFlyout.SecondaryCommands>
+                <AppBarButton x:Name="ResizeButton1" Label="Resize"/>
+                <AppBarButton x:Name="MoveButton1" Label="Move"/>
+            </CommandBarFlyout.SecondaryCommands>
+        </CommandBarFlyout>
+    </Page.Resources>
 </Page>

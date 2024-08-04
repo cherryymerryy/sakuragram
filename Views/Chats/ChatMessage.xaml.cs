@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using TdLib;
 using CherryMerryGram;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 
@@ -13,14 +14,34 @@ namespace CherryMerryGram.Views.Chats
     public sealed partial class ChatMessage : Page
     {
         private static TdClient _client = MainWindow._client;
+        private bool _isContextMenuOpen = false;
+        
+        private long _chatId;
+        private long _messageId;
+        
         
         public ChatMessage()
         {
             this.InitializeComponent();
+            
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
-        
-        public async void  UpdateMessage(TdApi.Message message)
+
+        private async Task ProcessUpdates(TdApi.Update update)
         {
+            switch (update)
+            {
+                case TdApi.Update.UpdateMessageEdited:  
+                    await UpdateMessageAfterEdit(); 
+                    break;
+            }
+        }
+
+        public async void UpdateMessage(TdApi.Message message)
+        {
+            _chatId = message.ChatId;
+            _messageId = message.Id;
+            
             var user = GetUser(message);
             var chatMember = GetChatMember(message.ChatId, message.SenderId);
             var chat = GetChat(message.ChatId);
@@ -96,6 +117,23 @@ namespace CherryMerryGram.Views.Chats
             };
         }
 
+        private Task UpdateMessageAfterEdit()
+        {
+            var message = _client.ExecuteAsync(new TdApi.GetMessage
+            {
+                ChatId = _chatId,
+                MessageId = _messageId
+            });
+            
+            MessageContent.Text = message.Result.Content switch
+            {
+                TdApi.MessageContent.MessageText messageText => MessageContent.Text = messageText.Text.Text,
+                _ => MessageContent.Text
+            };
+            
+            return Task.CompletedTask;
+        }
+        
         private static Task<TdApi.User> GetUser(TdApi.Message message)
         {
             long userId = message.SenderId switch {
@@ -133,14 +171,59 @@ namespace CherryMerryGram.Views.Chats
             return chat;
         }
 
+        private void ShowMenu(bool isTransient)
+        {
+            _isContextMenuOpen = isTransient;
+            FlyoutShowOptions myOption = new FlyoutShowOptions();
+            myOption.ShowMode = isTransient ? FlyoutShowMode.Transient : FlyoutShowMode.Standard;
+            CommandBarFlyout1.ShowAt(Message, myOption);
+        }
+        
         private void UIElement_OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            ShowMenu(!_isContextMenuOpen);
         }
 
         private void UIElement_OnDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             throw new System.NotImplementedException();
+        }
+
+        private void Reply_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Forward_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Edit_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.ExecuteAsync(new TdApi.EditMessageText
+            {
+
+            });
+        }
+
+        private void Delete_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.ExecuteAsync(new TdApi.DeleteMessages
+            {
+                ChatId = _chatId,
+                MessageIds = new[] { _messageId }
+            });
+        }
+
+        private void Pin_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.PinChatMessageAsync(_chatId, _messageId, true);
+        }
+
+        private void MessageLink_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.GetMessageLinkAsync(_chatId, _messageId);
         }
     }
 }

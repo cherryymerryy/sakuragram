@@ -5,41 +5,93 @@ using System.Linq;
 using System.Threading.Tasks;
 using TdLib;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace CherryMerryGram.Views.Chats
 {
     public sealed partial class Chat : Page
     {
         private static TdClient _client = MainWindow._client;
-        private static IEnumerable<Task<TdApi.Chat>> _chat;
-        private static long _chatId;
+        public long ChatId;
+        private List<TdApi.Message> _messagesList = [];
         
         public Chat()
         {
             this.InitializeComponent();
+            
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
-        public void UpdateChat(long chatId)
+        private async Task ProcessUpdates(TdApi.Update update)
         {
-            _chatId = chatId;
+            switch (update)
+            {
+                case TdApi.Update.UpdateNewMessage: { await GetMessages(ChatId); break; }
+                case TdApi.Update.UpdateChatTitle: { await UpdateChat(ChatId); break; }
+            }
+        }
+
+        public Task UpdateChat(long chatId)
+        {
             var chat = _client.GetChatAsync(chatId);
             ChatTitle.Text = chat.Result.Title;
-            GetMessages(chatId);
+            
+            //_client.ExecuteAsync(new TdApi.DownloadFile { FileId = chat.Result.Background.Background.Id, Priority = 1 });
+            
+            //ThemeBackground.ImageSource = new BitmapImage();
+
+            /*switch (chat.Result.Type)
+            {
+                case TdApi.ChatType.ChatTypeBasicGroup:
+                {
+                    var basicGroup = _client.ExecuteAsync(new TdApi.GetBasicGroupFullInfo {BasicGroupId = ChatId});
+                    if (basicGroup == null) return Task.CompletedTask;
+                    ChatMembers.Text = $"{basicGroup.Result.Members.Length} members";
+                    break;
+                }
+                case TdApi.ChatType.ChatTypeSupergroup:
+                {
+                    var superGroup = _client.ExecuteAsync(new TdApi.GetSupergroupFullInfo {SupergroupId = ChatId});
+                    if (superGroup == null) return Task.CompletedTask;
+                    ChatMembers.Text = $"{superGroup.Result.MemberCount} members";
+                    break;
+                }
+                default:
+                {
+                    ChatMembers.Visibility = Visibility.Collapsed;
+                    break;
+                }
+            }*/
+            
+            return Task.CompletedTask;
         }
         
-        private void GetMessages(long chatId)
+        public Task GetMessages(long chatId)
         {
             var messages = _client.ExecuteAsync(new TdApi.GetChatHistory
             {
                 ChatId = chatId,
                 Limit = 100
             });
+
+            GenerateMessage();
             
-            foreach (var message in messages.Result.Messages_.Reverse())
+            return Task.CompletedTask;
+
+            void GenerateMessage()
             {
-                var chatMessage = new ChatMessage();
-                chatMessage.UpdateMessage(message);
-                MessagesList.Children.Add(chatMessage);
+                foreach (var message in messages.Result.Messages_.Reverse())
+                {
+                    var chatMessage = new ChatMessage();
+                    chatMessage.UpdateMessage(message);
+                    MessagesList.Children.Add(chatMessage);
+                    _messagesList.Add(message);
+
+                    if (_messagesList.Count == messages.Result.Messages_.Length ||
+                        _messagesList.Contains(message)) continue;
+                    GenerateMessage();
+                    return;
+                }
             }
         }
 
@@ -68,7 +120,7 @@ namespace CherryMerryGram.Views.Chats
         {
             await _client.ExecuteAsync(new TdApi.SendMessage
             {
-                ChatId = _chatId,
+                ChatId = ChatId,
                 InputMessageContent = new TdApi.InputMessageContent.InputMessageText
                 {
                     Text = new TdApi.FormattedText
@@ -78,14 +130,14 @@ namespace CherryMerryGram.Views.Chats
                 }
             });
             
-            UserMessageInput.Text = "";
+            UserMessageInput.ClearValue(null);
         }
 
         private void Call_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                var chat = _client.GetChatAsync(_chatId);
+                var chat = _client.GetChatAsync(ChatId);
                 var messageSenderId = GetId(chat.Result.MessageSenderId);
 
                 _client.ExecuteAsync(new TdApi.CreateCall { IsVideo = false, Protocol = new TdApi.CallProtocol(), UserId = messageSenderId });
@@ -94,6 +146,10 @@ namespace CherryMerryGram.Views.Chats
             {
                 Console.WriteLine(exception);
             }
+        }
+
+        private void Back_OnClick(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

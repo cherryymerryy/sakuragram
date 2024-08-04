@@ -10,7 +10,7 @@ namespace CherryMerryGram.Views.Chats
 {
     public sealed partial class ChatEntry : Page
     {
-        public StackPanel ChatPage;
+        public Grid ChatPage;
         private static Chat _chatWidget;
 
         private static readonly TdClient _client = MainWindow._client;
@@ -81,8 +81,10 @@ namespace CherryMerryGram.Views.Chats
             }
             
             _chatWidget = new Chat();
-            ChatPage?.Children.Add(_chatWidget);
+            _chatWidget.ChatId = _chatId;
             _chatWidget.UpdateChat(_chatId);
+            _chatWidget.GetMessages(_chatId);
+            ChatPage?.Children.Add(_chatWidget);
         }
 
         private static Task<TdApi.User> GetUser(TdApi.Message message)
