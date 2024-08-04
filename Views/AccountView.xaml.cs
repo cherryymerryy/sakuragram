@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.UI.Xaml.Controls;
 using TdLib;
 using System.Threading.Tasks;
@@ -17,7 +18,6 @@ namespace CherryMerryGram.Views
         private string _username;
         private string _bio;
         private string _phoneNumber;
-        private TdApi.ProfilePhoto _profilePicture;
 
 		public AccountView()
 		{
@@ -29,19 +29,20 @@ namespace CherryMerryGram.Views
         private async void InitializeAllVariables()
         {
             var currentUser = await GetCurrentUser();
+            var userFullInfo = await _client.GetUserFullInfoAsync(currentUser.Id);
             GetProfilePhoto(currentUser);
             
             _firstName = $"{currentUser.FirstName}";
             _lastName = $"{currentUser.LastName}";
             _username = $"@{currentUser.Usernames?.ActiveUsernames[0]}";
-            //_bio = $"{}"
+            _bio = $"{userFullInfo.Bio.Text}";
             _phoneNumber = $"+{currentUser.PhoneNumber}";
 
-            textBlock_Username.Text = _username; 
-            textBlock_FirstName.Text = _firstName;
-            textBlock_LastName.Text = _lastName;
-            textBlock_Bio.Text = "я не ебу как достать био, чес слово";
-            textBlock_PhoneNumber.Content = _phoneNumber;
+            TextBoxUsername.Text = _username; 
+            TextBoxFirstName.Text = _firstName;
+            TextBoxLastName.Text = _lastName;
+            TextBoxBio.Text = _bio;
+            TextBoxPhoneNumber.Content = _phoneNumber;
         }
 
         private async void GetProfilePhoto(TdApi.User user)
@@ -53,8 +54,10 @@ namespace CherryMerryGram.Views
                     FileId = user.ProfilePhoto.Big.Id,
                     Priority = 1
                 });
-            
-                image_ProfilePicture.ImageSource = new BitmapImage(new Uri(profilePhoto.Local.Path));
+                
+                if (!Directory.Exists(profilePhoto.Local.Path)) return;
+                
+                ImageProfilePicture.ImageSource = new BitmapImage(new Uri(profilePhoto.Local.Path));
             }
             catch (Exception e)
             {
@@ -73,37 +76,37 @@ namespace CherryMerryGram.Views
             await _client.ExecuteAsync(new TdApi.LogOut());
         }
 
-        private void TextBlock_PhoneNumber_OnClick(object sender, RoutedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         private void Button_Apply_OnClick(object sender, RoutedEventArgs e)
         {
-            //_client.ExecuteAsync(new TdApi.SetProfilePhoto
-            //{
-            //  Photo = _profilePicture
-            //});
-            
-            _client.ExecuteAsync(new TdApi.SetName
+            if (TextBoxUsername.Text != _username)
             {
-                FirstName = _firstName,
-                LastName = _lastName
-            });
-
-            //if (_bio != GetCurrentUser().Result.Extra.)
-            //{
-            //    _client.ExecuteAsync(new TdApi.SetBio
-            //    {
-            //        Bio = _bio
-            //    });
-            //}
-
-            if (_username != GetCurrentUser().Result.Usernames.ActiveUsernames[0])
-            {
+                _username = TextBoxUsername.Text;
+                
                 _client.ExecuteAsync(new TdApi.SetUsername
                 {
                     Username = _username
+                });
+            }
+
+            if (TextBoxFirstName.Text != _firstName || TextBoxLastName.Text != _lastName)
+            {
+                _firstName = TextBoxFirstName.Text;
+                _lastName = TextBoxLastName.Text;
+                
+                _client.ExecuteAsync(new TdApi.SetName
+                {
+                    FirstName = _firstName,
+                    LastName = _lastName
+                });
+            }
+
+            if (TextBoxBio.Text != _bio)
+            {
+                _bio = TextBoxBio.Text;
+                
+                _client.ExecuteAsync(new TdApi.SetBio
+                {
+                    Bio = _bio
                 });
             }
         }

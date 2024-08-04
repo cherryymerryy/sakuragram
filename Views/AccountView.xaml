@@ -9,26 +9,26 @@
 	mc:Ignorable="d"
 	Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-	<StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal" Padding="0, 50, 0, 0" >
-		<Border Width="128px"
-		        Height="128px"
-		        HorizontalAlignment="Left"
-		        VerticalAlignment="Top"
-		        CornerRadius="100">
-			<Border.Background>
-				<ImageBrush x:Name="image_ProfilePicture" />
-			</Border.Background>
-		</Border>
-		<StackPanel Orientation="Vertical">
-			<TextBox x:Name="textBlock_FirstName" PlaceholderText="Enter your first name" />
-			<TextBox x:Name="textBlock_LastName" PlaceholderText="Enter your last name" />
-			<TextBox x:Name="textBlock_Username" PlaceholderText="Enter your @username" />
-			<TextBox x:Name="textBlock_Bio" PlaceholderText="Enter your bio" />
-			<HyperlinkButton x:Name="textBlock_PhoneNumber" Click="TextBlock_PhoneNumber_OnClick"/>
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-				<Button x:Name="button_Apply" Content="Apply" Click="Button_Apply_OnClick" IsEnabled="False" />
-				<Button x:Name="button_LogOut" Content="Log out" Click="Button_LogOut_OnClick" />
+	<Border Background="#383838" Width="300" Height="500" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="20">
+		<StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Orientation="Vertical" Padding="0, 50, 0, 0" >
+			<Border Background="#2D2D2D" Width="134" Height="134" Margin="0, 10, 0, 10" HorizontalAlignment="Center" VerticalAlignment="Top" CornerRadius="100">
+				<Border Width="128" Height="128" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="100">
+					<Border.Background>
+						<ImageBrush x:Name="ImageProfilePicture" />
+					</Border.Background>
+				</Border>
+			</Border>
+			<StackPanel Orientation="Vertical" Width="Auto">
+				<TextBox x:Name="TextBoxFirstName" PlaceholderText="Enter your first name" />
+				<TextBox x:Name="TextBoxLastName" PlaceholderText="Enter your last name" />
+				<TextBox x:Name="TextBoxUsername" PlaceholderText="Enter your @username" />
+				<TextBox x:Name="TextBoxBio" PlaceholderText="Enter your bio" />
+				<HyperlinkButton x:Name="TextBoxPhoneNumber" Width="Auto" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+				<StackPanel Orientation="Horizontal" Width="Auto" HorizontalAlignment="Stretch">
+					<Button x:Name="ButtonApply" Content="Apply" Click="Button_Apply_OnClick" IsEnabled="True" />
+					<Button x:Name="ButtonLogOut" Content="Log out" Click="Button_LogOut_OnClick" />
+				</StackPanel>
 			</StackPanel>
-		</StackPanel>
-    </StackPanel>
+	    </StackPanel>
+	</Border>
 </Page>
