@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /.idea
 /Config/*
+/CherryMerryGramDesktop/Config
+CherryMerryGramDesktop/Config/Config.cs
