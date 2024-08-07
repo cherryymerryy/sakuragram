@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="CherryMerryGram.Views.Chats.ChatEntry"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Button 
+        Click="Button_OnClick"
+        HorizontalContentAlignment="Left"
+        VerticalContentAlignment="Center"
+        Margin="5, 2, 5, 2"
+        MinWidth="340">
+        
+        <StackPanel Orientation="Horizontal">
+            
+            <Border Width="42px"
+                    Height="42px"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    CornerRadius="30"
+                    Margin="10">
+                <Border.Background>
+                    <ImageBrush x:Name="ChatEntryProfilePicture" />
+                </Border.Background>
+            </Border>
+            
+            <StackPanel Orientation="Vertical">
+                <TextBlock x:Name="TextBlockChatName" FontSize="14"/>
+                <TextBlock x:Name="TextBlockChatLastMessage" FontSize="10" />
+            </StackPanel>
+            
+            <StackPanel HorizontalAlignment="Right" Orientation="Vertical">
+                <Border Background="Black" CornerRadius="10">
+                    <TextBlock x:Name="UnreadMessagesCount" Padding="5" TextAlignment="Center" />
+                </Border>
+                <TextBlock x:Name="SendTime" />
+            </StackPanel>
+            
+        </StackPanel>
+        
+    </Button>
+</Page>

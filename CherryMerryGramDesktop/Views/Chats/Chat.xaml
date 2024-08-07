@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="CherryMerryGram.Views.Chats.Chat"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0, 10">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Row="0">
+            <Border Background="Gray">
+                <StackPanel x:Name="TopBar" Orientation="Horizontal">
+                    <Button x:Name="Back" Content="Back" Click="Back_OnClick" HorizontalAlignment="Left" />
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                        <TextBlock x:Name="ChatTitle" FontSize="18" FontStyle="Oblique"/>
+                        <TextBlock x:Name="ChatMembers" FontSize="14"/>
+                    </StackPanel>
+                    <Button x:Name="Call" Content="Call" Click="Call_OnClick" HorizontalAlignment="Right" />
+                </StackPanel>
+            </Border>
+        </Grid>
+        
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Row="1">
+            <Border>
+                <Border.Background>
+                    <ImageBrush x:Name="ThemeBackground" />
+                </Border.Background>
+                <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <StackPanel x:Name="MessagesList"/>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+        
+        <Grid Row="2">
+            <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"/>
+                <Button x:Name="Stickers" Content="Stickers" Width="70" MaxHeight="25" MaxWidth="25" />
+                <Button x:Name="SendMessage" Content="Send" Width="70" MaxHeight="25" MaxWidth="25" Click="SendMessage_OnClick" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
