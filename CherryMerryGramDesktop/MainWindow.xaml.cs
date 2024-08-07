@@ -1,21 +1,23 @@
-using Microsoft.UI.Xaml;
 using System;
 using System.IO;
-using System.Threading.Tasks;
-using TdLib.Bindings;
-using TdLib;
-using System.Threading;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Controls;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using CherryMerryGram.Config;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
+using TdLib;
+using TdLib.Bindings;
+using CherryMerryGramDesktop;
 
-namespace CherryMerryGram
+namespace CherryMerryGramDesktop
 {
 	public sealed partial class MainWindow : Window
 	{
 		private NavigationViewItem _lastItem;
-		private static Config.Config _config;
+		private static CherryMerryGram.Config.Config _config;
 
 		public static TdClient _client;
 		private static readonly ManualResetEventSlim ReadyToAuthenticate = new();
@@ -33,7 +35,7 @@ namespace CherryMerryGram
 			jsonClient.Send(json);
 			var result = jsonClient.Receive(timeout);
 			
-			_config = new Config.Config();
+			_config = new CherryMerryGram.Config.Config();
 			_client = new TdClient();
 			_client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
 
@@ -50,15 +52,15 @@ namespace CherryMerryGram
 					var filesLocation = Path.Combine(AppContext.BaseDirectory, "db");
 					await _client.ExecuteAsync(new TdApi.SetTdlibParameters
 					{
-						ApiId = Config.Config.ApiId,
-						ApiHash = Config.Config.ApiHash,
+						ApiId = Config.ApiId,
+						ApiHash = Config.ApiHash,
 						UseFileDatabase = true,
 						UseChatInfoDatabase = true,
 						UseMessageDatabase = true,
 						UseSecretChats = true,
-						DeviceModel = "PC",
+						DeviceModel = "Desktop",
 						SystemLanguageCode = "en",
-						ApplicationVersion = Config.Config.ApplicationVersion,
+						ApplicationVersion = Config.ApplicationVersion,
 						DatabaseDirectory = filesLocation,
 						FilesDirectory = filesLocation,
 					});
@@ -151,7 +153,7 @@ namespace CherryMerryGram
 
 		public bool NavigateToView(string clickedView)
 		{
-			var view = Assembly.GetExecutingAssembly().GetType($"CherryMerryGram.Views.{clickedView}");
+			var view = Assembly.GetExecutingAssembly().GetType($"CherryMerryGramDesktop.Views.{clickedView}");
 
 			if (string.IsNullOrEmpty(clickedView) || view == null)
 				return false;

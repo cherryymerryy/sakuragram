@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 
-namespace CherryMerryGram
+namespace CherryMerryGramDesktop
 {
     public partial class App : Application
     {
@@ -10,10 +10,10 @@ namespace CherryMerryGram
         }
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = new MainWindow();
-            m_window.Activate();
+            _mWindow = new MainWindow();
+            _mWindow.Activate();
         }
 
-        private Window m_window;
+        private Window _mWindow;
     }
 }

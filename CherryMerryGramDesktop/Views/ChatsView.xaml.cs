@@ -1,13 +1,11 @@
-using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
-using TdLib;
-using CherryMerryGram;
-using CherryMerryGram.Views.Chats;
-using System;
-using System.Threading;
 using System.Threading.Tasks;
+using CherryMerryGram;
+using CherryMerryGramDesktop.Views.Chats;
+using Microsoft.UI.Xaml.Controls;
+using TdLib;
 
-namespace CherryMerryGram.Views
+namespace CherryMerryGramDesktop.Views
 {
     public sealed partial class ChatsView : Page
     {

@@ -1,8 +1,9 @@
+using CherryMerryGram;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TdLib;
 
-namespace CherryMerryGram.Views
+namespace CherryMerryGramDesktop.Views
 {
 	public sealed partial class LoginView : Page
 	{

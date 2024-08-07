@@ -1,15 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml.Controls;
-using TdLib;
 using CherryMerryGram;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
+using TdLib;
 
-namespace CherryMerryGram.Views.Chats
+namespace CherryMerryGramDesktop.Views.Chats
 {
     public sealed partial class ChatMessage : Page
     {

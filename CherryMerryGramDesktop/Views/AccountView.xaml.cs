@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Microsoft.UI.Xaml.Controls;
-using TdLib;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.DataTransfer;
+using CherryMerryGram;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
+using TdLib;
 
-namespace CherryMerryGram.Views
+namespace CherryMerryGramDesktop.Views
 {
 	public sealed partial class AccountView : Page
 	{
