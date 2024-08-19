@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CherryMerryGramDesktop.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -15,10 +16,13 @@ namespace CherryMerryGramDesktop.Views.Chats
         private static TdClient _client = App._client;
         public long ChatId;
         private List<TdApi.Message> _messagesList = [];
+        private ForwardService _forwardService;
         
         public Chat()
         {
             InitializeComponent();
+
+            _forwardService = new ForwardService();
             
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
@@ -96,6 +100,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 foreach (var message in messages.Result.Messages_.Reverse())
                 {
                     var chatMessage = new ChatMessage();
+                    chatMessage._forwardService = _forwardService;
                     chatMessage.UpdateMessage(message);
                     MessagesList.Children.Add(chatMessage);
                     _messagesList.Add(message);

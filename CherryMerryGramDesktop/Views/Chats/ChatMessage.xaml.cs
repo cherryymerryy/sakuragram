@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using CherryMerryGramDesktop.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -17,11 +18,12 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         private long _chatId;
         private long _messageId;
-        
+
+        public ForwardService _forwardService;
         
         public ChatMessage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
@@ -53,13 +55,13 @@ namespace CherryMerryGramDesktop.Views.Chats
             _chatId = message.ChatId;
             _messageId = message.Id;
             
-            var user = GetUser(message);
-            var chatMember = GetChatMember(message.ChatId, message.SenderId);
-            var chat = GetChat(message.ChatId);
-            var chatType = chat.Result.Type;
-            var userProfilePicture = user.Result.ProfilePhoto;
+            var user = GetUser(message).Result;
+            var chatMember = GetChatMember(message.ChatId, message.SenderId).Result;
+            var chat = GetChat(message.ChatId).Result;
+            var chatType = chat.Type;
+            var userProfilePicture = user.ProfilePhoto;
 
-            if (chat.Result.Type is not TdApi.ChatType.ChatTypePrivate && chat.Result.Permissions.CanSendBasicMessages)
+            if (chat.Type is not TdApi.ChatType.ChatTypePrivate && chat.Permissions.CanSendBasicMessages)
             {
                 try
                 {
@@ -82,24 +84,26 @@ namespace CherryMerryGramDesktop.Views.Chats
                 BorderProfilePicture.Visibility = Visibility.Collapsed;
             }
 
-            DisplayName.Text = chat.Result.Type switch
+            DisplayName.Text = chat.Type switch
             {
-                TdApi.ChatType.ChatTypePrivate => DisplayName.Text = $"{user.Result.FirstName} {user.Result.LastName}",
-                TdApi.ChatType.ChatTypeSecret => DisplayName.Text = $"{user.Result.FirstName} {user.Result.LastName}",
-                TdApi.ChatType.ChatTypeBasicGroup => DisplayName.Text = chat.Result.Title,
+                TdApi.ChatType.ChatTypePrivate => DisplayName.Text = $"{user.FirstName} {user.LastName}",
+                TdApi.ChatType.ChatTypeSecret => DisplayName.Text = $"{user.FirstName} {user.LastName}",
+                TdApi.ChatType.ChatTypeBasicGroup => DisplayName.Text = chat.Title,
                 _ => DisplayName.Text
             };
 
-            if (chatType is TdApi.ChatType.ChatTypeSupergroup && chat.Result.Permissions.CanSendBasicMessages)
+            //DisplayName.Foreground = user.AccentColorId;
+
+            if (chatType is TdApi.ChatType.ChatTypeSupergroup && chat.Permissions.CanSendBasicMessages)
             {
-                DisplayName.Text = $"{user.Result.FirstName} {user.Result.LastName}";
+                DisplayName.Text = $"{user.FirstName} {user.LastName}";
             }
-            else if (chatType is TdApi.ChatType.ChatTypeSupergroup && !chat.Result.Permissions.CanSendBasicMessages)
+            else if (chatType is TdApi.ChatType.ChatTypeSupergroup && !chat.Permissions.CanSendBasicMessages)
             {
-                DisplayName.Text = chat.Result.Title;
+                DisplayName.Text = chat.Title;
             }
             
-            Status.Visibility = chat.Result.Type switch
+            Status.Visibility = chat.Type switch
             {
                 TdApi.ChatType.ChatTypePrivate => Status.Visibility = Visibility.Collapsed,
                 TdApi.ChatType.ChatTypeSecret => Status.Visibility = Visibility.Collapsed,
@@ -108,9 +112,9 @@ namespace CherryMerryGramDesktop.Views.Chats
                 _ => Status.Visibility
             };
 
-            if (chatType is TdApi.ChatType.ChatTypeSupergroup && chat.Result.Permissions.CanSendBasicMessages)
+            if (chatType is TdApi.ChatType.ChatTypeSupergroup && chat.Permissions.CanSendBasicMessages)
             {
-                Status.Text = chatMember.Result.Status switch
+                Status.Text = chatMember.Status switch
                 {
                     TdApi.ChatMemberStatus.ChatMemberStatusCreator => Status.Text += " (creator)",
                     TdApi.ChatMemberStatus.ChatMemberStatusAdministrator => Status.Text += " (admin)",
@@ -190,13 +194,7 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void Forward_OnClick(object sender, RoutedEventArgs e)
         {
-            _client.ExecuteAsync(new TdApi.ForwardMessages
-            {
-                ChatId = -4214922794,
-                FromChatId = _chatId,
-                MessageIds = new[] { _messageId },
-                Options = new TdApi.MessageSendOptions()
-            });
+            _forwardService.ForwardMessages(-4214922794, _chatId);
         }
 
         private void Edit_OnClick(object sender, RoutedEventArgs e)
@@ -230,6 +228,15 @@ namespace CherryMerryGramDesktop.Views.Chats
             Clipboard.SetContent(dataPackage);
             
             ShowMenu(false);
+        }
+
+        private void Select_OnClick(object sender, RoutedEventArgs e)
+        {
+            _forwardService.SelectMessageToForward(_messageId);
+        }
+
+        private void Report_OnClick(object sender, RoutedEventArgs e)
+        {
         }
     }
 }
