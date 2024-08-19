@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DoubleTapped="ChatMessage_OnDoubleTapped">
 
     <StackPanel x:Name="Message" Orientation="Horizontal" Margin="0, 5, 0, 5">
         <Border x:Name="BorderProfilePicture" Width="32" Height="32" CornerRadius="30" Margin="5">
@@ -14,7 +15,7 @@
                 <ImageBrush x:Name="ProfilePicture" />
             </Border.Background>
         </Border>
-        <Border MinWidth="150" MaxWidth="300" Width="Auto" DoubleTapped="UIElement_OnDoubleTapped" RightTapped="UIElement_OnRightTapped" Background="Black" CornerRadius="10">
+        <Border MinWidth="150" MaxWidth="300" Width="Auto" RightTapped="UIElement_OnRightTapped" Background="Black" CornerRadius="10">
             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical" Padding="5">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock x:Name="DisplayName" Text="@username" FontStyle="Oblique" Foreground="Orange" />
@@ -25,6 +26,12 @@
                                HorizontalTextAlignment="Right" 
                                HorizontalAlignment="Right"/>
                 </StackPanel>
+                <Border x:Name="Reply" Visibility="Collapsed" Background="#040404" CornerRadius="4">
+                    <StackPanel Padding="2">
+                        <TextBlock x:Name="ReplyFirstName" />
+                        <TextBlock x:Name="ReplyInputContent" />
+                    </StackPanel>
+                </Border>
                 <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" />
             </StackPanel>
         </Border>
@@ -32,16 +39,16 @@
     
     <Page.Resources>
         <CommandBarFlyout Placement="Bottom" x:Name="CommandBarFlyout1">
-            <AppBarButton x:Name="Reply" Label="Reply" ToolTipService.ToolTip="Share" Click="Reply_OnClick"/>
-            <AppBarButton x:Name="Forward" Label="Forward" ToolTipService.ToolTip="Save" Click="Forward_OnClick"/>
-            <AppBarButton x:Name="Select" Label="Select" ToolTipService.ToolTip="Save" Click="Select_OnClick"/>
-            <AppBarButton x:Name="Edit" Label="Edit" ToolTipService.ToolTip="Save" Click="Edit_OnClick"/>
-            <AppBarButton x:Name="Delete" Label="Delete" Icon="Delete" ToolTipService.ToolTip="Delete" Click="Delete_OnClick"/>
-            <AppBarButton x:Name="Pin" Label="Pin" ToolTipService.ToolTip="Delete" Click="Pin_OnClick"/>
+            <AppBarButton x:Name="ContextMenuReply" Label="Reply" ToolTipService.ToolTip="Share" Click="Reply_OnClick"/>
+            <AppBarButton x:Name="ContextMenuForward" Label="Forward" ToolTipService.ToolTip="Save" Click="Forward_OnClick"/>
+            <AppBarButton x:Name="ContextMenuSelect" Label="Select" ToolTipService.ToolTip="Save" Click="Select_OnClick"/>
+            <AppBarButton x:Name="ContextMenuEdit" Label="Edit" ToolTipService.ToolTip="Save" Click="Edit_OnClick"/>
+            <AppBarButton x:Name="ContextMenuDelete" Label="Delete" Icon="Delete" ToolTipService.ToolTip="Delete" Click="Delete_OnClick"/>
+            <AppBarButton x:Name="ContextMenuPin" Label="Pin" ToolTipService.ToolTip="Delete" Click="Pin_OnClick"/>
             <CommandBarFlyout.SecondaryCommands>
-                <AppBarButton x:Name="Report" Label="Report" ToolTipService.ToolTip="Save" Click="Report_OnClick"/>
-                <AppBarButton x:Name="MessageLink" Label="Copy message link" ToolTipService.ToolTip="Delete" Click="MessageLink_OnClick"/>
-                <AppBarButton x:Name="MessageId" Content="Message ID:" />
+                <AppBarButton x:Name="ContextMenuReport" Label="Report" ToolTipService.ToolTip="Save" Click="Report_OnClick"/>
+                <AppBarButton x:Name="ContextMenuMessageLink" Label="Copy message link" ToolTipService.ToolTip="Delete" Click="MessageLink_OnClick"/>
+                <AppBarButton x:Name="ContextMenuMessageId" Content="Message ID:" />
             </CommandBarFlyout.SecondaryCommands>
         </CommandBarFlyout>
     </Page.Resources>

@@ -16,15 +16,18 @@ namespace CherryMerryGramDesktop.Views.Chats
         private static TdClient _client = App._client;
         public long ChatId;
         private List<TdApi.Message> _messagesList = [];
+        
         private ForwardService _forwardService;
+        private ReplyService _replyService;
         
         public Chat()
         {
             InitializeComponent();
 
             _forwardService = new ForwardService();
+            _replyService = new ReplyService();
             
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private async Task ProcessUpdates(TdApi.Update update)
@@ -83,32 +86,40 @@ namespace CherryMerryGramDesktop.Views.Chats
             return Task.CompletedTask;
         }
         
-        public Task GetMessages(long chatId)
+        public async Task GetMessages(long chatId)
         {
-            var messages = _client.ExecuteAsync(new TdApi.GetChatHistory
-            {
-                ChatId = chatId,
-                Limit = 100
-            });
+            var offset = 0;
+            const int limit = 100;
 
-            GenerateMessage();
-            
-            return Task.CompletedTask;
-
-            void GenerateMessage()
+            while (true)
             {
-                foreach (var message in messages.Result.Messages_.Reverse())
+                var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
+                {
+                    ChatId = chatId,
+                    Offset = offset,
+                    Limit = limit
+                });
+
+                await GenerateMessage(messages);
+
+                if (messages.Messages_.Length < limit)
+                {
+                    break;
+                }
+
+                offset += limit;
+            }
+
+            async Task GenerateMessage(TdApi.Messages messages)
+            {
+                foreach (var message in messages.Messages_)
                 {
                     var chatMessage = new ChatMessage();
                     chatMessage._forwardService = _forwardService;
+                    chatMessage._replyService = _replyService;
                     chatMessage.UpdateMessage(message);
                     MessagesList.Children.Add(chatMessage);
                     _messagesList.Add(message);
-
-                    if (_messagesList.Count == messages.Result.Messages_.Length ||
-                        _messagesList.Contains(message)) continue;
-                    GenerateMessage();
-                    return;
                 }
             }
         }
@@ -136,19 +147,26 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         private async void SendMessage_OnClick(object sender, RoutedEventArgs e)
         {
-            await _client.ExecuteAsync(new TdApi.SendMessage
+            if (_replyService.GetReplyMessageId() == 0)
             {
-                ChatId = ChatId,
-                InputMessageContent = new TdApi.InputMessageContent.InputMessageText
+                await _client.ExecuteAsync(new TdApi.SendMessage
                 {
-                    Text = new TdApi.FormattedText
+                    ChatId = ChatId,
+                    InputMessageContent = new TdApi.InputMessageContent.InputMessageText
                     {
-                        Text = UserMessageInput.Text
+                        Text = new TdApi.FormattedText
+                        {
+                            Text = UserMessageInput.Text
+                        }
                     }
-                }
-            });
+                });
+            }
+            else
+            {
+                _replyService.ReplyOnMessage(ChatId, _replyService.GetReplyMessageId(), UserMessageInput.Text);
+            }
             
-            UserMessageInput.ClearValue(null);
+            UserMessageInput.ClearValue(TextBox.TextProperty);
         }
 
         private void Call_OnClick(object sender, RoutedEventArgs e)
