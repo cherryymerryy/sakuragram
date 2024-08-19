@@ -12,7 +12,13 @@ namespace CherryMerryGramDesktop.Views
 
 		public LoginView()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
+			Title = "CherryMerryGram : Login";
+			Window window = this;
+			window.ExtendsContentIntoTitleBar = true;
+			
+			TextBlockCurrentAuthState.Text = "Your phone";
+			TextBlockCurrentAuthStateDescription.Text = "Please confirm your country code and enter your phone number.";
 		}
 
 		private async void button_Next_Click(object sender, RoutedEventArgs e)
@@ -20,30 +26,37 @@ namespace CherryMerryGramDesktop.Views
 			switch (_loginState)
 			{
 				case 0:
-					button_Next.IsEnabled = false;
-					textBox_PhoneNumber.IsEnabled = false;
+					if (TextBoxPhoneNumber.Text == "") return;
+					ButtonNext.IsEnabled = false;
+					TextBoxPhoneNumber.IsEnabled = false;
 					await _client.ExecuteAsync(new TdApi.SetAuthenticationPhoneNumber
 					{
-						PhoneNumber = textBox_PhoneNumber.Text,
+						PhoneNumber = TextBoxPhoneNumber.Text,
 					});
 					_loginState++;
-					textBox_PhoneNumber.Visibility = Visibility.Collapsed;
-					textBox_Code.Visibility = Visibility.Visible;
-					button_Next.IsEnabled = true;
+					TextBlockCurrentAuthState.Text = "Phone verification";
+					TextBlockCurrentAuthStateDescription.Text = "We've sent the code to the Telegram app on your other device.";
+					TextBoxPhoneNumber.Visibility = Visibility.Collapsed;
+					TextBoxCode.Visibility = Visibility.Visible;
+					ButtonNext.IsEnabled = true;
 					break;
 				case 1:
-					button_Next.IsEnabled = false;
-					textBox_Code.IsEnabled = false;
+					if (TextBoxCode.Text == "") return;
+					ButtonNext.IsEnabled = false;
+					TextBoxCode.IsEnabled = false;
                     await _client.ExecuteAsync(new TdApi.CheckAuthenticationCode
 					{
-						Code = textBox_Code.Text
+						Code = TextBoxCode.Text
 					});
-					textBox_Code.Visibility = Visibility.Collapsed;
-					button_Next.IsEnabled = true;
+					TextBoxCode.Visibility = Visibility.Collapsed;
+					ButtonNext.IsEnabled = true;
 					if (App._passwordNeeded)
 					{
 						_loginState++;
-						textBox_Password.Visibility = Visibility.Visible; 
+						TextBoxPassword.Visibility = Visibility.Visible; 
+						TextBlockCurrentAuthState.Text = "Password";
+						TextBlockCurrentAuthStateDescription.Text = 
+							"You have Two-Step Verification enabled, so your account is protected with an additional password.";
 					}
 					else
 					{
@@ -53,19 +66,24 @@ namespace CherryMerryGramDesktop.Views
 					}
 					break;
 				case 2:
-					button_Next.IsEnabled = false;
-					textBox_Password.IsEnabled = false;
+					if (TextBoxPassword.Password == "") return;
+					ButtonNext.IsEnabled = false;
+					TextBoxPassword.IsEnabled = false;
                     await _client.ExecuteAsync(new TdApi.CheckAuthenticationPassword
 					{
-						Password = textBox_Password.Password
+						Password = TextBoxPassword.Password
 					});
 					_loginState = 0;
-					button_Next.IsEnabled = true;
+					ButtonNext.IsEnabled = true;
 					_mWindow = new MainWindow();
 					_mWindow.Activate();
 					Close();
 					break;
 			}
+		}
+
+		private void ForgotPassword_OnClick(object sender, RoutedEventArgs e)
+		{
 		}
 	}
 }

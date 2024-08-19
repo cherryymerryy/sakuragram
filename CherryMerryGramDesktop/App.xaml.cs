@@ -14,7 +14,7 @@ namespace CherryMerryGramDesktop
     {
         public App()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
         
         public static TdClient _client;
@@ -111,7 +111,7 @@ namespace CherryMerryGramDesktop
             }
         }
 
-        private Window _mWindow;
+        public Window _mWindow;
         private Window _loginWindow;
     }
 }

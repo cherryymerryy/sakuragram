@@ -20,10 +20,11 @@ namespace CherryMerryGramDesktop
 		
 		public MainWindow()
 		{
-			this.InitializeComponent();
-
+			InitializeComponent();
+			Title = "CherryMerryGram";
             Window window = this;
-            window.ExtendsContentIntoTitleBar = true;;
+            window.ExtendsContentIntoTitleBar = true;
+            NavigateToView("ChatsView");
 		}
 
 		private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e) 
@@ -43,7 +44,7 @@ namespace CherryMerryGramDesktop
 			_lastItem = item;
 		}
 
-		public bool NavigateToView(string clickedView)
+		private bool NavigateToView(string clickedView)
 		{
 			var view = Assembly.GetExecutingAssembly().GetType($"CherryMerryGramDesktop.Views.{clickedView}");
 

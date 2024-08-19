@@ -14,7 +14,6 @@
 				Loaded="NavView_Loaded"
 				SelectionChanged="NavView_SelectionChanged">
 		<NavigationView.MenuItems>
-			<NavigationViewItem x:Name="NavViewLogin" Content="Login" Tag="LoginView" Icon="Home"/>
             <NavigationViewItem x:Name="NavViewChats" Content="All chats" Tag="ChatsView" Icon="People">
 				<NavigationViewItem.InfoBadge>
 					<InfoBadge x:Name="UnreadMessagesCount"/>

@@ -5,12 +5,15 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
+using WinRT;
 
 namespace CherryMerryGramDesktop.Views
 {
 	public sealed partial class AccountView : Page
 	{
 		private static readonly TdClient _client = App._client;
+        
+        private Window _mWindow;
         
         private string _firstName;
         private string _lastName;
@@ -73,6 +76,14 @@ namespace CherryMerryGramDesktop.Views
         private async void Button_LogOut_OnClick(object sender, RoutedEventArgs e)
         {
             await _client.ExecuteAsync(new TdApi.LogOut());
+            await _client.ExecuteAsync(new TdApi.Destroy());
+            
+            _mWindow = new LoginView();
+            _mWindow.Activate();
+            
+            var window = (Application.Current as App)?._mWindow as MainWindow;
+            if (window == null) return;
+            window.Close();
         }
 
         private void Button_Apply_OnClick(object sender, RoutedEventArgs e)
