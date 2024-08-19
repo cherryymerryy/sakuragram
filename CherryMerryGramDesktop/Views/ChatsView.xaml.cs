@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CherryMerryGramDesktop.Views.Chats;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TdLib;
 
@@ -35,12 +36,29 @@ namespace CherryMerryGramDesktop.Views
             return Task.CompletedTask;
         }
 
+        private void OpenChat(long chatId)
+        {
+            try
+            {
+                var chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId}).Result;
+            
+                var _chatWidget = new Chat();
+                _chatWidget.ChatId = chat.Id;
+                _chatWidget.UpdateChat(chat.Id);
+                _chatWidget.GetMessages(chat.Id);
+                Chat.Children.Add(_chatWidget);
+            }
+            catch
+            {
+            }
+        }
+        
         private async void GenerateChatEntries()
         {
             try
             {
-                var chats = GetChats(10000);
-
+                var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats {Limit = 10000}).Result);
+                
                 await foreach (var chat in chats)
                 {
                     var chatEntry = new ChatEntry
@@ -61,13 +79,8 @@ namespace CherryMerryGramDesktop.Views
             }
         }
 
-        private static async IAsyncEnumerable<TdApi.Chat> GetChats(int limit)
+        private static async IAsyncEnumerable<TdApi.Chat> GetChats(TdApi.Chats chats)
         {
-            var chats = await _client.ExecuteAsync(new TdApi.GetChats
-            {
-                Limit = limit
-            });
-
             foreach (var chatId in chats.ChatIds)
             {
                 var chat = await _client.ExecuteAsync(new TdApi.GetChat
@@ -80,6 +93,45 @@ namespace CherryMerryGramDesktop.Views
                     yield return chat;
                 }
             }
+        }
+
+        private async void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (TextBoxSearch.Text == "") GenerateChatEntries();
+            
+            ChatsList.Children.Clear();
+            
+            var foundedChats = _client.ExecuteAsync(new TdApi.SearchChats
+            {
+                Query = TextBoxSearch.Text,
+                Limit = 100
+            });
+            
+            var chats = GetChats(foundedChats.Result);
+            
+            await foreach (var chat in chats)
+            {
+                var chatEntry = new ChatEntry
+                {
+                    ChatPage = Chat,
+                    Chat = chat,
+                    ChatId = chat.Id
+                };
+                    
+                chatEntry.UpdateChatInfo();
+                ChatsList.Children.Add(chatEntry);
+            }
+        }
+
+        private void ButtonArchive_OnClick(object sender, RoutedEventArgs e)
+        {
+            ChatsList.Children.Clear();
+            GenerateChatEntries();
+        }
+
+        private void ButtonSavedMessages_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenChat(_client.ExecuteAsync(new TdApi.GetMe()).Result.Id);
         }
     }
 }

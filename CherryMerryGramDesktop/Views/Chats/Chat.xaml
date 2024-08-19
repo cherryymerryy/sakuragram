@@ -15,6 +15,12 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         
+        <Border>
+            <Border.Background>
+                
+            </Border.Background>
+        </Border>
+        
         <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Row="0">
             <Border Background="Gray" HorizontalAlignment="Stretch">
                 <StackPanel x:Name="TopBar" Orientation="Horizontal" HorizontalAlignment="Stretch">

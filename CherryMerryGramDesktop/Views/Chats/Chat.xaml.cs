@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
+using WinRT;
 
 namespace CherryMerryGramDesktop.Views.Chats
 {
@@ -16,7 +18,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         public Chat()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
@@ -40,14 +42,18 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         public Task UpdateChat(long chatId)
         {
-            var chat = _client.GetChatAsync(chatId);
-            ChatTitle.Text = chat.Result.Title;
+            var chat = _client.GetChatAsync(chatId).Result;
+            ChatTitle.Text = chat.Title;
             
-            //_client.ExecuteAsync(new TdApi.DownloadFile { FileId = chat.Result.Background.Background.Id, Priority = 1 });
+            /*_client.ExecuteAsync(new TdApi.DownloadFile
+            {
+                FileId = (int)chat.Background.Background.Id, 
+                Priority = 1
+            });
             
-            //ThemeBackground.ImageSource = new BitmapImage();
+            ThemeBackground.ImageSource = new BitmapImage();
 
-            /*switch (chat.Result.Type)
+            switch (chat.Type)
             {
                 case TdApi.ChatType.ChatTypeBasicGroup:
                 {
