@@ -1,6 +1,6 @@
 # CherryMerryGram
 
-Custom Telegram Desktop client based on TdLib
+Custom Telegram Desktop client based on TDLib ([tdsharp](https://github.com/egramtel/tdsharp)) and WinUI 3
 
 [Telegram channel](https://t.me/cherrymerrygram), [Telegram forum](https://t.me/cherrymerrygramchat)
 
