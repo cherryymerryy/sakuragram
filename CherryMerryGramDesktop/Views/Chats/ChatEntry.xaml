@@ -10,37 +10,51 @@
 
     <Button 
         Click="Button_OnClick"
-        HorizontalContentAlignment="Left"
-        VerticalContentAlignment="Center"
-        Margin="5, 2, 5, 2"
+        HorizontalContentAlignment="Stretch"
+        VerticalContentAlignment="Stretch"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
         MinWidth="340">
-        
-        <StackPanel Orientation="Horizontal">
+        <!-- Margin="5, 2, 5, 2" -->
+
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
             
-            <Border Width="42px"
-                    Height="42px"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    CornerRadius="30"
-                    Margin="10">
-                <Border.Background>
-                    <ImageBrush x:Name="ChatEntryProfilePicture" />
-                </Border.Background>
-            </Border>
-            
-            <StackPanel Orientation="Vertical">
-                <TextBlock x:Name="TextBlockChatName" FontSize="14"/>
-                <TextBlock x:Name="TextBlockChatLastMessage" FontSize="10" />
-            </StackPanel>
-            
-            <StackPanel HorizontalAlignment="Right" Orientation="Vertical">
-                <Border Background="Black" CornerRadius="10">
-                    <TextBlock x:Name="UnreadMessagesCount" Padding="5" TextAlignment="Center" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                
+                <Border Width="42px"
+                        Height="42px"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        CornerRadius="30"
+                        Margin="10">
+                    <Border.Background>
+                        <ImageBrush x:Name="ChatEntryProfilePicture" />
+                    </Border.Background>
                 </Border>
-                <TextBlock x:Name="SendTime" />
+                
+                <Grid Row="0" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock x:Name="TextBlockChatName" FontSize="14"/>
+                        <TextBlock x:Name="TextBlockChatLastMessage" FontSize="10" />
+                    </StackPanel>
+                </Grid>
+                    
+                <Grid Row="1" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock x:Name="SendTime" />
+                        <Border Background="Black" CornerRadius="10">
+                            <TextBlock x:Name="UnreadMessagesCount" Padding="5" TextAlignment="Center" />
+                        </Border>
+                    </StackPanel>
+                </Grid>
+                    
             </StackPanel>
             
-        </StackPanel>
+        </Grid>
         
     </Button>
 </Page>

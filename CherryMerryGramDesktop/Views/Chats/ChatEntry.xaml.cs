@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using CherryMerryGram;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -13,36 +12,98 @@ namespace CherryMerryGramDesktop.Views.Chats
         public Grid ChatPage;
         private static Chat _chatWidget;
 
-        private static readonly TdClient _client = MainWindow._client;
-        
-        private long _chatId;
+        private static readonly TdClient _client = App._client;
+        public TdApi.Chat Chat;
+        public long ChatId;
         
         public ChatEntry()
         {
             InitializeComponent();
+            
+            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
-        public void UpdateChat(TdApi.Chat chat)
+        private Task ProcessUpdates(TdApi.Update update)
         {
-            _chatId = chat.Id;
-            TextBlockChatName.Text = chat.Title;
-
-            if (chat.UnreadCount > 0)
+            if (Chat == null) return Task.CompletedTask;
+            
+            switch (update)
             {
-                UnreadMessagesCount.Visibility = Visibility.Visible;
-                UnreadMessagesCount.Text = chat.UnreadCount.ToString();
+                case TdApi.Update.UpdateChatLastMessage:
+                {
+                    GetLastMessage(_client.GetChatAsync(ChatId).Result);
+                    break;
+                }
+                case TdApi.Update.UpdateChatReadInbox:
+                {
+                    if (Chat.UnreadCount > 0)
+                    {
+                        UnreadMessagesCount.Visibility = Visibility.Visible;
+                        UnreadMessagesCount.Text = Chat.UnreadCount.ToString();
 
+                    }
+                    else
+                    {
+                        UnreadMessagesCount.Visibility = Visibility.Collapsed;
+                    }
+
+                    break;
+                }
+                case TdApi.Update.UpdateChatTitle:
+                {
+                    TextBlockChatName.Text = Chat.Title;
+                    break;
+                }
+                case TdApi.Update.UpdateChatPhoto:
+                {
+                    GetChatPhoto(Chat);
+                    break;
+                }
+                case TdApi.Update.UpdateChatAddedToList:
+                {
+                    TextBlockChatName.Text = Chat.Title;
+
+                    GetChatPhoto(Chat);
+                    GetLastMessage(_client.GetChatAsync(ChatId).Result);
+
+                    if (Chat.UnreadCount > 0)
+                    {
+                        if (UnreadMessagesCount.Visibility == Visibility.Collapsed)
+                            UnreadMessagesCount.Visibility = Visibility.Visible;
+                        UnreadMessagesCount.Text = Chat.UnreadCount.ToString();
+                    }
+                    else
+                    {
+                        UnreadMessagesCount.Visibility = Visibility.Collapsed;
+                    }
+
+                    break;
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public void UpdateChatInfo()
+        {
+            if (Chat == null) return;
+            
+            TextBlockChatName.Text = Chat.Title;
+            
+            GetChatPhoto(Chat);
+            GetLastMessage(_client.GetChatAsync(ChatId).Result); 
+                    
+            if (Chat.UnreadCount > 0)
+            {
+                if (UnreadMessagesCount.Visibility == Visibility.Collapsed) UnreadMessagesCount.Visibility = Visibility.Visible;
+                UnreadMessagesCount.Text = Chat.UnreadCount.ToString();
             }
             else
             {
                 UnreadMessagesCount.Visibility = Visibility.Collapsed;
             }
-            
-            SendTime.Text = chat.LastMessage.Date != 0 ? DateTime.FromFileTime(chat.LastMessage.Date).ToString("HH:mm") : string.Empty;
-            GetChatPhoto(chat);
-            GetLastMessage(chat);
         }
-
+        
         private async void GetChatPhoto(TdApi.Chat chat)
         {
             try
@@ -81,9 +142,9 @@ namespace CherryMerryGramDesktop.Views.Chats
             }
             
             _chatWidget = new Chat();
-            _chatWidget.ChatId = _chatId;
-            _chatWidget.UpdateChat(_chatId);
-            _chatWidget.GetMessages(_chatId);
+            _chatWidget.ChatId = ChatId;
+            _chatWidget.UpdateChat(ChatId);
+            _chatWidget.GetMessages(ChatId);
             ChatPage?.Children.Add(_chatWidget);
         }
 
@@ -106,52 +167,30 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             try
             {
-                if (chat.Type is TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypePrivate &&
-                    !chat.Permissions.CanSendBasicMessages)
+                if (chat.Type is TdApi.ChatType.ChatTypePrivate) return;
+                if ((chat.Type as TdApi.ChatType.ChatTypeSupergroup)!.IsChannel) return;
+                
+                var user = GetUser(chat.LastMessage).Result;
+                var userFirstName = ""; //chat.Permissions.CanSendBasicMessages ? $"{user.FirstName}: " : "";
+                
+                TextBlockChatLastMessage.Text = chat.LastMessage.Content switch
                 {
-                    TextBlockChatLastMessage.Text = chat.LastMessage.Content switch
-                    {
-                        TdApi.MessageContent.MessageText messageText => $"{messageText.Text.Text}",
-                        TdApi.MessageContent.MessageAudio messageAudio =>
-                            $"Audio message ({messageAudio.Audio.Duration})",
-                        TdApi.MessageContent.MessageVoiceNote messageVoiceNote =>
-                            $"Voice message ({messageVoiceNote.VoiceNote.Duration})",
-                        TdApi.MessageContent.MessageVideo messageVideo =>
-                            $"Video message ({messageVideo.Video.Duration} sec)",
-                        TdApi.MessageContent.MessagePhoto messagePhoto =>
-                            $"Photo message ({messagePhoto.Photo.Minithumbnail.Width}x{messagePhoto.Photo.Minithumbnail.Height})",
-                        TdApi.MessageContent.MessageSticker messageSticker =>
-                            $"{messageSticker.Sticker.Emoji} Sticker message",
-                        TdApi.MessageContent.MessagePoll messagePoll => $"{messagePoll.Poll.Question} Poll message",
-                        TdApi.MessageContent.MessagePinMessage messagePinMessage =>
-                            $"{GetMessageText(chat.Id, messagePinMessage.MessageId)}",
-                        _ => TextBlockChatLastMessage.Text
-                    };
-                }
-                else if (chat.Type is not TdApi.ChatType.ChatTypePrivate &&
-                         chat.Permissions.CanSendBasicMessages)
-                {
-                    var user = GetUser(chat.LastMessage).Result;
-
-                    TextBlockChatLastMessage.Text = chat.LastMessage.Content switch
-                    {
-                        TdApi.MessageContent.MessageText messageText => $"{user.FirstName}: {messageText.Text.Text}",
-                        TdApi.MessageContent.MessageAudio messageAudio =>
-                            $"{user.FirstName}: Audio message ({messageAudio.Audio.Duration})",
-                        TdApi.MessageContent.MessageVoiceNote messageVoiceNote =>
-                            $"{user.FirstName}: Voice message ({messageVoiceNote.VoiceNote.Duration})",
-                        TdApi.MessageContent.MessageVideo messageVideo =>
-                            $"{user.FirstName}: Video message ({messageVideo.Video.Duration} sec)",
-                        TdApi.MessageContent.MessagePhoto messagePhoto =>
-                            $"Photo message ({messagePhoto.Photo.Minithumbnail.Width}x{messagePhoto.Photo.Minithumbnail.Height})",
-                        TdApi.MessageContent.MessageSticker messageSticker =>
-                            $"{user.FirstName}: {messageSticker.Sticker.Emoji} Sticker message",
-                        TdApi.MessageContent.MessagePoll messagePoll => $"{messagePoll.Poll.Question} Poll message",
-                        TdApi.MessageContent.MessagePinMessage messagePinMessage =>
-                            $"{user.FirstName} pinned {GetMessageText(chat.Id, messagePinMessage.MessageId)}",
-                        _ => TextBlockChatLastMessage.Text
-                    };
-                }
+                    TdApi.MessageContent.MessageText messageText => $"{userFirstName}: {messageText.Text.Text}",
+                    TdApi.MessageContent.MessageAudio messageAudio =>
+                        $"{userFirstName}Audio message ({messageAudio.Audio.Duration})",
+                    TdApi.MessageContent.MessageVoiceNote messageVoiceNote =>
+                        $"{userFirstName}Voice message ({messageVoiceNote.VoiceNote.Duration})",
+                    TdApi.MessageContent.MessageVideo messageVideo =>
+                        $"{userFirstName}Video message ({messageVideo.Video.Duration} sec)",
+                    TdApi.MessageContent.MessagePhoto messagePhoto =>
+                        $"{userFirstName}Photo message ({messagePhoto.Photo.Minithumbnail.Width}x{messagePhoto.Photo.Minithumbnail.Height})",
+                    TdApi.MessageContent.MessageSticker messageSticker =>
+                        $"{userFirstName}{messageSticker.Sticker.Emoji} Sticker message",
+                    TdApi.MessageContent.MessagePoll messagePoll => $"{userFirstName}{messagePoll.Poll.Question} Poll message",
+                    TdApi.MessageContent.MessagePinMessage messagePinMessage =>
+                        $"{userFirstName}pinned {GetMessageText(chat.Id, messagePinMessage.MessageId)}",
+                    _ => TextBlockChatLastMessage.Text
+                };
             }
             catch (Exception e)
             {

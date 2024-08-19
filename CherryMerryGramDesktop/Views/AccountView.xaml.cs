@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using CherryMerryGram;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -11,7 +10,7 @@ namespace CherryMerryGramDesktop.Views
 {
 	public sealed partial class AccountView : Page
 	{
-		private static readonly TdClient _client = MainWindow._client;
+		private static readonly TdClient _client = App._client;
         
         private string _firstName;
         private string _lastName;

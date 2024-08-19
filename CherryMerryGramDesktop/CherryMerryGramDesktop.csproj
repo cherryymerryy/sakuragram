@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <RootNamespace>CherryMerryGramDesktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;ARM64</Platforms>
@@ -45,6 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="Views\ContextMenu\ContextMenu.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\WebApp\WebAppView.cs">
+      <DependentUpon>WebAppView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <!--

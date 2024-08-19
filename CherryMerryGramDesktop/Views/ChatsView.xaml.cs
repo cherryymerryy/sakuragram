@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using CherryMerryGram;
 using CherryMerryGramDesktop.Views.Chats;
 using Microsoft.UI.Xaml.Controls;
 using TdLib;
@@ -9,13 +10,13 @@ namespace CherryMerryGramDesktop.Views
 {
     public sealed partial class ChatsView : Page
     {
-        private static TdClient _client = MainWindow._client;
+        private static TdClient _client = App._client;
 
         public ChatsView()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             
-            GenerateChatEntries(); 
+            GenerateChatEntries();
             //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
         }
 
@@ -23,7 +24,12 @@ namespace CherryMerryGramDesktop.Views
         {
             switch (update)
             {
-                case TdApi.Update.UpdateNewMessage: { GenerateChatEntries(); break; }
+                case TdApi.Update.UpdateNewMessage:
+                {
+                    Debug.WriteLine("UpdateNewMessage");
+                    GenerateChatEntries();
+                    break;
+                }
             }
 
             return Task.CompletedTask;
@@ -31,15 +37,27 @@ namespace CherryMerryGramDesktop.Views
 
         private async void GenerateChatEntries()
         {
-            ChatsList.Children.Clear();
-            var chats = GetChats(4000);
-
-            await foreach (var chat in chats)
+            try
             {
-                var chatEntry = new ChatEntry();
-                chatEntry.ChatPage = Chat;
-                chatEntry.UpdateChat(chat);
-                ChatsList.Children.Add(chatEntry);
+                var chats = GetChats(10000);
+
+                await foreach (var chat in chats)
+                {
+                    var chatEntry = new ChatEntry
+                    {
+                        ChatPage = Chat,
+                        Chat = chat,
+                        ChatId = chat.Id
+                    };
+                    
+                    chatEntry.UpdateChatInfo();
+                    ChatsList.Children.Add(chatEntry);
+                }
+            }
+            catch (Exception chatGenerationException)
+            {
+                Console.WriteLine(chatGenerationException);
+                throw;
             }
         }
 

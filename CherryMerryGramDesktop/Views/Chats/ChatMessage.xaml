@@ -34,12 +34,12 @@
         <CommandBarFlyout Placement="Bottom" x:Name="CommandBarFlyout1">
             <AppBarButton x:Name="Reply" Label="Reply" ToolTipService.ToolTip="Share" Click="Reply_OnClick"/>
             <AppBarButton x:Name="Edit" Label="Edit" ToolTipService.ToolTip="Save" Click="Edit_OnClick"/>
-            <AppBarButton x:Name="Delete" Label="Delete" ToolTipService.ToolTip="Delete" Click="Delete_OnClick"/>
+            <AppBarButton x:Name="Delete" Label="Delete" Icon="Delete" ToolTipService.ToolTip="Delete" Click="Delete_OnClick"/>
             <AppBarButton x:Name="Pin" Label="Pin" ToolTipService.ToolTip="Delete" Click="Pin_OnClick"/>
             <CommandBarFlyout.SecondaryCommands>
                 <AppBarButton x:Name="Forward" Label="Forward" ToolTipService.ToolTip="Save" Click="Forward_OnClick"/>
                 <AppBarButton x:Name="MessageLink" Label="Copy message link" ToolTipService.ToolTip="Delete" Click="MessageLink_OnClick"/>
-                <AppBarElementContainer Content="Message ID:" />
+                <AppBarButton x:Name="MessageId" Content="Message ID:" />
             </CommandBarFlyout.SecondaryCommands>
         </CommandBarFlyout>
     </Page.Resources>

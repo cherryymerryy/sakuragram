@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using CherryMerryGram;
+using Windows.ApplicationModel.DataTransfer;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -12,7 +12,7 @@ namespace CherryMerryGramDesktop.Views.Chats
 {
     public sealed partial class ChatMessage : Page
     {
-        private static TdClient _client = MainWindow._client;
+        private static TdClient _client = App._client;
         private bool _isContextMenuOpen = false;
         
         private long _chatId;
@@ -223,7 +223,13 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void MessageLink_OnClick(object sender, RoutedEventArgs e)
         {
-            _client.GetMessageLinkAsync(_chatId, _messageId);
+            var messageLink = _client.GetMessageLinkAsync(_chatId, _messageId);
+            var dataPackage = new DataPackage();
+            
+            dataPackage.SetText(messageLink.Result.Link);
+            Clipboard.SetContent(dataPackage);
+            
+            ShowMenu(false);
         }
     }
 }

@@ -23,7 +23,7 @@
                         <TextBlock x:Name="ChatTitle" FontSize="18" FontStyle="Oblique"/>
                         <TextBlock x:Name="ChatMembers" FontSize="14"/>
                     </StackPanel>
-                    <Button x:Name="Call" Content="Call" Click="Call_OnClick" HorizontalAlignment="Right" />
+                    <Button x:Name="Call" Content="Call" Click="Call_OnClick" HorizontalAlignment="Right" IsEnabled="False" />
                 </StackPanel>
             </Border>
         </Grid>

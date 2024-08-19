@@ -1,14 +1,14 @@
-using CherryMerryGram;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TdLib;
 
 namespace CherryMerryGramDesktop.Views
 {
-	public sealed partial class LoginView : Page
+	public sealed partial class LoginView : Window
 	{
-		private static TdClient _client = MainWindow._client;
+		private static TdClient _client = App._client;
 		private int _loginState = 0;
+		private Window _mWindow;
 
 		public LoginView()
 		{
@@ -40,10 +40,16 @@ namespace CherryMerryGramDesktop.Views
 					});
 					textBox_Code.Visibility = Visibility.Collapsed;
 					button_Next.IsEnabled = true;
-					if (MainWindow._passwordNeeded)
+					if (App._passwordNeeded)
 					{
 						_loginState++;
 						textBox_Password.Visibility = Visibility.Visible; 
+					}
+					else
+					{
+						_mWindow = new MainWindow();
+						_mWindow.Activate();
+						Close();
 					}
 					break;
 				case 2:
@@ -55,6 +61,9 @@ namespace CherryMerryGramDesktop.Views
 					});
 					_loginState = 0;
 					button_Next.IsEnabled = true;
+					_mWindow = new MainWindow();
+					_mWindow.Activate();
+					Close();
 					break;
 			}
 		}

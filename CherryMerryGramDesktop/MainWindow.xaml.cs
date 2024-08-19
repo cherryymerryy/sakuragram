@@ -3,7 +3,6 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using CherryMerryGram.Config;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -17,121 +16,14 @@ namespace CherryMerryGramDesktop
 	public sealed partial class MainWindow : Window
 	{
 		private NavigationViewItem _lastItem;
-		private static CherryMerryGram.Config.Config _config;
-
-		public static TdClient _client;
-		private static readonly ManualResetEventSlim ReadyToAuthenticate = new();
-
-		public static bool _authNeeded;
-        public static bool _passwordNeeded;
-        
-		private void PrepareTelegramApi()
-		{
-			using var jsonClient = new TdJsonClient();
-
-			var json = "";
-			double timeout = 1.0;
-
-			jsonClient.Send(json);
-			var result = jsonClient.Receive(timeout);
-			
-			_config = new CherryMerryGram.Config.Config();
-			_client = new TdClient();
-			_client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
-
-			_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
-
-            ReadyToAuthenticate.Wait();
-		}
-		
-		private static async Task ProcessUpdates(TdApi.Update update)
-		{
-			switch (update)
-			{
-				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitTdlibParameters }:
-					var filesLocation = Path.Combine(AppContext.BaseDirectory, "db");
-					await _client.ExecuteAsync(new TdApi.SetTdlibParameters
-					{
-						ApiId = Config.ApiId,
-						ApiHash = Config.ApiHash,
-						UseFileDatabase = true,
-						UseChatInfoDatabase = true,
-						UseMessageDatabase = true,
-						UseSecretChats = true,
-						DeviceModel = "Desktop",
-						SystemLanguageCode = "en",
-						ApplicationVersion = Config.ApplicationVersion,
-						DatabaseDirectory = filesLocation,
-						FilesDirectory = filesLocation,
-					});
-					break;
-
-				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitPhoneNumber }:
-					_authNeeded = true;
-					ReadyToAuthenticate.Set();
-					break;
-				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitCode }:
-					_authNeeded = true;
-					ReadyToAuthenticate.Set();
-					break;
-
-				case TdApi.Update.UpdateAuthorizationState { AuthorizationState: TdApi.AuthorizationState.AuthorizationStateWaitPassword }:
-					_authNeeded = true;
-					_passwordNeeded = true;
-					ReadyToAuthenticate.Set();
-					break;
-
-				case TdApi.Update.UpdateUser:
-					ReadyToAuthenticate.Set();
-					break;
-
-				case TdApi.Update.UpdateConnectionState { State: TdApi.ConnectionState.ConnectionStateReady }:
-					break;
-
-				default:
-					// ReSharper disable once EmptyStatement
-					;
-					// Add a breakpoint here to see other events
-					break;
-			}
-		}
-
-		private void CheckAuth()
-		{
-			if (_authNeeded)
-			{ 
-				NavigateToView("LoginView");
-				NavViewLogin.IsEnabled = true;
-				NavViewAccount.IsEnabled = false;
-				NavViewChats.IsEnabled = false;
-				NavViewSettings.IsEnabled = false;
-				NavViewHelp.IsEnabled = false;
-			}
-			else
-			{ 
-				NavigateToView("ChatsView");
-				NavViewLogin.IsEnabled = false;
-				NavViewAccount.IsEnabled = true;
-				NavViewChats.IsEnabled = true;
-				NavViewSettings.IsEnabled = true;
-				NavViewHelp.IsEnabled = true;
-			}
-		}
-		
-		public void UpdateWindow()
-		{
-			CheckAuth();
-		}
+		private static TdClient _client;
 		
 		public MainWindow()
 		{
 			this.InitializeComponent();
 
             Window window = this;
-            window.ExtendsContentIntoTitleBar = true;
-
-            PrepareTelegramApi();
-			UpdateWindow();
+            window.ExtendsContentIntoTitleBar = true;;
 		}
 
 		private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e) 

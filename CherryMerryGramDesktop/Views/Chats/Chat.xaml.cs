@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CherryMerryGram;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TdLib;
@@ -11,7 +10,7 @@ namespace CherryMerryGramDesktop.Views.Chats
 {
     public sealed partial class Chat : Page
     {
-        private static TdClient _client = MainWindow._client;
+        private static TdClient _client = App._client;
         public long ChatId;
         private List<TdApi.Message> _messagesList = [];
         
