@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Navigation;
 using TdLib;
 using TdLib.Bindings;
 using CherryMerryGramDesktop;
+using CherryMerryGramDesktop.Services;
 using CherryMerryGramDesktop.Views.Chats;
 
 namespace CherryMerryGramDesktop
@@ -17,7 +18,10 @@ namespace CherryMerryGramDesktop
 	public sealed partial class MainWindow : Window
 	{
 		private NavigationViewItem _lastItem;
-		private static TdClient _client;
+		private static TdClient _client = App._client;
+		private NotificationService _notificationService;
+		
+		private int _totalUnreadCount = 0;
 		
 		public MainWindow()
 		{
@@ -27,6 +31,42 @@ namespace CherryMerryGramDesktop
             window.ExtendsContentIntoTitleBar = true;
             NavigateToView("ChatsView");
             TrySetDesktopAcrylicBackdrop();
+            
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            _notificationService = new NotificationService();
+            
+            var chatsIds = _client.ExecuteAsync(new TdApi.GetChats{Limit = 100}).Result.ChatIds;
+            foreach (var chatId in chatsIds)
+            {
+	            var chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId}).Result;
+	            _totalUnreadCount += chat.UnreadCount;
+            }
+            
+			UnreadMessagesCount.Value = _totalUnreadCount;
+			
+			var folders = _client.ExecuteAsync(new TdApi.GetRecommendedChatFolders()).Result.ChatFolders;
+			foreach (var folder in folders)
+			{
+				folder.Folder.ExcludeArchived = true;
+				var folderItem = new NavigationViewItem
+				{
+					Tag = "ChatsView",
+					Content = folder.Folder.Title
+				};
+				NavViewChats.MenuItems.Add(folderItem);
+			}
+		}
+
+		private async Task ProcessUpdates(TdApi.Update update)
+		{
+			switch (update)
+			{
+				case TdApi.Update.UpdateNewMessage updateNewMessage:
+				{
+					//_notificationService.SendNotification(updateNewMessage.Message);
+					break;
+				}
+			}
 		}
 
 		private bool TrySetDesktopAcrylicBackdrop()

@@ -20,7 +20,7 @@
 		<NavigationView.MenuItems>
 			<NavigationViewItem x:Name="NavViewChats" Content="All chats" Tag="ChatsView" Icon="People">
 				<NavigationViewItem.InfoBadge>
-					<InfoBadge x:Name="UnreadMessagesCount"/>
+					<InfoBadge x:Name="UnreadMessagesCount" />
 				</NavigationViewItem.InfoBadge>
 			</NavigationViewItem>
 		</NavigationView.MenuItems>
