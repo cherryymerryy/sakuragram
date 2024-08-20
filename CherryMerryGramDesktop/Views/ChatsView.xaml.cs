@@ -12,12 +12,17 @@ namespace CherryMerryGramDesktop.Views
     public sealed partial class ChatsView : Page
     {
         private static TdClient _client = App._client;
-
+        
+        private bool _bInArchive = false;
+        private int _totalUnreadArchivedChatsCount = 0;
+        
         public ChatsView()
         {
             InitializeComponent();
             
-            GenerateChatEntries();
+            GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+            UpdateArchivedChatsCount();
+            
             //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
         }
 
@@ -28,7 +33,14 @@ namespace CherryMerryGramDesktop.Views
                 case TdApi.Update.UpdateNewMessage:
                 {
                     Debug.WriteLine("UpdateNewMessage");
-                    GenerateChatEntries();
+                    if (_bInArchive)
+                    {
+                        GenerateChatEntries(new TdApi.ChatList.ChatListArchive());
+                    }
+                    else
+                    {
+                        GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+                    }
                     break;
                 }
             }
@@ -36,6 +48,22 @@ namespace CherryMerryGramDesktop.Views
             return Task.CompletedTask;
         }
 
+        private void UpdateArchivedChatsCount()
+        {
+            var chatsIds = _client.ExecuteAsync(new TdApi.GetChats
+            {
+                Limit = 100, ChatList = new TdApi.ChatList.ChatListArchive()
+            }).Result.ChatIds;
+            
+            foreach (var chatId in chatsIds)
+            {
+                var chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId}).Result;
+                if (chat.UnreadCount > 0) _totalUnreadArchivedChatsCount++;
+            }
+            
+            ArchiveUnreadChats.Value = _totalUnreadArchivedChatsCount;
+        }
+        
         private void OpenChat(long chatId)
         {
             try
@@ -45,7 +73,7 @@ namespace CherryMerryGramDesktop.Views
                 var _chatWidget = new Chat();
                 _chatWidget.ChatId = chat.Id;
                 _chatWidget.UpdateChat(chat.Id);
-                _chatWidget.GetMessages(chat.Id);
+                _ = _chatWidget.GetMessagesAsync(chat.Id);
                 Chat.Children.Add(_chatWidget);
             }
             catch
@@ -53,11 +81,15 @@ namespace CherryMerryGramDesktop.Views
             }
         }
         
-        private async void GenerateChatEntries()
+        private async void GenerateChatEntries(TdApi.ChatList chatList)
         {
             try
             {
-                var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats {Limit = 10000}).Result);
+                var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats
+                {
+                    Limit = 10000,
+                    ChatList = chatList
+                }).Result);
                 
                 await foreach (var chat in chats)
                 {
@@ -97,7 +129,17 @@ namespace CherryMerryGramDesktop.Views
 
         private async void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (TextBoxSearch.Text == "") GenerateChatEntries();
+            if (TextBoxSearch.Text == "")
+            {
+                if (_bInArchive)
+                {
+                    ArchiveStatus.Text = "Archive";
+                    ArchiveUnreadChats.Visibility = Visibility.Visible;
+                    _bInArchive = false;
+                }
+                GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+                return;
+            }
             
             ChatsList.Children.Clear();
             
@@ -126,7 +168,20 @@ namespace CherryMerryGramDesktop.Views
         private void ButtonArchive_OnClick(object sender, RoutedEventArgs e)
         {
             ChatsList.Children.Clear();
-            GenerateChatEntries();
+            if (!_bInArchive)
+            {
+                ArchiveStatus.Text = "Back";
+                ArchiveUnreadChats.Visibility = Visibility.Collapsed;
+                _bInArchive = true;
+                GenerateChatEntries(new TdApi.ChatList.ChatListArchive());
+            }
+            else
+            {
+                ArchiveStatus.Text = "Archive";
+                ArchiveUnreadChats.Visibility = Visibility.Visible;
+                _bInArchive = false;
+                GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+            }
         }
 
         private void ButtonSavedMessages_OnClick(object sender, RoutedEventArgs e)

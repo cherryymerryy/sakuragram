@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using CherryMerryGramDesktop.Services;
 using CherryMerryGramDesktop.Views;
 using Microsoft.UI.Xaml;
 using TdLib;
@@ -43,7 +44,7 @@ namespace CherryMerryGramDesktop
             ReadyToAuthenticate.Wait();
 		}
 		
-		private static async Task ProcessUpdates(TdApi.Update update)
+		private async Task ProcessUpdates(TdApi.Update update)
 		{
 			switch (update)
 			{

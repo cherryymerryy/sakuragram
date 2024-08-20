@@ -25,7 +25,6 @@ namespace CherryMerryGramDesktop.Views.Chats
         public ChatMessage()
         {
             InitializeComponent();
-            
             //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
@@ -122,8 +121,6 @@ namespace CherryMerryGramDesktop.Views.Chats
                     TdApi.ChatType.ChatTypeBasicGroup => DisplayName.Text = chat.Title,
                     _ => DisplayName.Text
                 };
-
-                //DisplayName.Foreground = user.AccentColorId;
 
                 if (chatType is TdApi.ChatType.ChatTypeSupergroup && chat.Permissions.CanSendBasicMessages)
                 {
@@ -222,9 +219,9 @@ namespace CherryMerryGramDesktop.Views.Chats
             _replyService.SelectMessageForReply(_messageId);
         }
 
-        private void Forward_OnClick(object sender, RoutedEventArgs e)
+        private async void Forward_OnClick(object sender, RoutedEventArgs e)
         {
-            _forwardService.ForwardMessages(-4214922794, _chatId);
+            await ForwardMessageList.ShowAsync();
         }
 
         private void Edit_OnClick(object sender, RoutedEventArgs e)

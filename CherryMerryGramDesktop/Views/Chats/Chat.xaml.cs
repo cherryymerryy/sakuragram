@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.UI.Core;
 using CherryMerryGramDesktop.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
 using WinRT;
+using static System.Int32;
 
 namespace CherryMerryGramDesktop.Views.Chats
 {
@@ -27,21 +30,21 @@ namespace CherryMerryGramDesktop.Views.Chats
             _forwardService = new ForwardService();
             _replyService = new ReplyService();
             
-            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private async Task ProcessUpdates(TdApi.Update update)
         {
             switch (update)
             {
-                case TdApi.Update.UpdateNewMessage:
+                case TdApi.Update.UpdateNewMessage updateNewMessage:
                 {
-                    await GetMessages(ChatId); 
+                    await GetMessagesAsync(ChatId);
                     break;
                 }
-                case TdApi.Update.UpdateChatTitle:
+                case TdApi.Update.UpdateChatTitle updateChatTitle:
                 {
-                    await UpdateChat(ChatId); 
+                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ChatTitle.Text = updateChatTitle.Title);
                     break;
                 }
             }
@@ -51,6 +54,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             var chat = _client.GetChatAsync(chatId).Result;
             ChatTitle.Text = chat.Title;
+            ChatMembers.Text = chat.Type.ToString();
             
             /*_client.ExecuteAsync(new TdApi.DownloadFile
             {
@@ -86,7 +90,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             return Task.CompletedTask;
         }
         
-        public async Task GetMessages(long chatId)
+        public async Task GetMessagesAsync(long chatId)
         {
             var offset = 0;
             const int limit = 100;
@@ -100,30 +104,37 @@ namespace CherryMerryGramDesktop.Views.Chats
                     Limit = limit
                 });
 
-                await GenerateMessage(messages);
+                await Task.Run(() => DisplayMessages(messages));
 
-                if (messages.Messages_.Length < limit)
+                if (messages.Messages_.Length < limit || messages.Messages_.Length <= messages.TotalCount)
                 {
                     break;
                 }
 
                 offset += limit;
             }
-
-            async Task GenerateMessage(TdApi.Messages messages)
-            {
-                foreach (var message in messages.Messages_)
-                {
-                    var chatMessage = new ChatMessage();
-                    chatMessage._forwardService = _forwardService;
-                    chatMessage._replyService = _replyService;
-                    chatMessage.UpdateMessage(message);
-                    MessagesList.Children.Add(chatMessage);
-                    _messagesList.Add(message);
-                }
-            }
         }
 
+        private Task DisplayMessages(TdApi.Messages messages)
+        {
+            foreach (var message in messages.Messages_.Reverse())
+            {
+                var chatMessage = new ChatMessage
+                {
+                    _forwardService = _forwardService,
+                    _replyService = _replyService
+                };
+                chatMessage.UpdateMessage(message);
+
+                MessagesList.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                {
+                    MessagesList.Children.Add(chatMessage);
+                    _messagesList.Add(message);
+                });
+            }
+            
+            return Task.CompletedTask;
+        }
         private static IEnumerable<Task<TdApi.Chat>> GetChat(long chatId)
         {
             var chat = _client.ExecuteAsync(new TdApi.GetChat

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,7 +8,7 @@ using TdLib;
 
 namespace CherryMerryGramDesktop.Views.Chats
 {
-    public sealed partial class ChatEntry : Page
+    public sealed partial class ChatEntry : Button
     {
         public Grid ChatPage;
         private static Chat _chatWidget;
@@ -39,7 +40,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                     if (Chat.UnreadCount > 0)
                     {
                         UnreadMessagesCount.Visibility = Visibility.Visible;
-                        UnreadMessagesCount.Text = Chat.UnreadCount.ToString();
+                        UnreadMessagesCount.Value = Chat.UnreadCount;
 
                     }
                     else
@@ -70,7 +71,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                     {
                         if (UnreadMessagesCount.Visibility == Visibility.Collapsed)
                             UnreadMessagesCount.Visibility = Visibility.Visible;
-                        UnreadMessagesCount.Text = Chat.UnreadCount.ToString();
+                        UnreadMessagesCount.Value = Chat.UnreadCount;
                     }
                     else
                     {
@@ -96,7 +97,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             if (Chat.UnreadCount > 0)
             {
                 if (UnreadMessagesCount.Visibility == Visibility.Collapsed) UnreadMessagesCount.Visibility = Visibility.Visible;
-                UnreadMessagesCount.Text = Chat.UnreadCount.ToString();
+                UnreadMessagesCount.Value = Chat.UnreadCount;
             }
             else
             {
@@ -144,7 +145,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             _chatWidget = new Chat();
             _chatWidget.ChatId = ChatId;
             _chatWidget.UpdateChat(ChatId);
-            _chatWidget.GetMessages(ChatId);
+            _ = _chatWidget.GetMessagesAsync(ChatId);
             ChatPage?.Children.Add(_chatWidget);
         }
 

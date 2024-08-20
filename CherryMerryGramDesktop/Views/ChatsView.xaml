@@ -6,9 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
+    VerticalContentAlignment="Stretch">
 
-    <RelativePanel Padding="0, 50, 0, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <StackPanel Padding="0, 50, 0, 0" >
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="350" />
@@ -19,17 +22,22 @@
                 <TextBox x:Name="TextBoxSearch" PlaceholderText="Search" Width="350" Height="30" Margin="0, 0, 0, 4"
                          TextChanged="TextBoxSearch_OnTextChanged" />
                 <StackPanel Orientation="Horizontal" Margin="0, 0, 0, 4" HorizontalAlignment="Center">
-                    <Button x:Name="ButtonArchive" Content="Archive" Width="170" Height="30"
-                            Click="ButtonArchive_OnClick" />
+                    <Button x:Name="ButtonArchive" Width="170" Height="30"
+                            Click="ButtonArchive_OnClick">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="ArchiveStatus" Text="Archive" Margin="0, 0, 5, 0" />
+                            <InfoBadge x:Name="ArchiveUnreadChats" Value="0" />
+                        </StackPanel>
+                    </Button>
                     <Button x:Name="ButtonSavedMessages" Content="Saved" Width="170" Height="30" Margin="5, 0, 0, 0"
                             Click="ButtonSavedMessages_OnClick" />
                 </StackPanel>
-                <ScrollView>
+                <ScrollViewer VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled">
                     <StackPanel x:Name="ChatsList" Width="350" />
-                </ScrollView>
+                </ScrollViewer>
             </StackPanel>
             
-            <Grid x:Name="Chat" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=RelativePanel}"/>
+            <Grid x:Name="Chat" Grid.Column="1" />
         </Grid>
-    </RelativePanel>
+    </StackPanel>
 </Page>

@@ -6,35 +6,35 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
+    VerticalContentAlignment="Stretch">
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0, 10">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
         
-        <Border>
-            <Border.Background>
-                
-            </Border.Background>
-        </Border>
-        
-        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Row="0">
-            <Border Background="Gray" HorizontalAlignment="Stretch">
-                <StackPanel x:Name="TopBar" Orientation="Horizontal" HorizontalAlignment="Stretch">
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" Row="0" Padding="5">
+            <Border x:Name="TopBar" Background="#1a1a1a" HorizontalAlignment="Stretch" CornerRadius="4" Padding="5">
+                <StackPanel x:Name="ChatInfo" Orientation="Horizontal"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
                     <Button x:Name="Back" Content="Back" Click="Back_OnClick" HorizontalAlignment="Left" />
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                        <TextBlock x:Name="ChatTitle" FontSize="18" FontStyle="Oblique"/>
-                        <TextBlock x:Name="ChatMembers" FontSize="14"/>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                        <TextBlock x:Name="ChatTitle" FontSize="18" FontStyle="Oblique" TextAlignment="Center" />
+                        <TextBlock x:Name="ChatMembers" FontSize="14" TextAlignment="Center"/>
                     </StackPanel>
                     <Button x:Name="Call" Content="Call" Click="Call_OnClick" HorizontalAlignment="Right" IsEnabled="False" />
                 </StackPanel>
             </Border>
         </Grid>
         
-        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Row="1">
+        <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Row="1">
             <Border>
                 <Border.Background>
                     <ImageBrush x:Name="ThemeBackground" />
@@ -45,12 +45,18 @@
             </Border>
         </Grid>
         
-        <Grid Row="2">
-            <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-                <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"/>
-                <Button x:Name="Stickers" Content="Stickers" Width="70" MaxHeight="25" MaxWidth="25" />
-                <Button x:Name="SendMessage" Content="Send" Width="70" MaxHeight="25" MaxWidth="25" Click="SendMessage_OnClick" />
-            </StackPanel>
+        <Grid HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" Row="2" Padding="5">
+            <Border Background="#1a1a1a" CornerRadius="4" Padding="5">
+                <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal">
+                    <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message" HorizontalAlignment="Stretch" />
+                    <Button x:Name="Stickers" Content="Stickers" MaxHeight="25" MaxWidth="25" 
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch" />
+                    <Button x:Name="SendMessage" Content="Send" MaxHeight="25" MaxWidth="25" Click="SendMessage_OnClick"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch" />
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </Page>
