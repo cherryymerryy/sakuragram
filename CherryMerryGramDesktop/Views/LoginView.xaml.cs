@@ -16,11 +16,25 @@ namespace CherryMerryGramDesktop.Views
 			Title = "CherryMerryGram : Login";
 			Window window = this;
 			window.ExtendsContentIntoTitleBar = true;
+			TrySetDesktopAcrylicBackdrop();
 			
 			TextBlockCurrentAuthState.Text = "Your phone";
 			TextBlockCurrentAuthStateDescription.Text = "Please confirm your country code and enter your phone number.";
 		}
 
+		private bool TrySetDesktopAcrylicBackdrop()
+		{
+			if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
+			{
+				Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop DesktopAcrylicBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop();
+				this.SystemBackdrop = DesktopAcrylicBackdrop;
+
+				return true;
+			}
+
+			return false;
+		}
+		
 		private async void button_Next_Click(object sender, RoutedEventArgs e)
 		{
 			switch (_loginState)

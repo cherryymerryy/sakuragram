@@ -7,23 +7,27 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 	
+	<Window.SystemBackdrop>
+		<DesktopAcrylicBackdrop />
+	</Window.SystemBackdrop>
+	
 	<NavigationView
-				PaneDisplayMode="Left"
-				IsSettingsVisible="False"
-				ItemInvoked="NavView_ItemInvoked"
-				Loaded="NavView_Loaded"
-				SelectionChanged="NavView_SelectionChanged">
+		PaneDisplayMode="Left"
+		IsSettingsVisible="False"
+		ItemInvoked="NavView_ItemInvoked"
+		Loaded="NavView_Loaded"
+		SelectionChanged="NavView_SelectionChanged">
 		<NavigationView.MenuItems>
-            <NavigationViewItem x:Name="NavViewChats" Content="All chats" Tag="ChatsView" Icon="People">
+			<NavigationViewItem x:Name="NavViewChats" Content="All chats" Tag="ChatsView" Icon="People">
 				<NavigationViewItem.InfoBadge>
 					<InfoBadge x:Name="UnreadMessagesCount"/>
 				</NavigationViewItem.InfoBadge>
-	        </NavigationViewItem>
+			</NavigationViewItem>
 		</NavigationView.MenuItems>
 		<NavigationView.FooterMenuItems>
-            <NavigationViewItem x:Name="NavViewAccount" Content="Account" Tag="AccountView" Icon="Contact" />
-            <NavigationViewItem x:Name="NavViewSettings" Content="Settings" Tag="SettingsView" Icon="Setting" />
-            <NavigationViewItem x:Name="NavViewHelp" Content="Help" Tag="HelpView" Icon="Help" />
+			<NavigationViewItem x:Name="NavViewAccount" Content="Account" Tag="AccountView" Icon="Contact" />
+			<NavigationViewItem x:Name="NavViewSettings" Content="Settings" Tag="SettingsView" Icon="Setting" />
+			<NavigationViewItem x:Name="NavViewHelp" Content="Help" Tag="HelpView" Icon="Help" />
 		</NavigationView.FooterMenuItems>
 		<Frame x:Name="ContentFrame" NavigationFailed="ContentFrame_NavigationFailed"/>
 	</NavigationView>

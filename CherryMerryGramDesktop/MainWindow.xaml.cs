@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Navigation;
 using TdLib;
 using TdLib.Bindings;
 using CherryMerryGramDesktop;
+using CherryMerryGramDesktop.Views.Chats;
 
 namespace CherryMerryGramDesktop
 {
@@ -25,8 +26,22 @@ namespace CherryMerryGramDesktop
             Window window = this;
             window.ExtendsContentIntoTitleBar = true;
             NavigateToView("ChatsView");
+            TrySetDesktopAcrylicBackdrop();
 		}
 
+		private bool TrySetDesktopAcrylicBackdrop()
+		{
+			if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
+			{
+				Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop DesktopAcrylicBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop();
+				SystemBackdrop = DesktopAcrylicBackdrop;
+
+				return true;
+			}
+
+			return false;
+		}
+		
 		private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e) 
 		{
 

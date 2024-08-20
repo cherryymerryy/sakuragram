@@ -7,26 +7,28 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 	
-	<Border Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
-		<StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" 
-		            Height="Auto">
-			<TextBlock x:Name="TextBlockCurrentAuthState" FontSize="28" TextAlignment="Center" />
-			<TextBlock x:Name="TextBlockCurrentAuthStateDescription" FontSize="16" TextWrapping="Wrap" 
-			           TextAlignment="Center"
-			           Margin="0, 0, 0, 8" />
-			<TextBox x:Name="TextBoxPhoneNumber" PlaceholderText="Phone number" Width="200" />
-			<TextBox x:Name="TextBoxCode" PlaceholderText="Code" Visibility="Collapsed" Width="200" />
-			<PasswordBox x:Name="TextBoxPassword" PlaceholderText="Password" Width="200"
-			             Visibility="Collapsed" 
-			             PasswordChar="*" />
-			<Button x:Name="ButtonNext" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" 
-			        Content="Next" 
-			        Width="200" 
-			        Click="button_Next_Click"
-			        Margin="0, 8, 0, 8" />
-			<HyperlinkButton x:Name="ForgotPassword" Click="ForgotPassword_OnClick" Width="200"
-			                 Visibility="Collapsed" />
-		</StackPanel>
-	</Border>
+	<Window.SystemBackdrop>
+		<DesktopAcrylicBackdrop />
+	</Window.SystemBackdrop>
+	
+	<StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" 
+	            Height="Auto">
+		<TextBlock x:Name="TextBlockCurrentAuthState" FontSize="28" TextAlignment="Center" />
+		<TextBlock x:Name="TextBlockCurrentAuthStateDescription" FontSize="16" TextWrapping="Wrap" 
+		           TextAlignment="Center"
+		           Margin="0, 0, 0, 8" />
+		<TextBox x:Name="TextBoxPhoneNumber" PlaceholderText="Phone number" Width="200" />
+		<TextBox x:Name="TextBoxCode" PlaceholderText="Code" Visibility="Collapsed" Width="200" />
+		<PasswordBox x:Name="TextBoxPassword" PlaceholderText="Password" Width="200"
+		             Visibility="Collapsed" 
+		             PasswordChar="*" />
+		<Button x:Name="ButtonNext" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" 
+		        Content="Next" 
+		        Width="200" 
+		        Click="button_Next_Click"
+		        Margin="0, 8, 0, 8" />
+		<HyperlinkButton x:Name="ForgotPassword" Click="ForgotPassword_OnClick" Width="200"
+		                 Visibility="Collapsed" />
+	</StackPanel>
 	
 </Window>
