@@ -6,10 +6,30 @@
     xmlns:local="using:CherryMerryGram.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
 
     <StackPanel Padding="0, 50, 0, 0">
+        <Border x:Name="DcStatusList" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" Height="50">
+            <ScrollView HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled" VerticalContentAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="200" Height="35" Background="Blue" Padding="5">
+                        <TextBlock x:Name="Dc1Status" Text="Dc1" />
+                    </Border>
+                    <Border Width="200" Height="35" Background="Blue" Padding="5">
+                        <TextBlock x:Name="Dc2Status" Text="Dc2" />
+                    </Border>
+                    <Border Width="200" Height="35" Background="Blue" Padding="5">
+                        <TextBlock x:Name="Dc3Status" Text="Dc3" />
+                    </Border>
+                    <Border Width="200" Height="35" Background="Blue" Padding="5">
+                        <TextBlock x:Name="Dc4Status" Text="Dc4" />
+                    </Border>
+                    <Border Width="200" Height="35" Background="Blue" Padding="5">
+                        <TextBlock x:Name="Dc5Status" Text="Dc5" />
+                    </Border>
+                </StackPanel>
+            </ScrollView>
+        </Border>
         <StackPanel x:Name="PanelLinks" Orientation="Horizontal">
             <HyperlinkButton Content="Channel" NavigateUri="https://t.me/cherrymerrygram" Width="100px" />
             <HyperlinkButton Content="Chat" NavigateUri="https://t.me/cherrymerrygramchat" Width="100px" />

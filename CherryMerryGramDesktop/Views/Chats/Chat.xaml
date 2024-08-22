@@ -14,12 +14,12 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         
-        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" Row="0" Padding="5">
+        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" Grid.Row="0" Padding="5">
             <Border x:Name="TopBar" Background="#1a1a1a" HorizontalAlignment="Stretch" CornerRadius="4" Padding="5">
                 <StackPanel x:Name="ChatInfo" Orientation="Horizontal"
                             HorizontalAlignment="Stretch"
@@ -32,9 +32,9 @@
                     <Button x:Name="Call" Content="Call" Click="Call_OnClick" HorizontalAlignment="Right" IsEnabled="False" />
                 </StackPanel>
             </Border>
-        </Grid>
+        </StackPanel>
         
-        <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Row="1">
+        <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="1">
             <Border>
                 <Border.Background>
                     <ImageBrush x:Name="ThemeBackground" />
@@ -43,9 +43,9 @@
                     <StackPanel x:Name="MessagesList"/>
                 </ScrollViewer>
             </Border>
-        </Grid>
+        </StackPanel>
         
-        <Grid HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" Row="2" Padding="5">
+        <StackPanel HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" Grid.Row="2" Padding="5">
             <Border Background="#1a1a1a" CornerRadius="4" Padding="5">
                 <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal">
                     <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message" HorizontalAlignment="Stretch" />
@@ -57,6 +57,6 @@
                             VerticalAlignment="Stretch" />
                 </StackPanel>
             </Border>
-        </Grid>
+        </StackPanel>
     </Grid>
 </Page>

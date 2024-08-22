@@ -13,22 +13,33 @@
 	
 	<StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" 
 	            Height="Auto">
+		<Frame x:Name="ContentFrame" />
 		<TextBlock x:Name="TextBlockCurrentAuthState" FontSize="28" TextAlignment="Center" />
 		<TextBlock x:Name="TextBlockCurrentAuthStateDescription" FontSize="16" TextWrapping="Wrap" 
 		           TextAlignment="Center"
 		           Margin="0, 0, 0, 8" />
-		<TextBox x:Name="TextBoxPhoneNumber" PlaceholderText="Phone number" Width="200" />
-		<TextBox x:Name="TextBoxCode" PlaceholderText="Code" Visibility="Collapsed" Width="200" />
+		<TextBox x:Name="TextBoxPhoneNumber" PlaceholderText="Phone number" Width="200" Margin="0, 0, 0, 4" />
+		<TextBox x:Name="TextBoxCode" PlaceholderText="Code" Visibility="Collapsed" Width="200" 
+		         Margin="0, 0, 0, 4" />
 		<PasswordBox x:Name="TextBoxPassword" PlaceholderText="Password" Width="200"
 		             Visibility="Collapsed" 
-		             PasswordChar="*" />
+		             PasswordChar="*"
+		             Margin="0, 0, 0, 4" />
+		<ProgressBar x:Name="LoginProgress" IsIndeterminate="True" ShowPaused="False" ShowError="False" 
+		             Width="200"
+		             Visibility="Collapsed"
+		             HorizontalAlignment="Center"
+		             VerticalAlignment="Center" />
 		<Button x:Name="ButtonNext" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" 
-		        Content="Next" 
-		        Width="200" 
-		        Click="button_Next_Click"
-		        Margin="0, 8, 0, 8" />
-		<HyperlinkButton x:Name="ForgotPassword" Click="ForgotPassword_OnClick" Width="200"
-		                 Visibility="Collapsed" />
+			        Content="Next" 
+			        Width="200" 
+			        Click="button_Next_Click"
+			        Margin="0, 4, 0, 8" />
+		<HyperlinkButton x:Name="ForgotPassword" Content="Forgot password?" Click="ForgotPassword_OnClick" 
+	                 Width="200"
+	                 Visibility="Collapsed"
+	                 HorizontalAlignment="Center"
+	                 VerticalAlignment="Center"/>
 	</StackPanel>
 	
 </Window>

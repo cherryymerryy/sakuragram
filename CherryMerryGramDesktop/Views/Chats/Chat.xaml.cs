@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.Core;
 using CherryMerryGramDesktop.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
-using WinRT;
-using static System.Int32;
 
 namespace CherryMerryGramDesktop.Views.Chats
 {
@@ -39,12 +35,12 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 case TdApi.Update.UpdateNewMessage updateNewMessage:
                 {
-                    await GetMessagesAsync(ChatId);
+                    MessagesList.DispatcherQueue.TryEnqueue(() => _ = GetMessagesAsync(updateNewMessage.Message.ChatId));
                     break;
                 }
                 case TdApi.Update.UpdateChatTitle updateChatTitle:
                 {
-                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ChatTitle.Text = updateChatTitle.Title);
+                    ChatTitle.DispatcherQueue.TryEnqueue(() => UpdateChatTitle(updateChatTitle.Title));
                     break;
                 }
             }
@@ -89,34 +85,21 @@ namespace CherryMerryGramDesktop.Views.Chats
             
             return Task.CompletedTask;
         }
+
+        public Task UpdateChatTitle(string newTitle)
+        {
+            ChatTitle.Text = newTitle;
+            return Task.CompletedTask;
+        }
         
         public async Task GetMessagesAsync(long chatId)
         {
-            var offset = 0;
-            const int limit = 100;
-
-            while (true)
+            var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
             {
-                var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
-                {
-                    ChatId = chatId,
-                    Offset = offset,
-                    Limit = limit
-                });
+                ChatId = chatId,
+                Limit = 100
+            });
 
-                await Task.Run(() => DisplayMessages(messages));
-
-                if (messages.Messages_.Length < limit || messages.Messages_.Length <= messages.TotalCount)
-                {
-                    break;
-                }
-
-                offset += limit;
-            }
-        }
-
-        private Task DisplayMessages(TdApi.Messages messages)
-        {
             foreach (var message in messages.Messages_.Reverse())
             {
                 var chatMessage = new ChatMessage
@@ -125,24 +108,9 @@ namespace CherryMerryGramDesktop.Views.Chats
                     _replyService = _replyService
                 };
                 chatMessage.UpdateMessage(message);
-
-                MessagesList.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                {
-                    MessagesList.Children.Add(chatMessage);
-                    _messagesList.Add(message);
-                });
+                MessagesList.Children.Add(chatMessage);
+                _messagesList.Add(message);
             }
-            
-            return Task.CompletedTask;
-        }
-        private static IEnumerable<Task<TdApi.Chat>> GetChat(long chatId)
-        {
-            var chat = _client.ExecuteAsync(new TdApi.GetChat
-            {
-                ChatId = chatId
-            });
-
-            yield return chat;
         }
 
         private static long GetId(TdApi.MessageSender sender)

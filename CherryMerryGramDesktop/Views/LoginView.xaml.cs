@@ -1,5 +1,8 @@
+using System.Reflection;
+using CherryMerryGramDesktop.Views.Auth;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using TdLib;
 
 namespace CherryMerryGramDesktop.Views
@@ -43,10 +46,12 @@ namespace CherryMerryGramDesktop.Views
 					if (TextBoxPhoneNumber.Text == "") return;
 					ButtonNext.IsEnabled = false;
 					TextBoxPhoneNumber.IsEnabled = false;
+					LoginProgress.Visibility = Visibility.Visible;
 					await _client.ExecuteAsync(new TdApi.SetAuthenticationPhoneNumber
 					{
 						PhoneNumber = TextBoxPhoneNumber.Text,
 					});
+					LoginProgress.Visibility = Visibility.Collapsed;
 					_loginState++;
 					TextBlockCurrentAuthState.Text = "Phone verification";
 					TextBlockCurrentAuthStateDescription.Text = "We've sent the code to the Telegram app on your other device.";
@@ -58,16 +63,19 @@ namespace CherryMerryGramDesktop.Views
 					if (TextBoxCode.Text == "") return;
 					ButtonNext.IsEnabled = false;
 					TextBoxCode.IsEnabled = false;
+					LoginProgress.Visibility = Visibility.Visible;
                     await _client.ExecuteAsync(new TdApi.CheckAuthenticationCode
 					{
 						Code = TextBoxCode.Text
 					});
+					LoginProgress.Visibility = Visibility.Collapsed;
 					TextBoxCode.Visibility = Visibility.Collapsed;
 					ButtonNext.IsEnabled = true;
 					if (App._passwordNeeded)
 					{
 						_loginState++;
-						TextBoxPassword.Visibility = Visibility.Visible; 
+						TextBoxPassword.Visibility = Visibility.Visible;
+						ForgotPassword.Visibility = Visibility.Visible;
 						TextBlockCurrentAuthState.Text = "Password";
 						TextBlockCurrentAuthStateDescription.Text = 
 							"You have Two-Step Verification enabled, so your account is protected with an additional password.";
@@ -83,10 +91,12 @@ namespace CherryMerryGramDesktop.Views
 					if (TextBoxPassword.Password == "") return;
 					ButtonNext.IsEnabled = false;
 					TextBoxPassword.IsEnabled = false;
+					LoginProgress.Visibility = Visibility.Visible;
                     await _client.ExecuteAsync(new TdApi.CheckAuthenticationPassword
 					{
 						Password = TextBoxPassword.Password
 					});
+					LoginProgress.Visibility = Visibility.Collapsed;
 					_loginState = 0;
 					ButtonNext.IsEnabled = true;
 					_mWindow = new MainWindow();
@@ -98,6 +108,8 @@ namespace CherryMerryGramDesktop.Views
 
 		private void ForgotPassword_OnClick(object sender, RoutedEventArgs e)
 		{
+			var view = Assembly.GetExecutingAssembly().GetType("CherryMerryGramDesktop.Views.Auth.Auth_ForgotPassword");
+			ContentFrame.Navigate(view, null, new EntranceNavigationTransitionInfo());
 		}
 	}
 }

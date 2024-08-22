@@ -25,7 +25,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         public ChatMessage()
         {
             InitializeComponent();
-            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private Task ProcessUpdates(TdApi.Update update)
@@ -45,6 +45,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                         _ => MessageContent.Text
                     };
                     break;
+                
             }
             
             return Task.CompletedTask;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CherryMerryGramDesktop.Views.Chats;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TdLib;
@@ -23,7 +24,7 @@ namespace CherryMerryGramDesktop.Views
             GenerateChatEntries(new TdApi.ChatList.ChatListMain());
             UpdateArchivedChatsCount();
             
-            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
         }
 
         private Task ProcessUpdates(TdApi.Update update)
@@ -35,11 +36,11 @@ namespace CherryMerryGramDesktop.Views
                     Debug.WriteLine("UpdateNewMessage");
                     if (_bInArchive)
                     {
-                        GenerateChatEntries(new TdApi.ChatList.ChatListArchive());
+                        ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => GenerateChatEntries(new TdApi.ChatList.ChatListArchive()));
                     }
                     else
                     {
-                        GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+                        ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => GenerateChatEntries(new TdApi.ChatList.ChatListMain()));
                     }
                     break;
                 }
@@ -85,6 +86,8 @@ namespace CherryMerryGramDesktop.Views
         {
             try
             {
+                ChatsList.Children.Clear();
+                
                 var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats
                 {
                     Limit = 10000,
@@ -147,6 +150,13 @@ namespace CherryMerryGramDesktop.Views
             {
                 Query = TextBoxSearch.Text,
                 Limit = 100
+            });
+
+            var foundedMessages = _client.ExecuteAsync(new TdApi.SearchMessages()
+            {
+                ChatList = new TdApi.ChatList.ChatListMain(),
+                Limit = 100,
+                OnlyInChannels = true
             });
             
             var chats = GetChats(foundedChats.Result);

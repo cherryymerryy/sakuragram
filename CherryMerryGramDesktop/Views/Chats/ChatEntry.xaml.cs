@@ -21,65 +21,67 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             InitializeComponent();
             
-            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private Task ProcessUpdates(TdApi.Update update)
         {
-            if (Chat == null) return Task.CompletedTask;
-            
             switch (update)
             {
                 case TdApi.Update.UpdateChatLastMessage:
                 {
-                    GetLastMessage(_client.GetChatAsync(ChatId).Result);
+                    TextBlockChatLastMessage.DispatcherQueue.TryEnqueue(() => GetLastMessage(_client.GetChatAsync(ChatId).Result));
                     break;
                 }
                 case TdApi.Update.UpdateChatReadInbox:
                 {
                     if (Chat.UnreadCount > 0)
                     {
-                        UnreadMessagesCount.Visibility = Visibility.Visible;
-                        UnreadMessagesCount.Value = Chat.UnreadCount;
-
+                        UnreadMessagesCount.DispatcherQueue.TryEnqueue(() =>
+                        {
+                            UnreadMessagesCount.Visibility = Visibility.Visible;
+                            UnreadMessagesCount.Value = Chat.UnreadCount;
+                        });
                     }
                     else
                     {
-                        UnreadMessagesCount.Visibility = Visibility.Collapsed;
+                        UnreadMessagesCount.DispatcherQueue.TryEnqueue(() =>
+                        {
+                            UnreadMessagesCount.Visibility = Visibility.Collapsed;
+                        });
                     }
-
                     break;
                 }
                 case TdApi.Update.UpdateChatTitle:
                 {
-                    TextBlockChatName.Text = Chat.Title;
+                    TextBlockChatName.DispatcherQueue.TryEnqueue(() => TextBlockChatName.Text = Chat.Title);
                     break;
                 }
                 case TdApi.Update.UpdateChatPhoto:
                 {
-                    GetChatPhoto(Chat);
+                    ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(() => GetChatPhoto(Chat));
                     break;
                 }
-                case TdApi.Update.UpdateChatAddedToList:
-                {
-                    TextBlockChatName.Text = Chat.Title;
-
-                    GetChatPhoto(Chat);
-                    GetLastMessage(_client.GetChatAsync(ChatId).Result);
-
-                    if (Chat.UnreadCount > 0)
-                    {
-                        if (UnreadMessagesCount.Visibility == Visibility.Collapsed)
-                            UnreadMessagesCount.Visibility = Visibility.Visible;
-                        UnreadMessagesCount.Value = Chat.UnreadCount;
-                    }
-                    else
-                    {
-                        UnreadMessagesCount.Visibility = Visibility.Collapsed;
-                    }
-
-                    break;
-                }
+                // case TdApi.Update.UpdateChatAddedToList:
+                // {
+                //     TextBlockChatName.Text = Chat.Title;
+                //
+                //     GetChatPhoto(Chat);
+                //     GetLastMessage(_client.GetChatAsync(ChatId).Result);
+                //
+                //     if (Chat.UnreadCount > 0)
+                //     {
+                //         if (UnreadMessagesCount.Visibility == Visibility.Collapsed)
+                //             UnreadMessagesCount.Visibility = Visibility.Visible;
+                //         UnreadMessagesCount.Value = Chat.UnreadCount;
+                //     }
+                //     else
+                //     {
+                //         UnreadMessagesCount.Visibility = Visibility.Collapsed;
+                //     }
+                //
+                //     break;
+                // }
             }
 
             return Task.CompletedTask;
