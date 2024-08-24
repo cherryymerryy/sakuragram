@@ -45,7 +45,6 @@ namespace CherryMerryGramDesktop.Views.Chats
                         _ => MessageContent.Text
                     };
                     break;
-                
             }
             
             return Task.CompletedTask;
@@ -270,6 +269,26 @@ namespace CherryMerryGramDesktop.Views.Chats
         private void ChatMessage_OnDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             _replyService.SelectMessageForReply(_messageId);
+        }
+
+        private async void ForwardMessageList_OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
+        {
+            var chats = _client.ExecuteAsync(new TdApi.GetChats 
+                { ChatList = new TdApi.ChatList(), Limit = 100 }).Result;
+            
+            foreach (var chatId in chats.ChatIds)
+            {
+                var chat = await _client.ExecuteAsync(new TdApi.GetChat
+                {
+                    ChatId = chatId
+                });
+
+                if (chat.Type is not (TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypeBasicGroup
+                    or TdApi.ChatType.ChatTypePrivate)) continue;
+                
+                var chatEntry = new ChatEntryForForward();
+                ChatList.Children.Add(chatEntry);
+            }
         }
     }
 }

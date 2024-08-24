@@ -24,7 +24,7 @@ namespace CherryMerryGramDesktop.Views
             GenerateChatEntries(new TdApi.ChatList.ChatListMain());
             UpdateArchivedChatsCount();
             
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
+            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
         }
 
         private Task ProcessUpdates(TdApi.Update update)
@@ -33,7 +33,6 @@ namespace CherryMerryGramDesktop.Views
             {
                 case TdApi.Update.UpdateNewMessage:
                 {
-                    Debug.WriteLine("UpdateNewMessage");
                     if (_bInArchive)
                     {
                         ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => GenerateChatEntries(new TdApi.ChatList.ChatListArchive()));
@@ -71,11 +70,13 @@ namespace CherryMerryGramDesktop.Views
             {
                 var chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId}).Result;
             
-                var _chatWidget = new Chat();
-                _chatWidget.ChatId = chat.Id;
-                _chatWidget.UpdateChat(chat.Id);
-                _ = _chatWidget.GetMessagesAsync(chat.Id);
-                Chat.Children.Add(_chatWidget);
+                var chatWidget = new Chat
+                {
+                    _chatId = chat.Id
+                };
+                chatWidget.UpdateChat(chat.Id);
+                _ = chatWidget.GetMessagesAsync(chat.Id);
+                Chat.Children.Add(chatWidget);
             }
             catch
             {
@@ -84,10 +85,10 @@ namespace CherryMerryGramDesktop.Views
         
         private async void GenerateChatEntries(TdApi.ChatList chatList)
         {
+            ChatsList.Children.Clear();
+            
             try
             {
-                ChatsList.Children.Clear();
-                
                 var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats
                 {
                     Limit = 10000,

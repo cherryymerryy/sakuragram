@@ -21,7 +21,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             InitializeComponent();
             
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private Task ProcessUpdates(TdApi.Update update)
@@ -138,14 +138,16 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         private void Button_OnClick(object sender, RoutedEventArgs e)
         {
-            if (ChatPage != null && _chatWidget != null)
+            if (ChatPage != null && _chatWidget != null && _chatWidget._chatId != ChatId)
             {
                 ChatPage.Children.Remove(_chatWidget);
                 _chatWidget = null;
             }
             
-            _chatWidget = new Chat();
-            _chatWidget.ChatId = ChatId;
+            _chatWidget = new Chat
+            {
+                _chatId = ChatId
+            };
             _chatWidget.UpdateChat(ChatId);
             _ = _chatWidget.GetMessagesAsync(ChatId);
             ChatPage?.Children.Add(_chatWidget);

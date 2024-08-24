@@ -33,6 +33,8 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
     <Manifest Include="$(ApplicationManifest)" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="TDLib" Version="1.8.29" />
     <PackageReference Include="tdlib.native.win-x64" Version="1.8.29" />
   </ItemGroup>

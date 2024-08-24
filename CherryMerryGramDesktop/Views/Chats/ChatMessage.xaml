@@ -40,12 +40,15 @@
             </StackPanel>
         </Border>
         
-        <ContentDialog x:Name="ForwardMessageList" CloseButtonText="Back">
+        <ContentDialog x:Name="ForwardMessageList" CloseButtonText="Back" Opened="ForwardMessageList_OnOpened">
             <ContentDialog.TitleTemplate>
                 <DataTemplate>
                     <TextBlock Text="Select chat for forward" />
                 </DataTemplate>
             </ContentDialog.TitleTemplate>
+            <ScrollViewer VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled" MaxHeight="250" MaxWidth="100">
+                <StackPanel x:Name="ChatList" />
+            </ScrollViewer>
         </ContentDialog>
     </StackPanel>
     

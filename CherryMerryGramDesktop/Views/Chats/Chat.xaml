@@ -6,21 +6,23 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
     HorizontalContentAlignment="Stretch"
     VerticalContentAlignment="Stretch">
 
     <Grid>
+        
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="50" />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         
-        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" Grid.Row="0" Padding="5">
-            <Border x:Name="TopBar" Background="#1a1a1a" HorizontalAlignment="Stretch" CornerRadius="4" Padding="5">
+        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" 
+                    Grid.Row="0" Padding="5">
+            <Border x:Name="TopBar" Background="#1a1a1a" HorizontalAlignment="Stretch" CornerRadius="4" 
+                    Padding="5">
                 <StackPanel x:Name="ChatInfo" Orientation="Horizontal"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch">
@@ -29,30 +31,35 @@
                         <TextBlock x:Name="ChatTitle" FontSize="18" FontStyle="Oblique" TextAlignment="Center" />
                         <TextBlock x:Name="ChatMembers" FontSize="14" TextAlignment="Center"/>
                     </StackPanel>
-                    <Button x:Name="Call" Content="Call" Click="Call_OnClick" HorizontalAlignment="Right" IsEnabled="False" />
+                    <Button x:Name="Call" Content="Call" Click="Call_OnClick" HorizontalAlignment="Right" 
+                            IsEnabled="False" />
                 </StackPanel>
             </Border>
         </StackPanel>
         
-        <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="1">
+        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="Auto" MaxHeight="400" Grid.Row="1">
             <Border>
                 <Border.Background>
                     <ImageBrush x:Name="ThemeBackground" />
                 </Border.Background>
-                <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                     <StackPanel x:Name="MessagesList"/>
                 </ScrollViewer>
             </Border>
         </StackPanel>
         
-        <StackPanel HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" Grid.Row="2" Padding="5">
-            <Border Background="#1a1a1a" CornerRadius="4" Padding="5">
+        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="50" MaxHeight="50" 
+                    MinHeight="50" 
+                    Grid.Row="2" Padding="5">
+            <Border Background="#1a1a1a" VerticalAlignment="Bottom" CornerRadius="4" Padding="5">
                 <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal">
-                    <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message" HorizontalAlignment="Stretch" />
+                    <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message" 
+                             HorizontalAlignment="Stretch" />
                     <Button x:Name="Stickers" Content="Stickers" MaxHeight="25" MaxWidth="25" 
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch" />
-                    <Button x:Name="SendMessage" Content="Send" MaxHeight="25" MaxWidth="25" Click="SendMessage_OnClick"
+                    <Button x:Name="SendMessage" Content="Send" MaxHeight="25" MaxWidth="25" 
+                            Click="SendMessage_OnClick"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch" />
                 </StackPanel>
