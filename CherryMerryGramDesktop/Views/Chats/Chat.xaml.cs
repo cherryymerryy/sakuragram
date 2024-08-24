@@ -49,9 +49,21 @@ namespace CherryMerryGramDesktop.Views.Chats
                 }
                 case TdApi.Update.UpdateUserStatus updateUserStatus:
                 {
-                    ChatMembers.Text = updateUserStatus.Status.ToString(); 
+                    ChatMembers.DispatcherQueue.TryEnqueue(() =>
+                    {
+                        ChatMembers.Text = updateUserStatus.Status switch
+                        {
+                            TdApi.UserStatus.UserStatusOnline => "Online",
+                            TdApi.UserStatus.UserStatusOffline => "Offline",
+                            TdApi.UserStatus.UserStatusRecently => "Recently",
+                            TdApi.UserStatus.UserStatusLastWeek => "Last week",
+                            TdApi.UserStatus.UserStatusLastMonth => "Last month",
+                            TdApi.UserStatus.UserStatusEmpty => "A long time",
+                            _ => "Unknown"
+                        };
+                    });
                     break;
-                }
+            }
             }
         }
 
@@ -62,7 +74,17 @@ namespace CherryMerryGramDesktop.Views.Chats
             switch (chat.Type)
             {
                 case TdApi.ChatType.ChatTypePrivate typePrivate:
-                    ChatMembers.Text = _client.GetUserAsync(userId: typePrivate.UserId).Result.Status.ToString(); 
+                    var user = _client.GetUserAsync(userId: typePrivate.UserId).Result;
+                    ChatMembers.Text = user.Status switch
+                    {
+                        TdApi.UserStatus.UserStatusOnline => "Online",
+                        TdApi.UserStatus.UserStatusOffline => "Offline",
+                        TdApi.UserStatus.UserStatusRecently => "Recently",
+                        TdApi.UserStatus.UserStatusLastWeek => "Last week",
+                        TdApi.UserStatus.UserStatusLastMonth => "Last month",
+                        TdApi.UserStatus.UserStatusEmpty => "A long time",
+                        _ => "Unknown"
+                    };
                     break;
                 case TdApi.ChatType.ChatTypeBasicGroup typeBasicGroup:
                     var basicGroupInfo = _client.GetBasicGroupFullInfoAsync(
