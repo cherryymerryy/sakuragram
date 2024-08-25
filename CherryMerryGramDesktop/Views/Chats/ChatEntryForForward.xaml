@@ -14,9 +14,8 @@
         Height="50"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
-        HorizontalContentAlignment="Stretch"
-        VerticalContentAlignment="Stretch"
-        Background="Aqua"
+        HorizontalContentAlignment="Left"
+        VerticalContentAlignment="Center"
         Click="ChatEntryForForward_OnClick">
         
         <StackPanel Orientation="Horizontal">

@@ -19,7 +19,7 @@
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         
-        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50"
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50"
                     Width="Auto"
                     Grid.Row="0" 
                     Padding="5">
@@ -39,9 +39,9 @@
                             IsEnabled="False" />
                 </StackPanel>
             </Border>
-        </StackPanel>
+        </Grid>
         
-        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="1">
+        <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="1">
             <Border>
                 <Border.Background>
                     <ImageBrush x:Name="ThemeBackground" />
@@ -50,9 +50,9 @@
                     <StackPanel x:Name="MessagesList"/>
                 </ScrollViewer>
             </Border>
-        </StackPanel>
+        </Grid>
         
-        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="50" MaxHeight="50" 
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="50" MaxHeight="50" 
                     MinHeight="50" 
                     Grid.Row="2" Padding="5">
             <Border Background="#1a1a1a" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" CornerRadius="4" Padding="5">
@@ -69,6 +69,6 @@
                             VerticalAlignment="Stretch" />
                 </StackPanel>
             </Border>
-        </StackPanel>
+        </Grid>
     </Grid>
 </Page>

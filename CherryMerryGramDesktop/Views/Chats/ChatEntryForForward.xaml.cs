@@ -13,21 +13,17 @@ public partial class ChatEntryForForward : Button
     public long _fromChatId;
     public long[] _messageIds;
     
+    public ChatEntryForForward()
+    {
+        InitializeComponent();
+    }
+    
     public async void UpdateEntry(TdApi.Chat chat)
     {
+        if (ChatName == null) return;
+        
         _chat = chat;
         ChatName.Text = _chat.Title;
-        
-        // var chatPhoto = await _client.ExecuteAsync(new TdApi.DownloadFile
-        // {
-        //     FileId = _chat.Photo.Small.Id,
-        //     Priority = 1
-        // });
-        //
-        // if (chatPhoto != null)
-        // {
-        //     ProfilePicture.ImageSource = new BitmapImage(new Uri(chatPhoto.Local.Path));
-        // }
     }
 
     private void ChatEntryForForward_OnClick(object sender, RoutedEventArgs e)

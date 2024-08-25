@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CherryMerryGramDesktop.Services;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -40,7 +41,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 {
                     if (updateNewMessage.Message.ChatId == _chatId)
                     {
-                        MessagesList.DispatcherQueue.TryEnqueue(() =>
+                        MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
                         {
                             var chatMessage = new ChatMessage
                             {

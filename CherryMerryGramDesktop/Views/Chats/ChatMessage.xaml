@@ -51,7 +51,7 @@
             </ContentDialog.TitleTemplate>
             <ScrollViewer VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled" MaxHeight="250" MaxWidth="100"
                           MinHeight="250"
-                          MinWidth="100"
+                          MinWidth="260"
                           HorizontalContentAlignment="Stretch"
                           VerticalContentAlignment="Stretch"
                           HorizontalAlignment="Stretch"

@@ -162,6 +162,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 {
                     TdApi.MessageContent.MessageText messageText => MessageContent.Text = messageText.Text.Text,
                     TdApi.MessageContent.MessagePhoto messagePhoto => MessageContent.Text = messagePhoto.Caption.Text,
+                    TdApi.MessageContent.MessageVideo messageVideo => MessageContent.Text = messageVideo.Caption.Text,
                     _ => MessageContent.Text
                 };
 
@@ -230,6 +231,10 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private async void Forward_OnClick(object sender, RoutedEventArgs e)
         {
+            if (_messageService.GetSelectedMessages().Length == 0)
+            {
+                _messageService.SelectMessage(_messageId);
+            }
             await ForwardMessageList.ShowAsync();
         }
 
@@ -303,7 +308,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 
                 var chatEntry = new ChatEntryForForward
                 {
-                    _fromChatId = chat.Id,
+                    _fromChatId = _chatId,
                     _messageIds = _messageService.GetSelectedMessages()
                 };
                 ChatList.Children.Add(chatEntry);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CherryMerryGramDesktop.Views.Chats;
 using Microsoft.UI.Dispatching;
@@ -90,33 +91,25 @@ namespace CherryMerryGramDesktop.Views
         {
             ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatsList.Children.Clear());
             
-            try
+            var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats
             {
-                var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats
+                Limit = 10000,
+                ChatList = chatList
+            }).Result);
+            
+            await foreach (var chat in chats)
+            {
+                var chatEntry = new ChatEntry
                 {
-                    Limit = 10000,
-                    ChatList = chatList
-                }).Result);
-                
-                await foreach (var chat in chats)
-                {
-                    var chatEntry = new ChatEntry
-                    {
-                        ChatPage = Chat,
-                        Chat = chat,
-                        ChatId = chat.Id
-                    };
+                    ChatPage = Chat,
+                    Chat = chat,
+                    ChatId = chat.Id
+                };
 
-                    chatEntry.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
-                        () => chatEntry.UpdateChatInfo());
-                    ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                        () => ChatsList.Children.Add(chatEntry));
-                }
-            }
-            catch (Exception chatGenerationException)
-            {
-                Console.WriteLine(chatGenerationException);
-                throw;
+                chatEntry.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
+                    () => chatEntry.UpdateChatInfo());
+                ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                    () => ChatsList.Children.Add(chatEntry));
             }
         }
 
