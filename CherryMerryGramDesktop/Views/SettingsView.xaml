@@ -9,7 +9,9 @@
     mc:Ignorable="d">
 
     <StackPanel Padding="0, 50, 0, 0">
-        <Border x:Name="DcStatusList" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" Height="50">
+        <Border x:Name="DcStatusList" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" 
+                Height="50"
+                Visibility="Collapsed">
             <ScrollView HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled" VerticalContentAlignment="Center">
                 <StackPanel Orientation="Horizontal">
                     <Border Width="200" Height="35" Background="Blue" Padding="5">

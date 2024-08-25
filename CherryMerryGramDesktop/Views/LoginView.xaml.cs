@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Threading.Tasks;
 using CherryMerryGramDesktop.Views.Auth;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -12,6 +13,7 @@ namespace CherryMerryGramDesktop.Views
 		private static TdClient _client = App._client;
 		private int _loginState = 0;
 		private Window _mWindow;
+		private string _passwordHint;
 
 		public LoginView()
 		{
@@ -21,8 +23,29 @@ namespace CherryMerryGramDesktop.Views
 			window.ExtendsContentIntoTitleBar = true;
 			TrySetDesktopAcrylicBackdrop();
 			
+			_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+			
 			TextBlockCurrentAuthState.Text = "Your phone";
 			TextBlockCurrentAuthStateDescription.Text = "Please confirm your country code and enter your phone number.";
+		}
+
+		private async Task ProcessUpdates(TdApi.Update update)
+		{
+			switch (update)
+			{
+				case TdApi.Update.UpdateAuthorizationState updateAuthorizationState:
+				{
+					switch (updateAuthorizationState.AuthorizationState)
+					{
+						case TdApi.AuthorizationState.AuthorizationStateWaitPassword password:
+						{
+							_passwordHint = password.PasswordHint;
+							break;
+						}
+					}
+					break;
+				}
+			}
 		}
 
 		private bool TrySetDesktopAcrylicBackdrop()
@@ -79,6 +102,7 @@ namespace CherryMerryGramDesktop.Views
 						TextBlockCurrentAuthState.Text = "Password";
 						TextBlockCurrentAuthStateDescription.Text = 
 							"You have Two-Step Verification enabled, so your account is protected with an additional password.";
+						TextBoxPassword.PlaceholderText = $"Hint: {_passwordHint}";
 					}
 					else
 					{
@@ -108,8 +132,8 @@ namespace CherryMerryGramDesktop.Views
 
 		private void ForgotPassword_OnClick(object sender, RoutedEventArgs e)
 		{
-			var view = Assembly.GetExecutingAssembly().GetType("CherryMerryGramDesktop.Views.Auth.Auth_ForgotPassword");
-			ContentFrame.Navigate(view, null, new EntranceNavigationTransitionInfo());
+			var window = new Auth_ForgotPassword();
+			window.Activate();
 		}
 	}
 }

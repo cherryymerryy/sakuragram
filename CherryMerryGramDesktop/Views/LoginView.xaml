@@ -13,7 +13,6 @@
 	
 	<StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" 
 	            Height="Auto">
-		<Frame x:Name="ContentFrame" />
 		<TextBlock x:Name="TextBlockCurrentAuthState" FontSize="28" TextAlignment="Center" />
 		<TextBlock x:Name="TextBlockCurrentAuthStateDescription" FontSize="16" TextWrapping="Wrap" 
 		           TextAlignment="Center"
