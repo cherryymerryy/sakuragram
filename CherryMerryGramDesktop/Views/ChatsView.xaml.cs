@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using CherryMerryGramDesktop.Views.Chats;
 using Microsoft.UI.Dispatching;
@@ -24,23 +25,29 @@ namespace CherryMerryGramDesktop.Views
             GenerateChatEntries(new TdApi.ChatList.ChatListMain());
             UpdateArchivedChatsCount();
             
-            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
         }
 
         private Task ProcessUpdates(TdApi.Update update)
         {
             switch (update)
             {
-                case TdApi.Update.UpdateNewMessage:
+                case TdApi.Update.UpdateNewMessage updateNewMessage:
                 {
-                    if (_bInArchive)
+                    ChatsList.DispatcherQueue.TryEnqueue(() =>
                     {
-                        ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => GenerateChatEntries(new TdApi.ChatList.ChatListArchive()));
-                    }
-                    else
-                    {
-                        ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => GenerateChatEntries(new TdApi.ChatList.ChatListMain()));
-                    }
+                        var chats = ChatsList.Children;
+                        var chatToMove = chats.OfType<ChatEntry>()
+                            .FirstOrDefault(chat => chat.ChatId == updateNewMessage.Message.ChatId);
+
+                        if (chatToMove != null && chatToMove.ChatId == updateNewMessage.Message.ChatId)
+                        {
+                            chats.Remove(chatToMove);
+                            chats.Insert(0, chatToMove);
+                        }
+                
+                        chatToMove.UpdateChatInfo();
+                    });
                     break;
                 }
             }
@@ -74,18 +81,15 @@ namespace CherryMerryGramDesktop.Views
                 {
                     _chatId = chat.Id
                 };
-                chatWidget.UpdateChat(chat.Id);
-                _ = chatWidget.GetMessagesAsync(chat.Id);
-                Chat.Children.Add(chatWidget);
+                chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => chatWidget.UpdateChat(chat.Id));
+                Chat.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => Chat.Children.Add(chatWidget));
             }
-            catch
-            {
-            }
+            catch { }
         }
         
         private async void GenerateChatEntries(TdApi.ChatList chatList)
         {
-            ChatsList.Children.Clear();
+            ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatsList.Children.Clear());
             
             try
             {
@@ -103,9 +107,11 @@ namespace CherryMerryGramDesktop.Views
                         Chat = chat,
                         ChatId = chat.Id
                     };
-                    
-                    chatEntry.UpdateChatInfo();
-                    ChatsList.Children.Add(chatEntry);
+
+                    chatEntry.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
+                        () => chatEntry.UpdateChatInfo());
+                    ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                        () => ChatsList.Children.Add(chatEntry));
                 }
             }
             catch (Exception chatGenerationException)
@@ -145,7 +151,7 @@ namespace CherryMerryGramDesktop.Views
                 return;
             }
             
-            ChatsList.Children.Clear();
+            ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatsList.Children.Clear());
             
             var foundedChats = _client.ExecuteAsync(new TdApi.SearchChats
             {
@@ -172,7 +178,10 @@ namespace CherryMerryGramDesktop.Views
                 };
                     
                 chatEntry.UpdateChatInfo();
-                ChatsList.Children.Add(chatEntry);
+                ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
+                {
+                    ChatsList.Children.Add(chatEntry);
+                });
             }
         }
 
