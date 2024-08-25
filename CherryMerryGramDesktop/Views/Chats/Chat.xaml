@@ -9,19 +9,20 @@
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
     HorizontalContentAlignment="Stretch"
-    VerticalContentAlignment="Stretch">
+    VerticalContentAlignment="Stretch"
+    Background="#2a2a2a">
 
     <Grid>
-        
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="60" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         
         <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" 
                     Grid.Row="0" Padding="5">
-            <Border x:Name="TopBar" Background="#1a1a1a" HorizontalAlignment="Stretch" CornerRadius="4" 
+            <Border x:Name="TopBar" Background="#1a1a1a" VerticalAlignment="Center" HorizontalAlignment="Stretch" 
+                    CornerRadius="4" 
                     Padding="5">
                 <StackPanel x:Name="ChatInfo" Orientation="Horizontal"
                             HorizontalAlignment="Stretch"

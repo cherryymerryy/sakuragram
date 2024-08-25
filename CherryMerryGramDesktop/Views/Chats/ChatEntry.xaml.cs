@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -21,40 +22,37 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             InitializeComponent();
             
-            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private Task ProcessUpdates(TdApi.Update update)
         {
             switch (update)
             {
-                case TdApi.Update.UpdateChatLastMessage:
+                // case TdApi.Update.UpdateChatLastMessage:
+                // {
+                //     TextBlockChatLastMessage.DispatcherQueue.TryEnqueue(() => GetLastMessage(_client.GetChatAsync(ChatId).Result));
+                //     break;
+                // }
+                // case TdApi.Update.UpdateChatReadInbox updateChatReadInbox:
+                // {
+                //     UnreadMessagesCount.DispatcherQueue.TryEnqueue(() =>
+                //     {
+                //         if (Chat.UnreadCount > 0)
+                //         {
+                //             UnreadMessagesCount.Visibility = Visibility.Visible;
+                //             UnreadMessagesCount.Value = updateChatReadInbox.UnreadCount;
+                //         }
+                //         else
+                //         {
+                //             UnreadMessagesCount.Visibility = Visibility.Collapsed;
+                //         } 
+                //     });
+                //     break;
+                // }
+                case TdApi.Update.UpdateChatTitle updateChatTitle:
                 {
-                    TextBlockChatLastMessage.DispatcherQueue.TryEnqueue(() => GetLastMessage(_client.GetChatAsync(ChatId).Result));
-                    break;
-                }
-                case TdApi.Update.UpdateChatReadInbox:
-                {
-                    if (Chat.UnreadCount > 0)
-                    {
-                        UnreadMessagesCount.DispatcherQueue.TryEnqueue(() =>
-                        {
-                            UnreadMessagesCount.Visibility = Visibility.Visible;
-                            UnreadMessagesCount.Value = Chat.UnreadCount;
-                        });
-                    }
-                    else
-                    {
-                        UnreadMessagesCount.DispatcherQueue.TryEnqueue(() =>
-                        {
-                            UnreadMessagesCount.Visibility = Visibility.Collapsed;
-                        });
-                    }
-                    break;
-                }
-                case TdApi.Update.UpdateChatTitle:
-                {
-                    TextBlockChatName.DispatcherQueue.TryEnqueue(() => TextBlockChatName.Text = Chat.Title);
+                    TextBlockChatName.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => TextBlockChatName.Text = updateChatTitle.Title);
                     break;
                 }
                 case TdApi.Update.UpdateChatPhoto:
@@ -136,11 +134,12 @@ namespace CherryMerryGramDesktop.Views.Chats
             return messageText;
         }
         
-        private void Button_OnClick(object sender, RoutedEventArgs e)
+        private async void Button_OnClick(object sender, RoutedEventArgs e)
         {
             if (ChatPage != null && _chatWidget != null && _chatWidget._chatId != ChatId)
             {
-                ChatPage.Children.Remove(_chatWidget);
+                ChatPage.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
+                    () => ChatPage.Children.Remove(_chatWidget));
                 _chatWidget = null;
             }
             
@@ -148,9 +147,9 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 _chatId = ChatId
             };
-            _chatWidget.UpdateChat(ChatId);
-            _ = _chatWidget.GetMessagesAsync(ChatId);
-            ChatPage?.Children.Add(_chatWidget);
+            
+            _chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _chatWidget.UpdateChat(Chat.Id));
+            ChatPage?.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatPage.Children.Add(_chatWidget));
         }
 
         private static Task<TdApi.User> GetUser(TdApi.Message message)

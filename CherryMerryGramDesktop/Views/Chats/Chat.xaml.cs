@@ -13,24 +13,23 @@ namespace CherryMerryGramDesktop.Views.Chats
     public sealed partial class Chat : Page
     {
         private static TdClient _client = App._client;
+        private static TdApi.Chat _chat;
         private List<TdApi.Message> _messagesList = [];
         
         public long _chatId;
         private int _backgroundId;
         
-        private ForwardService _forwardService;
         private ReplyService _replyService;
+        private MessageService _messageService;
         
         public Chat()
         {
             InitializeComponent();
 
-            _forwardService = new ForwardService();
             _replyService = new ReplyService();
+            _messageService = new MessageService();
             
             //var pinnedMessage = _client.ExecuteAsync(new TdApi.GetChatPinnedMessage {ChatId = ChatId});
-            
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private async Task ProcessUpdates(TdApi.Update update)
@@ -49,25 +48,41 @@ namespace CherryMerryGramDesktop.Views.Chats
                 }
                 case TdApi.Update.UpdateUserStatus updateUserStatus:
                 {
-                    ChatMembers.DispatcherQueue.TryEnqueue(() =>
+                    if (_chat.Type is TdApi.ChatType.ChatTypePrivate)
                     {
-                        ChatMembers.Text = updateUserStatus.Status switch
+                        ChatMembers.DispatcherQueue.TryEnqueue(() =>
                         {
-                            TdApi.UserStatus.UserStatusOnline => "Online",
-                            TdApi.UserStatus.UserStatusOffline => "Offline",
-                            TdApi.UserStatus.UserStatusRecently => "Recently",
-                            TdApi.UserStatus.UserStatusLastWeek => "Last week",
-                            TdApi.UserStatus.UserStatusLastMonth => "Last month",
-                            TdApi.UserStatus.UserStatusEmpty => "A long time",
-                            _ => "Unknown"
-                        };
-                    });
+                            ChatMembers.Text = updateUserStatus.Status switch
+                            {
+                                TdApi.UserStatus.UserStatusOnline => "Online",
+                                TdApi.UserStatus.UserStatusOffline => "Offline",
+                                TdApi.UserStatus.UserStatusRecently => "Recently",
+                                TdApi.UserStatus.UserStatusLastWeek => "Last week",
+                                TdApi.UserStatus.UserStatusLastMonth => "Last month",
+                                TdApi.UserStatus.UserStatusEmpty => "A long time",
+                                _ => "Unknown"
+                            };
+                        });
+                    }
                     break;
             }
+                case TdApi.Update.UpdateChatOnlineMemberCount updateChatOnlineMemberCount:
+                {
+                    if (_chat.Type is TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypeBasicGroup &&
+                        _chat.Permissions.CanSendBasicMessages)
+                    {
+                        ChatMembers.DispatcherQueue.TryEnqueue(() =>
+                        {
+                            ChatMembers.Text =
+                                $"{ChatMembers.Text}, {updateChatOnlineMemberCount.OnlineMemberCount} online";
+                        });   
+                    }
+                    break;
+                }
             }
         }
 
-        public async Task UpdateChat(long chatId)
+        public async void UpdateChat(long chatId)
         {
             var chat = _client.GetChatAsync(chatId).Result;
 
@@ -98,14 +113,14 @@ namespace CherryMerryGramDesktop.Views.Chats
                         .Result;
                     ChatMembers.Text = supergroupInfo.MemberCount + " members";
                     break;
-                default:
-                    break;
             }
             
             _chatId = chatId;
             ChatTitle.Text = chat.Title;
             
-            return;
+            _chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = _chatId}).Result;
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            await GetMessagesAsync(chatId);
         }
 
         public Task UpdateChatTitle(string newTitle)
@@ -126,8 +141,8 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 var chatMessage = new ChatMessage
                 {
-                    _forwardService = _forwardService,
-                    _replyService = _replyService
+                    _replyService = _replyService,
+                    _messageService = _messageService
                 };
                 chatMessage.UpdateMessage(message);
                 MessagesList.Children.Add(chatMessage);

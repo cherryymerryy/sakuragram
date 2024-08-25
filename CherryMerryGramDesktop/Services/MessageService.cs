@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using CherryMerryGramDesktop.Views.Chats;
 using TdLib;
 
 namespace CherryMerryGramDesktop.Services;
@@ -6,6 +8,30 @@ namespace CherryMerryGramDesktop.Services;
 public class MessageService
 {
     private static TdClient _client = App._client;
+    private List<long> _selectedMessages = [];
+
+    public long[] GetSelectedMessages()
+    {
+        return _selectedMessages.ToArray();
+    }
+
+    public void SelectMessage(long messageId)
+    {
+        if (_selectedMessages.Contains(messageId)) return;
+        _selectedMessages.Add(messageId);
+    }
+    
+    public void DeselectMessage(long messageId)
+    {
+        if (!_selectedMessages.Contains(messageId)) return;
+        _selectedMessages.Remove(messageId);
+    }
+
+    public void ClearSelectedMessages()
+    {
+        if (_selectedMessages.Count <= 0) return;
+        _selectedMessages.Clear();
+    }
     
     public string GetLastMessageContent(TdApi.Message message)
     {

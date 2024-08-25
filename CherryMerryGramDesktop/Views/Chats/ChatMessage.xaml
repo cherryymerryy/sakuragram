@@ -8,7 +8,8 @@
     xmlns:user="using:CherryMerryGramDesktop.Views.User"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    DoubleTapped="ChatMessage_OnDoubleTapped">
+    DoubleTapped="ChatMessage_OnDoubleTapped"
+    GettingFocus="ChatMessage_OnGettingFocus">
 
     <StackPanel x:Name="Message" Orientation="Horizontal" Margin="0, 5, 0, 5">
         <Border x:Name="BorderProfilePicture" Width="32" Height="32" CornerRadius="30" Margin="5" 
@@ -18,7 +19,9 @@
                 <ImageBrush x:Name="ProfilePicture" />
             </Border.Background>
         </Border>
-        <Border MinWidth="150" MaxWidth="300" Width="Auto" RightTapped="UIElement_OnRightTapped" Background="Black" 
+        <Border x:Name="MessageBackground" MinWidth="150" MaxWidth="300" Width="Auto" 
+                RightTapped="UIElement_OnRightTapped" 
+                Background="Black" 
                 CornerRadius="10">
             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical" Padding="5">
                 <StackPanel Orientation="Horizontal">
@@ -46,9 +49,44 @@
                     <TextBlock Text="Select chat for forward" />
                 </DataTemplate>
             </ContentDialog.TitleTemplate>
-            <ScrollViewer VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled" MaxHeight="250" MaxWidth="100">
+            <ScrollViewer VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled" MaxHeight="250" MaxWidth="100"
+                          MinHeight="250"
+                          MinWidth="100"
+                          HorizontalContentAlignment="Stretch"
+                          VerticalContentAlignment="Stretch"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
                 <StackPanel x:Name="ChatList" />
             </ScrollViewer>
+        </ContentDialog>
+        
+        <ContentDialog x:Name="PinMessageConfirmation" IsPrimaryButtonEnabled="True" 
+                    DefaultButton="Primary"
+                    PrimaryButtonClick="PinMessageConfirmation_OnPrimaryButtonClick"
+                    PrimaryButtonText="Pin"
+                    CloseButtonText="Back">
+            <ContentDialog.TitleTemplate>
+                <DataTemplate>
+                    <TextBlock Text="Pin this message in the group?" />
+                </DataTemplate>
+            </ContentDialog.TitleTemplate>
+            <CheckBox x:Name="NotifyAllMembers" Content="Notify all members"/>
+        </ContentDialog>
+        
+        <ContentDialog x:Name="DeleteMessagesConfirmation" IsPrimaryButtonEnabled="True" 
+                       DefaultButton="Primary"
+                       PrimaryButtonClick="DeleteMessagesConfirmation_OnPrimaryButtonClick"
+                       PrimaryButtonText="Delete"
+                       CloseButtonText="Back">
+            <ContentDialog.TitleTemplate>
+                <DataTemplate>
+                    <TextBlock Text="Delete this message/s in the group?" />
+                </DataTemplate>
+            </ContentDialog.TitleTemplate>
+            <StackPanel>
+                <TextBlock x:Name="DeleteMessageText" Text="Are you sure want to delete this {count} messages?" />
+                <CheckBox x:Name="Revoke" Content="Delete message for all members"/>
+            </StackPanel>
         </ContentDialog>
     </StackPanel>
     
@@ -60,7 +98,8 @@
                           Click="Forward_OnClick"/>
             <AppBarButton x:Name="ContextMenuSelect" Label="Select" ToolTipService.ToolTip="Save" 
                           Click="Select_OnClick"/>
-            <AppBarButton x:Name="ContextMenuEdit" Label="Edit" ToolTipService.ToolTip="Save" Click="Edit_OnClick"/>
+            <AppBarButton x:Name="ContextMenuEdit" Label="Edit" IsEnabled="False" ToolTipService.ToolTip="Save" 
+                          Click="Edit_OnClick"/>
             <AppBarButton x:Name="ContextMenuDelete" Label="Delete" Icon="Delete" ToolTipService.ToolTip="Delete" 
                           Click="Delete_OnClick"/>
             <AppBarButton x:Name="ContextMenuPin" Label="Pin" ToolTipService.ToolTip="Delete" Click="Pin_OnClick"/>

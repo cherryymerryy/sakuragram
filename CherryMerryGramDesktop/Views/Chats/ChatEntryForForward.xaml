@@ -6,8 +6,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        MaxHeight="250"
-        MaxWidth="100">
+        MinWidth="230"
+        MaxWidth="230"
+        MinHeight="50"
+        MaxHeight="50"
+        Width="230"
+        Height="50"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        HorizontalContentAlignment="Stretch"
+        VerticalContentAlignment="Stretch"
+        Background="Aqua"
+        Click="ChatEntryForForward_OnClick">
         
         <StackPanel Orientation="Horizontal">
                 <Border Width="32" Height="32" CornerRadius="30" Margin="5">

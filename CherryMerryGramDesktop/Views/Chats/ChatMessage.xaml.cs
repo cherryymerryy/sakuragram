@@ -1,11 +1,14 @@
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.UI;
 using CherryMerryGramDesktop.Services;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
 
@@ -19,8 +22,10 @@ namespace CherryMerryGramDesktop.Views.Chats
         private long _chatId;
         private long _messageId;
 
-        public ForwardService _forwardService;
         public ReplyService _replyService;
+        public MessageService _messageService;
+
+        private bool _bIsSelected = false;
         
         public ChatMessage()
         {
@@ -234,16 +239,12 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void Delete_OnClick(object sender, RoutedEventArgs e)
         {
-            _client.ExecuteAsync(new TdApi.DeleteMessages
-            {
-                ChatId = _chatId,
-                MessageIds = new[] { _messageId }
-            });
+            DeleteMessagesConfirmation.ShowAsync();
         }
 
         private void Pin_OnClick(object sender, RoutedEventArgs e)
         {
-            _client.PinChatMessageAsync(_chatId, _messageId, true);
+            PinMessageConfirmation.ShowAsync();
         }
 
         private void MessageLink_OnClick(object sender, RoutedEventArgs e)
@@ -259,7 +260,18 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void Select_OnClick(object sender, RoutedEventArgs e)
         {
-            _forwardService.SelectMessageToForward(_messageId);
+            if (!_bIsSelected)
+            {
+                _messageService.SelectMessage(messageId: _messageId);
+                MessageBackground.Background = new SolidColorBrush(Colors.Gray);
+                _bIsSelected = true;
+            }
+            else
+            {
+                _messageService.DeselectMessage(messageId: _messageId);
+                MessageBackground.Background = new SolidColorBrush(Colors.Black);
+                _bIsSelected = false;
+            }
         }
 
         private void Report_OnClick(object sender, RoutedEventArgs e)
@@ -274,7 +286,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         private async void ForwardMessageList_OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
         {
             var chats = _client.ExecuteAsync(new TdApi.GetChats 
-                { ChatList = new TdApi.ChatList(), Limit = 100 }).Result;
+                { ChatList = new TdApi.ChatList.ChatListMain(), Limit = 100 }).Result;
             
             foreach (var chatId in chats.ChatIds)
             {
@@ -282,13 +294,36 @@ namespace CherryMerryGramDesktop.Views.Chats
                 {
                     ChatId = chatId
                 });
-
-                if (chat.Type is not (TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypeBasicGroup
-                    or TdApi.ChatType.ChatTypePrivate)) continue;
                 
-                var chatEntry = new ChatEntryForForward();
+                if (!chat.Permissions.CanSendBasicMessages) continue;
+                
+                var chatEntry = new ChatEntryForForward
+                {
+                    _fromChatId = chat.Id,
+                    _messageIds = _messageService.GetSelectedMessages()
+                };
                 ChatList.Children.Add(chatEntry);
+                chatEntry.UpdateEntry(chat);
             }
+        }
+
+        private void PinMessageConfirmation_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            _client.PinChatMessageAsync(_chatId, _messageId, NotifyAllMembers.IsChecked.Value);
+        }
+
+        private void DeleteMessagesConfirmation_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            _client.ExecuteAsync(new TdApi.DeleteMessages
+            {
+                ChatId = _chatId,
+                MessageIds = _messageService.GetSelectedMessages(),
+                Revoke = Revoke.IsChecked.Value
+            });
+        }
+
+        private void ChatMessage_OnGettingFocus(UIElement sender, GettingFocusEventArgs args)
+        {
         }
     }
 }
