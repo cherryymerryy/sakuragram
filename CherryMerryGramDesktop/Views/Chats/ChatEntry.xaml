@@ -13,7 +13,8 @@
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
     Margin="0, 2, 0, 2"
-    MinWidth="340">
+    MinWidth="340"
+    CornerRadius="4">
     
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.RowDefinitions>

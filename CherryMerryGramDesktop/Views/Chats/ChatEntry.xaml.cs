@@ -187,7 +187,8 @@ namespace CherryMerryGramDesktop.Views.Chats
                     TdApi.MessageContent.MessageVideo messageVideo =>
                         $"{userFirstName}Video message ({messageVideo.Video.Duration} sec)",
                     TdApi.MessageContent.MessagePhoto messagePhoto =>
-                        $"{userFirstName}Photo message ({messagePhoto.Photo.Minithumbnail.Width}x{messagePhoto.Photo.Minithumbnail.Height})",
+                        $"{userFirstName}Photo message ({messagePhoto.Photo.Minithumbnail.Width}x" +
+                        $"{messagePhoto.Photo.Minithumbnail.Height}), {messagePhoto.Caption.Text}",
                     TdApi.MessageContent.MessageSticker messageSticker =>
                         $"{userFirstName}{messageSticker.Sticker.Emoji} Sticker message",
                     TdApi.MessageContent.MessagePoll messagePoll => $"{userFirstName}{messagePoll.Poll.Question} Poll message",

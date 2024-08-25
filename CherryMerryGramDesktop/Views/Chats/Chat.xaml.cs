@@ -38,7 +38,20 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 case TdApi.Update.UpdateNewMessage updateNewMessage:
                 {
-                    MessagesList.DispatcherQueue.TryEnqueue(() => _ = GetMessagesAsync(updateNewMessage.Message.ChatId));
+                    if (updateNewMessage.Message.ChatId == _chatId)
+                    {
+                        MessagesList.DispatcherQueue.TryEnqueue(() =>
+                        {
+                            var chatMessage = new ChatMessage
+                            {
+                                _replyService = _replyService,
+                                _messageService = _messageService
+                            };
+                            chatMessage.UpdateMessage(updateNewMessage.Message);
+                            MessagesList.Children.Add(chatMessage);
+                            _messagesList.Add(updateNewMessage.Message);
+                        });
+                    }
                     break;
                 }
                 case TdApi.Update.UpdateChatTitle updateChatTitle:

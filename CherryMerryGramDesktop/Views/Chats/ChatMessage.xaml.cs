@@ -161,12 +161,16 @@ namespace CherryMerryGramDesktop.Views.Chats
                 MessageContent.Text = message.Content switch
                 {
                     TdApi.MessageContent.MessageText messageText => MessageContent.Text = messageText.Text.Text,
+                    TdApi.MessageContent.MessagePhoto messagePhoto => MessageContent.Text = messagePhoto.Caption.Text,
                     _ => MessageContent.Text
                 };
+
+                if (chat.Permissions.CanPinMessages)
+                {
+                    ContextMenuPin.IsEnabled = false;
+                }
             }
-            catch
-            {
-            }
+            catch { }
         }
         
         private static Task<TdApi.User> GetUser(TdApi.Message message)

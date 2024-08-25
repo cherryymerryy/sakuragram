@@ -19,16 +19,19 @@
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         
-        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50" 
-                    Grid.Row="0" Padding="5">
+        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50"
+                    Width="Auto"
+                    Grid.Row="0" 
+                    Padding="5">
             <Border x:Name="TopBar" Background="#1a1a1a" VerticalAlignment="Center" HorizontalAlignment="Stretch" 
                     CornerRadius="4" 
-                    Padding="5">
+                    Padding="5"
+                    Width="Auto">
                 <StackPanel x:Name="ChatInfo" Orientation="Horizontal"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch">
                     <Button x:Name="Back" Content="Back" Click="Back_OnClick" HorizontalAlignment="Left" />
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto">
                         <TextBlock x:Name="ChatTitle" FontSize="18" FontStyle="Oblique" TextAlignment="Center" />
                         <TextBlock x:Name="ChatMembers" FontSize="14" TextAlignment="Center"/>
                     </StackPanel>
@@ -38,7 +41,7 @@
             </Border>
         </StackPanel>
         
-        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="Auto" MaxHeight="400" Grid.Row="1">
+        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="1">
             <Border>
                 <Border.Background>
                     <ImageBrush x:Name="ThemeBackground" />
@@ -52,10 +55,11 @@
         <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="50" MaxHeight="50" 
                     MinHeight="50" 
                     Grid.Row="2" Padding="5">
-            <Border Background="#1a1a1a" VerticalAlignment="Bottom" CornerRadius="4" Padding="5">
+            <Border Background="#1a1a1a" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" CornerRadius="4" Padding="5">
                 <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal">
                     <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message" 
-                             HorizontalAlignment="Stretch" />
+                             HorizontalAlignment="Stretch"
+                             Width="Auto" />
                     <Button x:Name="Stickers" Content="Stickers" MaxHeight="25" MaxWidth="25" 
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch" />

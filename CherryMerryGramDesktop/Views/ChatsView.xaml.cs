@@ -44,9 +44,8 @@ namespace CherryMerryGramDesktop.Views
                         {
                             chats.Remove(chatToMove);
                             chats.Insert(0, chatToMove);
+                            chatToMove.UpdateChatInfo();
                         }
-                
-                        chatToMove.UpdateChatInfo();
                     });
                     break;
                 }

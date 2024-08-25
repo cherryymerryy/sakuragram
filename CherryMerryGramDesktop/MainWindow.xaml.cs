@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using TdLib;
 using CherryMerryGramDesktop.Services;
+using Microsoft.UI.Dispatching;
 
 namespace CherryMerryGramDesktop
 {

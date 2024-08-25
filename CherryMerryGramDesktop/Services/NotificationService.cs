@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Notifications;
 using TdLib;
+using static Microsoft.Toolkit.Uwp.Notifications.ToastActivationType;
 
 namespace CherryMerryGramDesktop.Services;
 
@@ -9,14 +10,22 @@ public class NotificationService
     private static TdClient _client = App._client;
     public TdApi.User _user;
     
-    public void SendNotification(TdApi.Message message)
+    public virtual async void SendNotification(TdApi.Message message)
     {
-        //TODO: add check for notification is enabled
+        var chat = await _client.ExecuteAsync(new TdApi.GetChat {ChatId = message.ChatId});
+        if (chat.NotificationSettings.MuteFor > 1) return;
+        var userId = message.SenderId switch
+        {
+            TdApi.MessageSender.MessageSenderUser u => u.UserId,
+            TdApi.MessageSender.MessageSenderChat c => c.ChatId,
+            _ => 0
+        };
+        var user = _client.ExecuteAsync(new TdApi.GetUser {UserId = userId}).Result;
         
         new ToastContentBuilder()
             .AddArgument("action", "viewConversation")
             .AddArgument("ChatId", message.ChatId)
-            .AddText("User sent you a message")
+            .AddText($"{user.FirstName} {user.LastName}")
             .AddText($"{message.Content}")
             .Show();
     }
