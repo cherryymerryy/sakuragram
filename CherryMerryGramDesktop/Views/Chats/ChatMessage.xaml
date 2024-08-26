@@ -39,6 +39,7 @@
                         <TextBlock x:Name="ReplyInputContent" TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
+                <Image x:Name="MessageSticker" />
                 <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" />
             </StackPanel>
         </Border>

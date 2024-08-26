@@ -52,7 +52,8 @@ namespace CherryMerryGramDesktop.Views.Chats
                 // }
                 case TdApi.Update.UpdateChatTitle updateChatTitle:
                 {
-                    TextBlockChatName.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => TextBlockChatName.Text = updateChatTitle.Title);
+                    TextBlockChatName.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, 
+                        () => TextBlockChatName.Text = updateChatTitle.Title);
                     break;
                 }
                 case TdApi.Update.UpdateChatPhoto:
@@ -134,10 +135,13 @@ namespace CherryMerryGramDesktop.Views.Chats
             return messageText;
         }
         
-        private async void Button_OnClick(object sender, RoutedEventArgs e)
+        private void Button_OnClick(object sender, RoutedEventArgs e)
         {
             if (ChatPage != null && _chatWidget != null && _chatWidget._chatId != ChatId)
             {
+                ChatPage.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
+                    () => ChatPage.Children.Remove(_chatWidget));
+                _chatWidget = null;
                 ChatPage.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
                     () => ChatPage.Children.Remove(_chatWidget));
                 _chatWidget = null;

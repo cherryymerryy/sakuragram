@@ -166,6 +166,28 @@ namespace CherryMerryGramDesktop.Views.Chats
                     _ => MessageContent.Text
                 };
 
+                switch (message.Content)
+                {
+                    case TdApi.MessageContent.MessageText:
+                    {
+                        MessageContent.Visibility = Visibility.Visible;
+                        MessageSticker.Visibility = Visibility.Collapsed;
+                        break;
+                    }
+                    case TdApi.MessageContent.MessageSticker messageSticker:
+                    {
+                        MessageContent.Visibility = Visibility.Collapsed;
+                        MessageSticker.Visibility = Visibility.Visible;
+                        var stickerFile = await _client.ExecuteAsync(new TdApi.DownloadFile
+                        {
+                            FileId = messageSticker.Sticker.Sticker_.Id,
+                            Priority = 1
+                        });
+                        MessageSticker.Source = new BitmapImage(new Uri(stickerFile.Local.Path));
+                        break;
+                    }
+                }
+                
                 if (chat.Permissions.CanPinMessages)
                 {
                     ContextMenuPin.IsEnabled = false;
