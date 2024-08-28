@@ -7,7 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:user="using:CherryMerryGramDesktop.Views.User"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DoubleTapped="ChatMessage_OnDoubleTapped"
     GettingFocus="ChatMessage_OnGettingFocus">
 
