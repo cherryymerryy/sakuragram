@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.UI;
 using CherryMerryGramDesktop.Services;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
@@ -61,7 +60,8 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 _chatId = message.ChatId;
                 _messageId = message.Id;
-                
+
+                var content = message.Content;
                 var user = GetUser(message).Result;
                 var chatMember = GetChatMember(message.ChatId, message.SenderId).Result;
                 var chat = GetChat(message.ChatId).Result;
@@ -163,6 +163,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                     TdApi.MessageContent.MessageText messageText => MessageContent.Text = messageText.Text.Text,
                     TdApi.MessageContent.MessagePhoto messagePhoto => MessageContent.Text = messagePhoto.Caption.Text,
                     TdApi.MessageContent.MessageVideo messageVideo => MessageContent.Text = messageVideo.Caption.Text,
+                    TdApi.MessageContent.MessageUnsupported => MessageContent.Text = "Your version of CherryMerryGram does not support this type of message, make sure that you are using the latest version of the client.",
                     _ => MessageContent.Text
                 };
 

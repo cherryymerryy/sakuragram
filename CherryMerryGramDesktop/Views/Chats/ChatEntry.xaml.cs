@@ -1,9 +1,10 @@
 using System;
-using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
 
@@ -15,6 +16,8 @@ namespace CherryMerryGramDesktop.Views.Chats
         private static Chat _chatWidget;
 
         private static readonly TdClient _client = App._client;
+        private bool _isContextMenuOpen = false;
+        
         public TdApi.Chat Chat;
         public long ChatId;
         
@@ -205,6 +208,60 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 Console.WriteLine(e);
             }
+        }
+        
+        private void ShowMenu(bool isTransient)
+        {
+            _isContextMenuOpen = isTransient;
+            FlyoutShowOptions myOption = new FlyoutShowOptions();
+            myOption.ShowMode = isTransient ? FlyoutShowMode.Transient : FlyoutShowMode.Standard;
+            CommandBarFlyout1.ShowAt(ChatEntryInfo, myOption);
+        }
+        
+        private void ChatEntry_OnRightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            ShowMenu(!_isContextMenuOpen);
+        }
+
+        private void ContextMenuMarkAs_OnClick(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ContextMenuNotifications_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ContextMenuPin_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.ExecuteAsync(new TdApi.SetPinnedChats { });
+        }
+
+        private void ContextMenuArchive_OnClick(object sender, RoutedEventArgs e)
+        {
+            var chat = _client.ExecuteAsync(new TdApi.GetChat { ChatId = ChatId }).Result;
+
+            if (chat.ChatLists is TdApi.ChatList.ChatListMain)
+            {
+                _client.ExecuteAsync(new TdApi.AddChatToList
+                {
+                    ChatId = ChatId, 
+                    ChatList = new TdApi.ChatList.ChatListArchive()
+                });
+            }
+            else if (chat.ChatLists is TdApi.ChatList.ChatListArchive)
+            {
+                _client.ExecuteAsync(new TdApi.AddChatToList
+                {
+                    ChatId = ChatId, 
+                    ChatList = new TdApi.ChatList.ChatListMain()
+                });
+            }
+        }
+
+        private void ContextMenuLeave_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.ExecuteAsync(new TdApi.LeaveChat { ChatId = ChatId });
         }
     }
 }

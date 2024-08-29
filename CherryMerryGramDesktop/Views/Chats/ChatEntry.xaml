@@ -8,6 +8,7 @@
     xmlns:user="using:CherryMerryGramDesktop.Views.User"
     mc:Ignorable="d"
     Click="Button_OnClick"
+    RightTapped="ChatEntry_OnRightTapped"
     HorizontalContentAlignment="Stretch"
     VerticalContentAlignment="Center"
     HorizontalAlignment="Stretch"
@@ -15,41 +16,56 @@
     Margin="0, 2, 0, 2"
     MinWidth="340"
     CornerRadius="4">
-    
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                
-                <Border Width="42px"
-                        Height="42px"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        CornerRadius="30"
-                        Margin="10">
-                    <Border.Background>
-                        <ImageBrush x:Name="ChatEntryProfilePicture" />
-                    </Border.Background>
-                </Border>
-                
-                <Grid Row="0" HorizontalAlignment="Left" VerticalAlignment="Stretch">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock x:Name="TextBlockChatName" FontSize="14"/>
-                        <TextBlock x:Name="TextBlockChatLastMessage" FontSize="10" />
-                    </StackPanel>
-                </Grid>
-                    
-                <Grid Row="1" HorizontalAlignment="Right" VerticalAlignment="Stretch">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock x:Name="SendTime" />
-                        <InfoBadge x:Name="UnreadMessagesCount" />
-                    </StackPanel>
-                </Grid>
-                    
-            </StackPanel>
-            
+        
+    <StackPanel x:Name="ChatEntryInfo" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        
+        <Border Width="42px"
+                Height="42px"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                CornerRadius="30"
+                Margin="10">
+            <Border.Background>
+                <ImageBrush x:Name="ChatEntryProfilePicture" />
+            </Border.Background>
+        </Border>
+        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
         </Grid>
+        
+        <Grid Column="0" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+            <StackPanel Orientation="Vertical">
+                <TextBlock x:Name="TextBlockChatName" FontSize="14"/>
+                <TextBlock x:Name="TextBlockChatLastMessage" FontSize="10" />
+            </StackPanel>
+        </Grid>
+            
+        <Grid Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+            <StackPanel Orientation="Vertical">
+                <TextBlock x:Name="SendTime" />
+                <InfoBadge x:Name="UnreadMessagesCount" />
+            </StackPanel>
+        </Grid>
+            
+    </StackPanel>
+    
+    <Button.Resources>
+        <CommandBarFlyout Placement="Bottom" x:Name="CommandBarFlyout1">
+            <AppBarButton x:Name="ContextMenuArchive" Label="Archive" ToolTipService.ToolTip="Archive selected chat" 
+                          Click="ContextMenuArchive_OnClick"/>
+            <AppBarButton x:Name="ContextMenuPin" Label="Pin" ToolTipService.ToolTip="Pin selected chat" 
+                          Click="ContextMenuPin_OnClick"/>
+            <AppBarButton x:Name="ContextMenuNotifications" Label="Mute" ToolTipService.ToolTip="" 
+                          Click="ContextMenuNotifications_OnClick"/>
+            <AppBarButton x:Name="ContextMenuMarkAs" Label="Mark as" ToolTipService.ToolTip="Read all messages from 
+                          selected chat"
+                          Click="ContextMenuMarkAs_OnClick"/>
+            <AppBarButton x:Name="ContextMenuLeave" Label="Leave" ToolTipService.ToolTip="Leave from selected chat" 
+                          Click="ContextMenuLeave_OnClick"/>
+        </CommandBarFlyout>
+    </Button.Resources>
 </Button>
