@@ -22,10 +22,7 @@ namespace CherryMerryGramDesktop.Views
         public ChatsView()
         {
             InitializeComponent();
-            
-            GenerateChatEntries(new TdApi.ChatList.ChatListMain());
             UpdateArchivedChatsCount();
-            
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
         }
 
@@ -199,6 +196,11 @@ namespace CherryMerryGramDesktop.Views
         private void ButtonSavedMessages_OnClick(object sender, RoutedEventArgs e)
         {
             OpenChat(_client.ExecuteAsync(new TdApi.GetMe()).Result.Id);
+        }
+
+        private void ChatList_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            GenerateChatEntries(new TdApi.ChatList.ChatListMain());
         }
     }
 }

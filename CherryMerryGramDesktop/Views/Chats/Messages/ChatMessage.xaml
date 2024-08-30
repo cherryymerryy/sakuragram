@@ -33,8 +33,8 @@
                 </StackPanel>
                 <Border x:Name="Reply" Visibility="Collapsed" Background="#1A1A1A" CornerRadius="4">
                     <StackPanel Padding="4">
-                        <TextBlock x:Name="ReplyFirstName" />
-                        <TextBlock x:Name="ReplyInputContent" TextWrapping="Wrap" />
+                        <TextBlock x:Name="ReplyFirstName" Foreground="#A4A4A4" />
+                        <TextBlock x:Name="ReplyInputContent" TextWrapping="Wrap" Foreground="#8D8D8D" FontSize="12" />
                     </StackPanel>
                 </Border>
                 <Image x:Name="MessageSticker" />

@@ -19,7 +19,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         private bool _isContextMenuOpen = false;
         
         private long _chatId;
-        private long _messageId;
+        public long _messageId;
 
         public ReplyService _replyService;
         public MessageService _messageService;

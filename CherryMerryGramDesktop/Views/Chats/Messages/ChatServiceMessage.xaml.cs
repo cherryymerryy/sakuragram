@@ -19,7 +19,7 @@ namespace CherryMerryGramDesktop.Views.Chats.Messages
                 TdApi.MessageContent.MessageGiftedPremium messageGiftedPremiumText => 
                     $"received a {messageGiftedPremiumText.MonthCount}-month premium for {messageGiftedPremiumText.Amount} {messageGiftedPremiumText.Currency}",
                 TdApi.MessageContent.MessagePinMessage messagePinMessageText => MessageText.Text = $"pinned this message ({messagePinMessageText.MessageId})",
-                TdApi.MessageContent.MessageChatAddMembers messageChatAddMembersText => MessageText.Text = messageChatAddMembersText.
+                //TdApi.MessageContent.MessageChatAddMembers messageChatAddMembersText => MessageText.Text = messageChatAddMembersText.
                 _ => MessageText.Text
             };
         }

@@ -142,9 +142,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             if (ChatPage != null && _chatWidget != null && _chatWidget._chatId != ChatId)
             {
-                ChatPage.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                    () => ChatPage.Children.Remove(_chatWidget));
-                _chatWidget = null;
+                _chatWidget.CloseChat();
                 ChatPage.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
                     () => ChatPage.Children.Remove(_chatWidget));
                 _chatWidget = null;

@@ -20,7 +20,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="60" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MaxHeight="1000" />
                 <RowDefinition Height="50" />
             </Grid.RowDefinitions>
             
@@ -46,8 +46,8 @@
             </Grid>
             
             <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="1">
-                    <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-                        <StackPanel x:Name="MessagesList"/>
+                    <ScrollViewer x:Name="MessagesScrollViewer" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" >
+                        <StackPanel x:Name="MessagesList" Loaded="MessagesList_OnLoaded" />
                     </ScrollViewer>
             </Grid>
             
@@ -55,10 +55,10 @@
                         MinHeight="50" 
                         Grid.Row="2" Padding="5">
                 <Border Background="#1a1a1a" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" CornerRadius="4" Padding="5">
-                    <StackPanel x:Name="UserActionsPanel" Orientation="Horizontal">
-                        <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message" 
+                    <Grid x:Name="UserActionsPanel">
+                        <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"
                                  HorizontalAlignment="Stretch"
-                                 Width="Auto" />
+                                 KeyDown="UserMessageInput_OnKeyDown"/>
                         <Button x:Name="Stickers" Content="Stickers" MaxHeight="25" MaxWidth="25" 
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch" />
@@ -66,7 +66,7 @@
                                 Click="SendMessage_OnClick"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch" />
-                    </StackPanel>
+                    </Grid>
                 </Border>
             </Grid>
         </Grid>

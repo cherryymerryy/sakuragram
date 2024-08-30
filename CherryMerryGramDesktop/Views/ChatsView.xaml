@@ -44,7 +44,7 @@
                           VerticalScrollMode="Enabled" 
                           VerticalScrollBarVisibility="Auto"
                           Height="Auto">
-                <StackPanel x:Name="ChatsList" Width="350" Height="Auto" />
+                <StackPanel x:Name="ChatsList" Width="350" Height="Auto" Loaded="ChatList_OnLoaded" />
             </ScrollViewer>
         </Grid>
         
