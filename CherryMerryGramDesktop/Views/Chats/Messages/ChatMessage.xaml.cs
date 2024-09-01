@@ -346,16 +346,29 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void DeleteMessagesConfirmation_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            _client.ExecuteAsync(new TdApi.DeleteMessages
+            if (_messageService._isMessageSelected)
             {
-                ChatId = _chatId,
-                MessageIds = _messageService.GetSelectedMessages(),
-                Revoke = Revoke.IsChecked.Value
-            });
+                _client.ExecuteAsync(new TdApi.DeleteMessages
+                {
+                    ChatId = _chatId,
+                    MessageIds = _messageService.GetSelectedMessages(),
+                    Revoke = Revoke.IsChecked.Value
+                });
+            }
+            else
+            {
+                _client.ExecuteAsync(new TdApi.DeleteMessages
+                {
+                    ChatId = _chatId,
+                    MessageIds = new long[] { _messageId },
+                    Revoke = Revoke.IsChecked.Value
+                });
+            }
         }
 
-        private void ChatMessage_OnGettingFocus(UIElement sender, GettingFocusEventArgs args)
+        private void ChatMessage_OnTapped(object sender, TappedRoutedEventArgs e)
         {
+            if (_messageService._isMessageSelected) Select_OnClick(null, null);
         }
     }
 }
