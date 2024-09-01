@@ -40,12 +40,64 @@
                 </StackPanel>
             </StackPanel>
             
-            <ScrollViewer Grid.Row="1" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
-                          VerticalScrollMode="Enabled" 
-                          VerticalScrollBarVisibility="Auto"
-                          Height="Auto">
-                <StackPanel x:Name="ChatsList" Width="350" Height="Auto" Loaded="ChatList_OnLoaded" />
-            </ScrollViewer>
+            <RelativePanel Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <ScrollViewer HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollMode="Enabled" 
+                              VerticalScrollBarVisibility="Auto"
+                              Height="Auto">
+                    <StackPanel x:Name="ChatsList" Width="350" Height="Auto" Loaded="ChatList_OnLoaded" />
+                </ScrollViewer>
+                <Button x:Name="ButtonNewMessage" Width="42" Height="42" Content="+" FontSize="18" Margin="5" 
+                        Click="ButtonNewMessage_OnClick"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"/>
+            </RelativePanel>
+            
+            <ContentDialog x:Name="NewMessage" CloseButtonText="Cancel" PrimaryButtonText="Create">
+                <ContentDialog.TitleTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="New message" />
+                    </DataTemplate>
+                </ContentDialog.TitleTemplate>
+                <StackPanel>
+                    <Button x:Name="CreateNewGroup" Content="Create group" HorizontalAlignment="Stretch" 
+                            Margin="0, 0, 0, 4" 
+                            Click="CreateNewGroup_OnClick"/>
+                    <Button x:Name="CreateNewChannel" Content="Create channel" HorizontalAlignment="Stretch" 
+                            Click="CreateNewChannel_OnClick"/>
+                    <ScrollViewer MinHeight="50" MaxHeight="100">
+                        <StackPanel x:Name="ContactList"/>
+                    </ScrollViewer>
+                </StackPanel>
+            </ContentDialog>
+            
+            <ContentDialog x:Name="NewGroup" CloseButtonText="Cancel" PrimaryButtonText="Create"
+                           DefaultButton="Primary"
+                           PrimaryButtonClick="NewGroup_OnPrimaryButtonClick">
+                <ContentDialog.TitleTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="New Group" />
+                    </DataTemplate>
+                </ContentDialog.TitleTemplate>
+                <StackPanel>
+                    <TextBox x:Name="TextBoxGroupName" PlaceholderText="Group name" />
+                </StackPanel>
+            </ContentDialog>
+            
+            <ContentDialog x:Name="NewChannel" CloseButtonText="Cancel" PrimaryButtonText="Create"
+                           DefaultButton="Primary"
+                           PrimaryButtonClick="NewChannel_OnPrimaryButtonClick">
+                <ContentDialog.TitleTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="New Group" />
+                    </DataTemplate>
+                </ContentDialog.TitleTemplate>
+                <StackPanel>
+                    <TextBox x:Name="TextBoxChannelName" PlaceholderText="Channel name " Margin="0, 0, 0, 4" />
+                    <TextBox x:Name="TextBoxChannelDescription" PlaceholderText="Channel description" MaxLength="255" 
+                             MaxWidth="270"/>
+                </StackPanel>
+            </ContentDialog>
         </Grid>
         
         <Grid x:Name="Chat" Grid.Column="1" />

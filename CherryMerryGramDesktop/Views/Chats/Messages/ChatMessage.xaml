@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     DoubleTapped="ChatMessage_OnDoubleTapped"
-    GettingFocus="ChatMessage_OnGettingFocus">
+    Tapped="ChatMessage_OnTapped">
 
     <StackPanel x:Name="Message" Orientation="Horizontal" Margin="0, 5, 0, 5">
         <Border x:Name="BorderProfilePicture" Width="32" Height="32" CornerRadius="30" Margin="5" 

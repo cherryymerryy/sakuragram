@@ -17,7 +17,9 @@ namespace CherryMerryGramDesktop.Views
         private static TdClient _client = App._client;
         
         private bool _bInArchive = false;
+        private bool _firstGenerate = true;
         private int _totalUnreadArchivedChatsCount = 0;
+        private List<long> _chatsIds = [];
         
         public ChatsView()
         {
@@ -45,6 +47,24 @@ namespace CherryMerryGramDesktop.Views
                             chatToMove.UpdateChatInfo();
                         }
                     });
+                    break;
+                }
+                case TdApi.Update.UpdateNewChat updateNewChat:
+                {
+                    if (!_firstGenerate && !_chatsIds.Contains(updateNewChat.Chat.Id))
+                    {
+                        ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
+                        {
+                            var chatEntry = new ChatEntry
+                            {
+                                ChatPage = Chat,
+                                Chat = updateNewChat.Chat,
+                                ChatId = updateNewChat.Chat.Id
+                            };
+                            ChatsList.Children.Insert(0, chatEntry);
+                            _chatsIds.Add(updateNewChat.Chat.Id);
+                        });
+                    }
                     break;
                 }
             }
@@ -102,12 +122,15 @@ namespace CherryMerryGramDesktop.Views
                     Chat = chat,
                     ChatId = chat.Id
                 };
-
+                _chatsIds.Add(chat.Id);
+                
                 chatEntry.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
                     () => chatEntry.UpdateChatInfo());
                 ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
                     () => ChatsList.Children.Add(chatEntry));
             }
+            
+            _firstGenerate = false;
         }
 
         private static async IAsyncEnumerable<TdApi.Chat> GetChats(TdApi.Chats chats)
@@ -201,6 +224,46 @@ namespace CherryMerryGramDesktop.Views
         private void ChatList_OnLoaded(object sender, RoutedEventArgs e)
         {
             GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+        }
+
+        private void ButtonNewMessage_OnClick(object sender, RoutedEventArgs e)
+        {
+            NewMessage.ShowAsync();
+        }
+
+        private void NewGroup_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            if (TextBoxGroupName.Text == "") return;
+
+            _client.ExecuteAsync(new TdApi.CreateNewBasicGroupChat
+            {
+                Title = TextBoxGroupName.Text,
+                UserIds = null
+            });
+        }
+        
+        private void NewChannel_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            if (TextBoxChannelName.Text == "") return;
+
+            _client.ExecuteAsync(new TdApi.CreateNewSupergroupChat
+            {
+                IsChannel = true,
+                Title = TextBoxChannelName.Text,
+                Description = TextBoxChannelDescription.Text
+            });
+        }
+        
+        private void CreateNewGroup_OnClick(object sender, RoutedEventArgs e)
+        {
+            NewMessage.Hide();
+            NewGroup.ShowAsync();
+        }
+
+        private void CreateNewChannel_OnClick(object sender, RoutedEventArgs e)
+        {
+            NewMessage.Hide();
+            NewChannel.ShowAsync();
         }
     }
 }
