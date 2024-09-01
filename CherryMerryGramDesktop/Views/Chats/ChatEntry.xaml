@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Button
     x:Class="CherryMerryGramDesktop.Views.Chats.ChatEntry"
+    x:Name="ButtonChatEntry"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,7 +17,7 @@
     Margin="0, 2, 0, 2"
     MinWidth="340"
     CornerRadius="4">
-        
+    
     <StackPanel x:Name="ChatEntryInfo" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         
         <Border Width="42px"
@@ -53,19 +54,13 @@
             
     </StackPanel>
     
-    <Button.Resources>
-        <CommandBarFlyout Placement="Bottom" x:Name="CommandBarFlyout1">
-            <AppBarButton x:Name="ContextMenuArchive" Label="Archive" ToolTipService.ToolTip="Archive selected chat" 
-                          Click="ContextMenuArchive_OnClick"/>
-            <AppBarButton x:Name="ContextMenuPin" Label="Pin" ToolTipService.ToolTip="Pin selected chat" 
-                          Click="ContextMenuPin_OnClick"/>
-            <AppBarButton x:Name="ContextMenuNotifications" Label="Mute" ToolTipService.ToolTip="" 
-                          Click="ContextMenuNotifications_OnClick"/>
-            <AppBarButton x:Name="ContextMenuMarkAs" Label="Mark as" ToolTipService.ToolTip="Read all messages from 
-                          selected chat"
-                          Click="ContextMenuMarkAs_OnClick"/>
-            <AppBarButton x:Name="ContextMenuLeave" Label="Leave" ToolTipService.ToolTip="Leave from selected chat" 
-                          Click="ContextMenuLeave_OnClick"/>
-        </CommandBarFlyout>
-    </Button.Resources>
+    <Button.Flyout>
+        <MenuFlyout x:Name="ContextMenu" Placement="Bottom">
+            <MenuFlyoutItem Text="Archive" Click="ContextMenuArchive_OnClick"/>
+            <MenuFlyoutItem Text="Pin" Click="ContextMenuPin_OnClick"/>
+            <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
+            <MenuFlyoutItem Text="Mark as" Click="ContextMenuMarkAs_OnClick"/>
+            <MenuFlyoutItem Text="Leave" Click="ContextMenuLeave_OnClick"/>
+        </MenuFlyout>
+    </Button.Flyout>
 </Button>

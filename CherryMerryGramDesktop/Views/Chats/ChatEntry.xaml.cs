@@ -16,7 +16,6 @@ namespace CherryMerryGramDesktop.Views.Chats
         private static Chat _chatWidget;
 
         private static readonly TdClient _client = App._client;
-        private bool _isContextMenuOpen = false;
         
         public TdApi.Chat Chat;
         public long ChatId;
@@ -208,17 +207,9 @@ namespace CherryMerryGramDesktop.Views.Chats
             }
         }
         
-        private void ShowMenu(bool isTransient)
-        {
-            _isContextMenuOpen = isTransient;
-            FlyoutShowOptions myOption = new FlyoutShowOptions();
-            myOption.ShowMode = isTransient ? FlyoutShowMode.Transient : FlyoutShowMode.Standard;
-            CommandBarFlyout1.ShowAt(ChatEntryInfo, myOption);
-        }
-        
         private void ChatEntry_OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            ShowMenu(!_isContextMenuOpen);
+            ContextMenu.ShowAt(ButtonChatEntry);
         }
 
         private void ContextMenuMarkAs_OnClick(object sender, RoutedEventArgs e)
