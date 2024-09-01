@@ -51,20 +51,20 @@ namespace CherryMerryGramDesktop.Views
                 }
                 case TdApi.Update.UpdateNewChat updateNewChat:
                 {
-                    if (!_firstGenerate && !_chatsIds.Contains(updateNewChat.Chat.Id))
-                    {
-                        ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
-                        {
-                            var chatEntry = new ChatEntry
-                            {
-                                ChatPage = Chat,
-                                Chat = updateNewChat.Chat,
-                                ChatId = updateNewChat.Chat.Id
-                            };
-                            ChatsList.Children.Insert(0, chatEntry);
-                            _chatsIds.Add(updateNewChat.Chat.Id);
-                        });
-                    }
+                    // if (!_firstGenerate && !_chatsIds.Contains(updateNewChat.Chat.Id))
+                    // {
+                    //     ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
+                    //     {
+                    //         var chatEntry = new ChatEntry
+                    //         {
+                    //             ChatPage = Chat,
+                    //             Chat = updateNewChat.Chat,
+                    //             ChatId = updateNewChat.Chat.Id
+                    //         };
+                    //         ChatsList.Children.Insert(0, chatEntry);
+                    //         _chatsIds.Add(updateNewChat.Chat.Id);
+                    //     });
+                    // }
                     break;
                 }
             }

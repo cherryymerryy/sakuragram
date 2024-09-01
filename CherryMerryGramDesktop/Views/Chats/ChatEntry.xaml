@@ -16,7 +16,8 @@
     VerticalAlignment="Stretch"
     Margin="0, 2, 0, 2"
     MinWidth="340"
-    CornerRadius="4">
+    CornerRadius="4"
+    MaxHeight="80">
     
     <StackPanel x:Name="ChatEntryInfo" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         
