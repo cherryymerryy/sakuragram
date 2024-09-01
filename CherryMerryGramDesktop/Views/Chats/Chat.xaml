@@ -38,9 +38,24 @@
                             <TextBlock x:Name="ChatTitle" FontSize="14" FontStyle="Oblique" TextAlignment="Center" />
                             <TextBlock x:Name="ChatMembers" FontSize="10" Foreground="Gray" TextAlignment="Center"/>
                         </StackPanel>
-                        <Button x:Name="Call" Content="Call" Click="Call_OnClick" HorizontalAlignment="Right" 
+                        <Button x:Name="MoreActions" Content="..." Click="MoreActions_OnClick" HorizontalAlignment="Right" 
                                 VerticalAlignment="Center"
-                                IsEnabled="False" />
+                                IsEnabled="True" >
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="ContextMenu" Placement="Bottom">
+                                    <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
+                                    <MenuFlyoutItem Text="View group info" Click="ContextMenuViewGroupInfo_OnClick"/>
+                                    <MenuFlyoutItem Text="To beginning" Click="ContextMenuToBeginning_OnClick"/>
+                                    <MenuFlyoutItem Text="Manage group" Click="ContextMenuManageGroup_OnClick"/>
+                                    <MenuFlyoutItem Text="Boost group" Click="ContextMenuBoostGroup_OnClick"/>
+                                    <MenuFlyoutItem Text="Create poll" Click="ContextMenuCreatePoll_OnClick"/>
+                                    <MenuFlyoutItem Text="Report" Click="ContextMenuReport_OnClick"/>
+                                    <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
+                                    <MenuFlyoutItem Text="Clear history" Click="ContextMenuClearHistory_OnClick"/>
+                                    <MenuFlyoutItem Text="Leave" Click="ContextMenuLeaveGroup_OnClick"/>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
                     </Grid>
                 </Border>
             </Grid>
@@ -51,11 +66,11 @@
                     </ScrollViewer>
             </Grid>
             
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="50" MaxHeight="50" 
+            <Grid x:Name="UserActionsPanel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="50" MaxHeight="50" 
                         MinHeight="50" 
                         Grid.Row="2" Padding="5">
                 <Border Background="#1a1a1a" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" CornerRadius="4" Padding="5">
-                    <Grid x:Name="UserActionsPanel">
+                    <Grid>
                         <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"
                                  HorizontalAlignment="Stretch"
                                  KeyDown="UserMessageInput_OnKeyDown"/>
@@ -69,9 +84,35 @@
                     </Grid>
                 </Border>
             </Grid>
+            
+            <ContentDialog x:Name="CreatePoll" CloseButtonText="Cancel" PrimaryButtonText="Create"
+                           SecondaryButtonText="New option"
+                           IsPrimaryButtonEnabled="True"
+                           IsSecondaryButtonEnabled="True"
+                           PrimaryButtonClick="CreatePoll_OnPrimaryButtonClick"
+                           SecondaryButtonClick="CreatePoll_OnSecondaryButtonClick"
+                           DefaultButton="Primary">
+                <ContentDialog.TitleTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="New poll" />
+                    </DataTemplate>
+                </ContentDialog.TitleTemplate>
+                <StackPanel>
+                    <TextBox x:Name="PollQuestion" Header="Question" PlaceholderText="Ask a question" />
+                    <TextBlock Text="Poll options"/>
+                    <ScrollViewer MinHeight="50" MaxHeight="100">
+                        <StackPanel x:Name="PollOptions">
+                            <TextBox x:Name="DefaultPollOption" PlaceholderText="Add an option"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <TextBlock Text="Settings"/>
+                    <CheckBox x:Name="AnonymousVoting" Content="Anonymous voting" IsChecked="True" />
+                    <CheckBox x:Name="MultipleAnswers" Content="Multiple answers" IsChecked="False"/>
+                    <CheckBox x:Name="QuizMode" Content="Quiz mode" IsChecked="False"/>
+                </StackPanel>
+            </ContentDialog>
         </Grid>
         
     </Border>
-    
     
 </Page>

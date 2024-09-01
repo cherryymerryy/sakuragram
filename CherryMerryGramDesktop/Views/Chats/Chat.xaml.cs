@@ -6,6 +6,7 @@ using Windows.System;
 using CherryMerryGramDesktop.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using TdLib;
 using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
@@ -23,10 +24,11 @@ namespace CherryMerryGramDesktop.Views.Chats
         private int _memberCount;
         private int _onlineMemberCount;
         private int _offset;
+        private int _pollOptionsCount = 1;
         
         private ReplyService _replyService;
         private MessageService _messageService;
-        
+
         public Chat()
         {
             InitializeComponent();
@@ -171,6 +173,24 @@ namespace CherryMerryGramDesktop.Views.Chats
                     var supergroupInfo = _client.GetSupergroupFullInfoAsync(
                         supergroupId: typeSupergroup.SupergroupId)
                         .Result;
+                    var supergroup = _client.GetSupergroupAsync(
+                        supergroupId: typeSupergroup.SupergroupId)
+                        .Result;
+
+                    if (supergroup.IsChannel)
+                    {
+                        UserActionsPanel.Visibility = supergroup.Status switch
+                        {
+                            TdApi.ChatMemberStatus.ChatMemberStatusCreator => Visibility.Visible,
+                            TdApi.ChatMemberStatus.ChatMemberStatusAdministrator => Visibility.Visible,
+                            TdApi.ChatMemberStatus.ChatMemberStatusMember => Visibility.Collapsed,
+                            TdApi.ChatMemberStatus.ChatMemberStatusBanned => Visibility.Collapsed,
+                            TdApi.ChatMemberStatus.ChatMemberStatusRestricted => Visibility.Collapsed,
+                            TdApi.ChatMemberStatus.ChatMemberStatusLeft => Visibility.Collapsed,
+                            _ => Visibility.Collapsed
+                        };
+                    }
+                    
                     ChatMembers.Text = supergroupInfo.MemberCount + " members";
                     break;
             }
@@ -189,24 +209,47 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             var offset = 0;
             chatId = _chatId;
-            
-            while (true)
+            bool moreMessages = true;
+
+            while (moreMessages)
             {
                 var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
-                { ChatId = chatId, Limit = 10, Offset = offset, FromMessageId = 0, OnlyLocal = false });
-                offset -= 1;
-
-                foreach (var message in messages.Messages_.Reverse())
                 {
-                    var chatMessage = new ChatMessage { _replyService = _replyService, _messageService = _messageService };
-                    chatMessage.UpdateMessage(message);
-                    MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                        () => {
-                            MessagesList.Children.Add(chatMessage); 
-                            _messagesList.Add(message);
-                        });
-                    
+                    ChatId = chatId,
+                    Limit = 100,
+                    Offset = offset,
+                    FromMessageId = _chat.LastMessage.Id,
+                    OnlyLocal = false
+                });
+
+                if (messages.Messages_.Length == 0)
+                {
+                    moreMessages = false;
+                    break;
                 }
+
+                offset -= messages.Messages_.Length;
+
+                var chatMessages = messages.Messages_.Reverse().Select(message =>
+                {
+                    var chatMessage = new ChatMessage
+                    {
+                        _replyService = _replyService,
+                        _messageService = _messageService
+                    };
+                    chatMessage.UpdateMessage(message);
+                    return chatMessage;
+                }).ToList();
+
+                MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
+                {
+                    foreach (var chatMessage in chatMessages)
+                    {
+                        MessagesList.Children.Add(chatMessage);
+                    }
+
+                    _messagesList.AddRange(messages.Messages_);
+                });
             }
         }
 
@@ -245,19 +288,9 @@ namespace CherryMerryGramDesktop.Views.Chats
             UserMessageInput.ClearValue(TextBox.TextProperty);
         }
 
-        private void Call_OnClick(object sender, RoutedEventArgs e)
+        private void MoreActions_OnClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var chat = _client.GetChatAsync(_chatId);
-                var messageSenderId = GetId(chat.Result.MessageSenderId);
-
-                _client.ExecuteAsync(new TdApi.CreateCall { IsVideo = false, Protocol = new TdApi.CallProtocol(), UserId = messageSenderId });
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-            }
+            ContextMenu.ShowAt(MoreActions);
         }
 
         private void Back_OnClick(object sender, RoutedEventArgs e)
@@ -282,6 +315,71 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 SendMessage_OnClick(sender, null);
             }
+        }
+        
+        private void ContextMenuNotifications_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ContextMenuViewGroupInfo_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ContextMenuToBeginning_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ContextMenuManageGroup_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ContextMenuBoostGroup_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ContextMenuCreatePoll_OnClick(object sender, RoutedEventArgs e)
+        {
+            CreatePoll.ShowAsync();
+        }
+
+        private void ContextMenuReport_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.ExecuteAsync(new TdApi.ReportChat
+            {
+                ChatId = _chatId, 
+                Reason = new TdApi.ReportReason.ReportReasonCopyright()
+            });
+        }
+
+        private void ContextMenuClearHistory_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.ExecuteAsync(new TdApi.DeleteChatHistory
+            {
+                ChatId = _chatId, RemoveFromChatList = false, Revoke = true
+            });
+        }
+
+        private void ContextMenuLeaveGroup_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CreatePoll_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+        }
+
+        private void CreatePoll_OnSecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            if (_pollOptionsCount >= 10) return;
+            _pollOptionsCount += 1;
+            var NewPollOption = new TextBox();
+            NewPollOption.PlaceholderText = "Add an option";
+            PollOptions.Children.Add(NewPollOption);
         }
     }
 }
