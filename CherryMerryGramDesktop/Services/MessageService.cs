@@ -9,6 +9,7 @@ public class MessageService
 {
     private static TdClient _client = App._client;
     private List<long> _selectedMessages = [];
+    public bool _isMessageSelected = false;
 
     public long[] GetSelectedMessages()
     {
@@ -19,12 +20,14 @@ public class MessageService
     {
         if (_selectedMessages.Contains(messageId)) return;
         _selectedMessages.Add(messageId);
+        if (_selectedMessages.Count > 0) _isMessageSelected = true;
     }
     
     public void DeselectMessage(long messageId)
     {
         if (!_selectedMessages.Contains(messageId)) return;
         _selectedMessages.Remove(messageId);
+        if (_selectedMessages.Count <= 0) _isMessageSelected = false;
     }
 
     public void ClearSelectedMessages()
