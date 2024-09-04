@@ -16,6 +16,7 @@ namespace CherryMerryGramDesktop.Views
     {
         private static TdClient _client = App._client;
         
+        public Chat _currentChat;
         private bool _bInArchive = false;
         private bool _firstGenerate = true;
         private int _totalUnreadArchivedChatsCount = 0;
@@ -94,14 +95,22 @@ namespace CherryMerryGramDesktop.Views
             {
                 var chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId}).Result;
             
-                var chatWidget = new Chat
+                _currentChat = new Chat
                 {
+                    _ChatsView = this,
                     _chatId = chat.Id
                 };
-                chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => chatWidget.UpdateChat(chat.Id));
-                Chat.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => Chat.Children.Add(chatWidget));
+                _currentChat.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _currentChat.UpdateChat(chat.Id));
+                Chat.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => Chat.Children.Add(_currentChat));
             }
             catch { }
+        }
+
+        public void CloseChat()
+        {
+            if (_currentChat == null) return;
+            _currentChat.CloseChat();
+            Chat.Children.Remove(_currentChat);
         }
         
         private async void GenerateChatEntries(TdApi.ChatList chatList)
@@ -118,6 +127,7 @@ namespace CherryMerryGramDesktop.Views
             {
                 var chatEntry = new ChatEntry
                 {
+                    _ChatsView = this,
                     ChatPage = Chat,
                     Chat = chat,
                     ChatId = chat.Id

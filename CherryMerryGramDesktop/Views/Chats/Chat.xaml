@@ -38,24 +38,36 @@
                             <TextBlock x:Name="ChatTitle" FontSize="14" FontStyle="Oblique" TextAlignment="Center" />
                             <TextBlock x:Name="ChatMembers" FontSize="10" Foreground="Gray" TextAlignment="Center"/>
                         </StackPanel>
-                        <Button x:Name="MoreActions" Content="..." Click="MoreActions_OnClick" HorizontalAlignment="Right" 
-                                VerticalAlignment="Center"
-                                IsEnabled="True" >
-                            <Button.Flyout>
-                                <MenuFlyout x:Name="ContextMenu" Placement="Bottom">
-                                    <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
-                                    <MenuFlyoutItem Text="View group info" Click="ContextMenuViewGroupInfo_OnClick"/>
-                                    <MenuFlyoutItem Text="To beginning" Click="ContextMenuToBeginning_OnClick"/>
-                                    <MenuFlyoutItem Text="Manage group" Click="ContextMenuManageGroup_OnClick"/>
-                                    <MenuFlyoutItem Text="Boost group" Click="ContextMenuBoostGroup_OnClick"/>
-                                    <MenuFlyoutItem Text="Create poll" Click="ContextMenuCreatePoll_OnClick"/>
-                                    <MenuFlyoutItem Text="Report" Click="ContextMenuReport_OnClick"/>
-                                    <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
-                                    <MenuFlyoutItem Text="Clear history" Click="ContextMenuClearHistory_OnClick"/>
-                                    <MenuFlyoutItem Text="Leave" Click="ContextMenuLeaveGroup_OnClick"/>
-                                </MenuFlyout>
-                            </Button.Flyout>
-                        </Button>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button x:Name="SearchMessages" Content="Search" Click="SearchMessages_OnClick" 
+                                    HorizontalAlignment="Right" 
+                                    VerticalAlignment="Center"
+                                    IsEnabled="True"
+                                    Margin="0,0,5,0"/>
+                            <Button x:Name="CreateVideoCall" Content="Call" Click="CreateVideoCall_OnClick" 
+                                    HorizontalAlignment="Right" 
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,5,0"/>
+                            <Button x:Name="MoreActions" Content="..." Click="MoreActions_OnClick" 
+                                    HorizontalAlignment="Right" 
+                                    VerticalAlignment="Center"
+                                    IsEnabled="True" >
+                                <Button.Flyout>
+                                    <MenuFlyout x:Name="ContextMenu" Placement="Bottom">
+                                        <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
+                                        <MenuFlyoutItem Text="View group info" Click="ContextMenuViewGroupInfo_OnClick"/>
+                                        <MenuFlyoutItem Text="To beginning" Click="ContextMenuToBeginning_OnClick"/>
+                                        <MenuFlyoutItem Text="Manage group" Click="ContextMenuManageGroup_OnClick"/>
+                                        <MenuFlyoutItem Text="Boost group" Click="ContextMenuBoostGroup_OnClick"/>
+                                        <MenuFlyoutItem Text="Create poll" Click="ContextMenuCreatePoll_OnClick"/>
+                                        <MenuFlyoutItem Text="Report" Click="ContextMenuReport_OnClick"/>
+                                        <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
+                                        <MenuFlyoutItem Text="Clear history" Click="ContextMenuClearHistory_OnClick"/>
+                                        <MenuFlyoutItem Text="Leave" Click="ContextMenuLeaveGroup_OnClick"/>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+                        </StackPanel>
                     </Grid>
                 </Border>
             </Grid>

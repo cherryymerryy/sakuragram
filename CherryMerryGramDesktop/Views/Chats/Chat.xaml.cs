@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.System;
 using CherryMerryGramDesktop.Services;
+using CherryMerryGramDesktop.Views.Calls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -17,6 +18,7 @@ namespace CherryMerryGramDesktop.Views.Chats
     {
         private static TdClient _client = App._client;
         private static TdApi.Chat _chat;
+        public ChatsView _ChatsView;
         private List<TdApi.Message> _messagesList = [];
         
         public long _chatId;
@@ -35,6 +37,16 @@ namespace CherryMerryGramDesktop.Views.Chats
 
             _replyService = new ReplyService();
             _messageService = new MessageService();
+            
+            #if DEBUG
+            {
+                CreateVideoCall.IsEnabled = true;
+            }
+            #else
+            {
+                CreateVideoCall.IsEnabled = false;
+            }
+            #endif
             
             //var pinnedMessage = _client.ExecuteAsync(new TdApi.GetChatPinnedMessage {ChatId = ChatId});
         }
@@ -302,6 +314,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             if (MessagesList.Children.Count > 0) MessagesList.Children.Clear();
             _client.ExecuteAsync(new TdApi.CloseChat {ChatId = _chatId});
+            _ChatsView.CloseChat();
         }
 
         private async void MessagesList_OnLoaded(object sender, RoutedEventArgs e)
@@ -380,6 +393,17 @@ namespace CherryMerryGramDesktop.Views.Chats
             var NewPollOption = new TextBox();
             NewPollOption.PlaceholderText = "Add an option";
             PollOptions.Children.Add(NewPollOption);
+        }
+
+        private void SearchMessages_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CreateVideoCall_OnClick(object sender, RoutedEventArgs e)
+        {
+            var videoCall = new VoiceCall();
+            videoCall.Activate();
         }
     }
 }

@@ -14,6 +14,7 @@ namespace CherryMerryGramDesktop.Views.Chats
     {
         public Grid ChatPage;
         private static Chat _chatWidget;
+        public ChatsView _ChatsView;
 
         private static readonly TdClient _client = App._client;
         
@@ -147,10 +148,13 @@ namespace CherryMerryGramDesktop.Views.Chats
                 _chatWidget = null;
             }
             
+            ChatEntry_OnRightTapped(null, null);
             _chatWidget = new Chat
             {
+                _ChatsView = _ChatsView,
                 _chatId = ChatId
             };
+            _ChatsView._currentChat = _chatWidget;
             
             _chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _chatWidget.UpdateChat(Chat.Id));
             ChatPage?.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatPage.Children.Add(_chatWidget));

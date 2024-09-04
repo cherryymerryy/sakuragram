@@ -21,9 +21,17 @@ namespace CherryMerryGramDesktop
 		public MainWindow()
 		{
 			InitializeComponent();
-			Title = "CherryMerryGram";
-            Window window = this;
-            window.ExtendsContentIntoTitleBar = true;
+			#if DEBUG
+			{
+				Title = "CherryMerryGram: DEBUG";
+			}
+			#else
+			{
+				Title = "CherryMerryGram";
+			}
+			#endif
+
+            ExtendsContentIntoTitleBar = true;
             NavigateToView("ChatsView");
             TrySetDesktopAcrylicBackdrop();
             
