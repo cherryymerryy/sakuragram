@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -76,14 +77,13 @@ namespace CherryMerryGramDesktop.Views
         private async void Button_LogOut_OnClick(object sender, RoutedEventArgs e)
         {
             await _client.ExecuteAsync(new TdApi.LogOut());
-            await _client.ExecuteAsync(new TdApi.Destroy());
             
             _mWindow = new LoginView();
             _mWindow.Activate();
             
             var window = (Application.Current as App)?._mWindow as MainWindow;
             if (window == null) return;
-            window.Close();
+            window.AppWindow.Destroy();
         }
 
         private void Button_Apply_OnClick(object sender, RoutedEventArgs e)

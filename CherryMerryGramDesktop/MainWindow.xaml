@@ -23,6 +23,13 @@
 					<InfoBadge x:Name="UnreadMessagesCount" />
 				</NavigationViewItem.InfoBadge>
 			</NavigationViewItem>
+			<NavigationViewItem x:Name="NavViewUpdateManager" Content="Update manager" Tag="UpdateManagerView" 
+			                    Icon="Sync" 
+			                    IsEnabled="False">
+				<NavigationViewItem.InfoBadge>
+					<InfoBadge x:Name="CurrentVersionBadge"/>
+				</NavigationViewItem.InfoBadge>
+			</NavigationViewItem>
 		</NavigationView.MenuItems>
 		<NavigationView.FooterMenuItems>
 			<NavigationViewItem x:Name="NavViewAccount" Content="Account" Tag="AccountView" Icon="Contact" />

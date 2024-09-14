@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Windows.System;
 using CherryMerryGramDesktop.Services;
@@ -9,6 +10,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
 using TdLib;
 using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
 
@@ -217,7 +219,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 $"{_memberCount} members";
         }
 
-        private async Task GetMessagesAsync(long chatId)
+        private Task GetMessagesAsync(long chatId)
         {
             var offset = 0;
             chatId = _chatId;
@@ -225,14 +227,14 @@ namespace CherryMerryGramDesktop.Views.Chats
 
             while (moreMessages)
             {
-                var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
+                var messages = _client.ExecuteAsync(new TdApi.GetChatHistory
                 {
                     ChatId = chatId,
                     Limit = 100,
                     Offset = offset,
                     FromMessageId = _chat.LastMessage.Id,
                     OnlyLocal = false
-                });
+                }).Result;
 
                 if (messages.Messages_.Length == 0)
                 {
@@ -263,6 +265,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                     _messagesList.AddRange(messages.Messages_);
                 });
             }
+            return Task.CompletedTask;
         }
 
         private static long GetId(TdApi.MessageSender sender)
@@ -337,7 +340,6 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void ContextMenuViewGroupInfo_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         private void ContextMenuToBeginning_OnClick(object sender, RoutedEventArgs e)

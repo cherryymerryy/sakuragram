@@ -11,9 +11,9 @@ public partial class Auth_ForgotPassword : Window
     public Auth_ForgotPassword()
     {
         InitializeComponent();
+        
         Title = "CherryMerryGram : Password recovery";
-        Window window = this;
-        window.ExtendsContentIntoTitleBar = true;
+        ExtendsContentIntoTitleBar = true;
         TrySetDesktopAcrylicBackdrop();
         
         _client.ExecuteAsync(new TdApi.RequestAuthenticationPasswordRecovery());
@@ -47,6 +47,8 @@ public partial class Auth_ForgotPassword : Window
             NewHint = NewHint.Text
         });
         
+        var window = new LoginView();
+        window.Activate();
         Close();
     }
 

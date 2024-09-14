@@ -1,18 +1,22 @@
-﻿using Windows.Foundation;
-using Windows.Graphics;
-using Windows.UI.ViewManagement;
+﻿using Windows.Graphics;
 using Microsoft.UI.Xaml;
+using TdLib;
 
 namespace CherryMerryGramDesktop.Views.Calls
 {
     public partial class VoiceCall : Window
     {
+        private static TdClient _client = App._client;
+        private bool _isIncomingCall;
+        private bool _isOutgoingCall;
+        private bool _isMuted = false;
+        
         public VoiceCall()
         {
             InitializeComponent();
             
             ExtendsContentIntoTitleBar = true;
-            AppWindow.Resize(new SizeInt32(400, 800));
+            AppWindow.Resize(new SizeInt32(600, 300));
             TrySetDesktopAcrylicBackdrop();
         }
         
@@ -27,6 +31,22 @@ namespace CherryMerryGramDesktop.Views.Calls
             }
 
             return false;
+        }
+
+        private void ButtonMute_OnClick(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ButtonShareScreen_OnClick(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ButtonEnableVideo_OnClick(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ButtonEndCall_OnClick(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

@@ -1,9 +1,6 @@
-using System.Reflection;
 using System.Threading.Tasks;
 using CherryMerryGramDesktop.Views.Auth;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
 using TdLib;
 
 namespace CherryMerryGramDesktop.Views
@@ -134,6 +131,7 @@ namespace CherryMerryGramDesktop.Views
 		{
 			var window = new Auth_ForgotPassword();
 			window.Activate();
+			AppWindow.Destroy();
 		}
 	}
 }

@@ -24,6 +24,8 @@
                 <RowDefinition Height="50" />
             </Grid.RowDefinitions>
             
+            <Frame x:Name="ContentFrame"/>
+            
             <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50"
                         Grid.Row="0" 
                         Padding="5">
@@ -78,10 +80,12 @@
                     </ScrollViewer>
             </Grid>
             
-            <Grid x:Name="UserActionsPanel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="50" MaxHeight="50" 
+            <Grid x:Name="UserActionsPanel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="50" 
+                  MaxHeight="50" 
                         MinHeight="50" 
                         Grid.Row="2" Padding="5">
-                <Border Background="#1a1a1a" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" CornerRadius="4" Padding="5">
+                <Border Background="#1a1a1a" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" CornerRadius="4" 
+                        Padding="5">
                     <Grid>
                         <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"
                                  HorizontalAlignment="Stretch"

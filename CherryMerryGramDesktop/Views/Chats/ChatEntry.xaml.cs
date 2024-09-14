@@ -55,13 +55,19 @@ namespace CherryMerryGramDesktop.Views.Chats
                 // }
                 case TdApi.Update.UpdateChatTitle updateChatTitle:
                 {
-                    TextBlockChatName.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, 
-                        () => TextBlockChatName.Text = updateChatTitle.Title);
+                    if (updateChatTitle.ChatId == ChatId)
+                    {
+                        TextBlockChatName.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
+                            () => TextBlockChatName.Text = updateChatTitle.Title);
+                    }
                     break;
                 }
-                case TdApi.Update.UpdateChatPhoto:
+                case TdApi.Update.UpdateChatPhoto updateChatPhoto:
                 {
-                    ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(() => GetChatPhoto(Chat));
+                    if (updateChatPhoto.ChatId == ChatId)
+                    {
+                        ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(() => GetChatPhoto(Chat));
+                    }
                     break;
                 }
                 // case TdApi.Update.UpdateChatAddedToList:

@@ -241,15 +241,29 @@ namespace CherryMerryGramDesktop.Views
             NewMessage.ShowAsync();
         }
 
-        private void NewGroup_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private async void NewGroup_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             if (TextBoxGroupName.Text == "") return;
 
-            _client.ExecuteAsync(new TdApi.CreateNewBasicGroupChat
+            var newGroupPhoto = await _client.ExecuteAsync(new TdApi.PreliminaryUploadFile
+            {
+                File = new TdApi.InputFile.InputFileLocal{Path = "C:/Users/cherrymerryy/Downloads/AyuGram Desktop/12.png"}, 
+                FileType = new TdApi.FileType.FileTypeProfilePhoto(), 
+                Priority = 1
+            });
+            
+            var newGroup = await _client.ExecuteAsync(new TdApi.CreateNewBasicGroupChat
             {
                 Title = TextBoxGroupName.Text,
-                UserIds = null
+                UserIds = null,
+                
             });
+            
+            // _client.ExecuteAsync(new TdApi.SetChatPhoto
+            // {
+            //     ChatId = newGroup.ChatId, 
+            //     Photo = 
+            // });
         }
         
         private void NewChannel_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
