@@ -33,12 +33,15 @@
             <NavigationViewItem x:Name="NavViewNotificationsAndSounds" Content="Notifications and Sounds" 
                                 Tag="NotificationsAndSounds" 
                                 Icon="Volume"/>
+            <NavigationViewItem x:Name="NavViewPrivacyAndSecurity" Content="Privacy and Security" 
+                                Tag="PrivacyAndSecurity" 
+                                Icon="Volume"/>
             <NavigationViewItem x:Name="NavViewChatSettings" Content="Chat settings" 
                                 Tag="ChatSettings"
                                 Icon="People"/>
             <NavigationViewItem x:Name="NavViewFolders" Content="Folders" 
                                 Tag="Folders"
-                                Icon="People"/>
+                                Icon="Folder"/>
             <NavigationViewItem x:Name="NavViewAdvanced" Content="Advanced" 
                                 Tag="Advanced"
                                 Icon="List"/>
