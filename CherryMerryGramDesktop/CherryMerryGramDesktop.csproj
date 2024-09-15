@@ -14,6 +14,7 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
+	<WindowsSdkPackageVersion>10.0.26100.38</WindowsSdkPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -61,6 +62,9 @@
       <DependentUpon>WebAppView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <WebView2EnableCsWinRTProjection>False</WebView2EnableCsWinRTProjection>
+  </PropertyGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
