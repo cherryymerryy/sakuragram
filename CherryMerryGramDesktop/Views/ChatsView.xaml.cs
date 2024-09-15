@@ -147,10 +147,10 @@ namespace CherryMerryGramDesktop.Views
         {
             foreach (var chatId in chats.ChatIds)
             {
-                var chat = await _client.ExecuteAsync(new TdApi.GetChat
+                var chat = _client.ExecuteAsync(new TdApi.GetChat
                 {
                     ChatId = chatId
-                });
+                }).Result;
 
                 if (chat.Type is TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypeBasicGroup or TdApi.ChatType.ChatTypePrivate)
                 {

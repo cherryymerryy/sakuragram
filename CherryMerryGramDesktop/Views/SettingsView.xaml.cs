@@ -2,33 +2,45 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.UI.Core;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
+using TdLib;
 
 namespace CherryMerryGramDesktop.Views
 {
     public sealed partial class SettingsView : Page
     {
+        private TdClient _client = App._client;
+        private NavigationViewItem _lastItem;
+        
         public SettingsView()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             
-            Version.Content = $"Latest version: {ThisAssembly.Git.BaseTag}";
-            Version.NavigateUri = new Uri($"https://github.com/cherryymerryy/CherryMerryGram/releases/tag/{ThisAssembly.Git.BaseTag}");
+            //Version.Text = $"Version {ThisAssembly.Git.BaseTag}";
+            //HyperlinkButtonLatestRelease.NavigateUri = new Uri($"https://github.com/cherryymerryy/CherryMerryGram/releases/tag/{ThisAssembly.Git.BaseTag}");
 
             //StartUpdatingDcStatus();
             //UpdateDcStatus(Dc1Status, 1);
+            
+            NavigateToView("Account");
         }
 
+        private void TestVoid()
+        {
+        }
+        
         private async void StartUpdatingDcStatus()
         {
-            await UpdateDcStatus(Dc1Status, 1);
-            await UpdateDcStatus(Dc2Status, 2);
-            await UpdateDcStatus(Dc3Status, 3);
-            await UpdateDcStatus(Dc4Status, 4);
-            await UpdateDcStatus(Dc5Status, 5);
+            //await UpdateDcStatus(Dc1Status, 1);
+            //await UpdateDcStatus(Dc2Status, 2);
+            //await UpdateDcStatus(Dc3Status, 3);
+            //await UpdateDcStatus(Dc4Status, 4);
+            //await UpdateDcStatus(Dc5Status, 5);
         }
         
         private Task UpdateDcStatus(TextBlock textStatus, int serverIndex)
@@ -69,6 +81,37 @@ namespace CherryMerryGramDesktop.Views
             Thread.Sleep(5000);
             
             return Task.CompletedTask;
+        }
+
+        private void NavigationView_OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+        {
+            var item = args.InvokedItemContainer as NavigationViewItem;
+            if (item == null || item == _lastItem)
+                return;
+
+            var clickedView = item.Tag.ToString();
+
+            if (!NavigateToView(clickedView)) return;
+            _lastItem = item;
+        }
+
+        private void FrameworkElement_OnLoaded(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void NavigationView_OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        {
+        }
+        
+        private bool NavigateToView(string clickedView)
+        {
+            var view = Assembly.GetExecutingAssembly().GetType($"CherryMerryGramDesktop.Views.Settings.{clickedView}");
+
+            if (string.IsNullOrEmpty(clickedView) || view == null)
+                return false;
+
+            ContentFrame.Navigate(view, null, new EntranceNavigationTransitionInfo());
+            return true;
         }
     }
 }

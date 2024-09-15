@@ -69,6 +69,22 @@ namespace CherryMerryGramDesktop
 					//_notificationService.SendNotification(updateNewMessage.Message);
 					break;
 				}
+				case TdApi.Update.UpdateConnectionState updateConnectionState:
+				{
+					DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+					{
+						Title = updateConnectionState.State switch
+						{
+							TdApi.ConnectionState.ConnectionStateReady => "CherryMerryGram",
+							TdApi.ConnectionState.ConnectionStateUpdating => "Updating...",
+							TdApi.ConnectionState.ConnectionStateConnecting => "Connecting...",
+							TdApi.ConnectionState.ConnectionStateWaitingForNetwork => "Waiting for network...",
+							TdApi.ConnectionState.ConnectionStateConnectingToProxy => "Connecting to proxy...",
+							_ => "CherryMerryGram"
+						};
+					});
+					break;
+				}
 			}
 		}
 
@@ -96,7 +112,7 @@ namespace CherryMerryGramDesktop
 			if (item == null || item == _lastItem)
 				return;
 
-			var clickedView = item.Tag.ToString() ?? "SettingsView";
+			var clickedView = item.Tag.ToString();
 
 			if (!NavigateToView(clickedView)) return;
 			_lastItem = item;

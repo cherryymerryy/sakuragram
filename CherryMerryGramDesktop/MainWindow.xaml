@@ -32,7 +32,6 @@
 			</NavigationViewItem>
 		</NavigationView.MenuItems>
 		<NavigationView.FooterMenuItems>
-			<NavigationViewItem x:Name="NavViewAccount" Content="Account" Tag="AccountView" Icon="Contact" />
 			<NavigationViewItem x:Name="NavViewSettings" Content="Settings" Tag="SettingsView" Icon="Setting" />
 			<NavigationViewItem x:Name="NavViewHelp" Content="Help" Tag="HelpView" Icon="Help" />
 		</NavigationView.FooterMenuItems>

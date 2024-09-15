@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="CherryMerryGramDesktop.Views.Settings.NotificationsAndSounds"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    mc:Ignorable="d">
+    <Page.Resources>
+
+        <x:Double x:Key="SettingsCardSpacing">4</x:Double>
+
+        <Style x:Key="SettingsSectionHeaderTextBlockStyle"
+               BasedOn="{StaticResource BodyStrongTextBlockStyle}"
+               TargetType="TextBlock">
+            <Style.Setters>
+                <Setter Property="Margin" Value="1,30,0,6" />
+            </Style.Setters>
+        </Style>
+        
+    </Page.Resources>
+    
+    <ScrollViewer>
+        <Grid>
+            <StackPanel MaxWidth="1000"
+                        HorizontalAlignment="Stretch"
+                        Spacing="{StaticResource SettingsCardSpacing}">
+                <win:StackPanel.ChildrenTransitions>
+                    <win:EntranceThemeTransition FromVerticalOffset="50" />
+                    <win:RepositionThemeTransition IsStaggeringEnabled="False" />
+                </win:StackPanel.ChildrenTransitions>
+                    <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                               Text="Notifications" />
+                            
+                    <controls:SettingsCard Description="Turn this off if you want to receive notifications only from the account you are currently using."
+                                           Header="Show notifications from"
+                                           HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                        <ToggleSwitch OffContent="Current account" 
+                                      OnContent="All accounts" 
+                                      IsOn="False" />
+                    </controls:SettingsCard>
+                    
+                    <controls:SettingsExpander Header="Global settings">
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="Desktop notifications"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="Flash the taskbar icon"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="Allow sound"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+                    
+                    <controls:SettingsExpander Header="Notifications for chats">
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="Private chats"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="Groups"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="Channels"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+                    
+                    <controls:SettingsExpander Header="Events">
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="Contact joined Telegram"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="Pinned messages"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+                    
+                    <controls:SettingsExpander Header="Calls">
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="Accept calls on this device"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+                    
+                    <controls:SettingsExpander Header="Badge counter">
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="Include muted chats in unread count"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="Count unread messages"
+                                                   HeaderIcon="{ui:FontIcon Glyph=&#xE716;}">
+                                <ToggleSwitch IsOn="False" />
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>
