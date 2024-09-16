@@ -47,10 +47,12 @@
                               Height="Auto">
                     <StackPanel x:Name="ChatsList" Width="350" Height="Auto" Loaded="ChatList_OnLoaded" />
                 </ScrollViewer>
-                <Button x:Name="ButtonNewMessage" Width="42" Height="42" Content="+" FontSize="18" Margin="5" 
+                <Button x:Name="ButtonNewMessage" Width="52" Height="52" Content="+" FontSize="18" Margin="5" 
+                        Style="{StaticResource AccentButtonStyle}"
                         Click="ButtonNewMessage_OnClick"
                         HorizontalAlignment="Left"
-                        VerticalAlignment="Bottom"/>
+                        VerticalAlignment="Bottom"
+                        RelativePanel.AlignBottomWithPanel="True"/>
             </RelativePanel>
             
             <ContentDialog x:Name="NewMessage" CloseButtonText="Cancel" PrimaryButtonText="Create">
