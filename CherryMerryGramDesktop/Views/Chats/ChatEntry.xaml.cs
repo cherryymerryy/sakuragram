@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
@@ -20,6 +19,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         public TdApi.Chat Chat;
         public long ChatId;
+        private int _profilePhotoFileId;
         
         public ChatEntry()
         {
@@ -32,27 +32,6 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             switch (update)
             {
-                // case TdApi.Update.UpdateChatLastMessage:
-                // {
-                //     TextBlockChatLastMessage.DispatcherQueue.TryEnqueue(() => GetLastMessage(_client.GetChatAsync(ChatId).Result));
-                //     break;
-                // }
-                // case TdApi.Update.UpdateChatReadInbox updateChatReadInbox:
-                // {
-                //     UnreadMessagesCount.DispatcherQueue.TryEnqueue(() =>
-                //     {
-                //         if (Chat.UnreadCount > 0)
-                //         {
-                //             UnreadMessagesCount.Visibility = Visibility.Visible;
-                //             UnreadMessagesCount.Value = updateChatReadInbox.UnreadCount;
-                //         }
-                //         else
-                //         {
-                //             UnreadMessagesCount.Visibility = Visibility.Collapsed;
-                //         } 
-                //     });
-                //     break;
-                // }
                 case TdApi.Update.UpdateChatTitle updateChatTitle:
                 {
                     if (updateChatTitle.ChatId == ChatId)
@@ -70,26 +49,23 @@ namespace CherryMerryGramDesktop.Views.Chats
                     }
                     break;
                 }
-                // case TdApi.Update.UpdateChatAddedToList:
-                // {
-                //     TextBlockChatName.Text = Chat.Title;
-                //
-                //     GetChatPhoto(Chat);
-                //     GetLastMessage(_client.GetChatAsync(ChatId).Result);
-                //
-                //     if (Chat.UnreadCount > 0)
-                //     {
-                //         if (UnreadMessagesCount.Visibility == Visibility.Collapsed)
-                //             UnreadMessagesCount.Visibility = Visibility.Visible;
-                //         UnreadMessagesCount.Value = Chat.UnreadCount;
-                //     }
-                //     else
-                //     {
-                //         UnreadMessagesCount.Visibility = Visibility.Collapsed;
-                //     }
-                //
-                //     break;
-                // }
+                case TdApi.Update.UpdateFile updateFile:
+                {
+                    if (updateFile.File.Id != _profilePhotoFileId) return Task.CompletedTask;
+                    ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(() =>
+                    {
+                        if (updateFile.File.Local.Path != "")
+                        {
+                            ChatEntryProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path));
+                        }
+                        else
+                        {
+                            ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
+                                () => ChatEntryProfilePicture.DisplayName = Chat.Title);
+                        }
+                    });
+                    break;
+                }
             }
 
             return Task.CompletedTask;
@@ -115,21 +91,36 @@ namespace CherryMerryGramDesktop.Views.Chats
             }
         }
         
-        private async void GetChatPhoto(TdApi.Chat chat)
+        private void GetChatPhoto(TdApi.Chat chat)
         {
-            try
+            if (chat.Photo == null)
             {
-                var chatPhoto = await _client.ExecuteAsync(new TdApi.DownloadFile
-                {
-                    FileId = chat.Photo.Small.Id,
-                    Priority = 1
-                });
-                
-                ChatEntryProfilePicture.ImageSource = new BitmapImage(new Uri(chatPhoto.Local.Path));
+                ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
+                    () => ChatEntryProfilePicture.DisplayName = chat.Title);
+                return;
             }
-            catch (Exception e)
+            if (chat.Photo.Big.Local.Path != "")
             {
-                Console.WriteLine(e);
+                try
+                {
+                    ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                        () => ChatEntryProfilePicture.ProfilePicture = new BitmapImage(new Uri(chat.Photo.Big.Local.Path)));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
+            else
+            {
+                _profilePhotoFileId = chat.Photo.Big.Id;
+                
+                var file = _client.ExecuteAsync(new TdApi.DownloadFile
+                {
+                    FileId = _profilePhotoFileId,
+                    Priority = 1
+                }).Result;
             }
         }
 
@@ -228,7 +219,6 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void ContextMenuNotifications_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         private void ContextMenuPin_OnClick(object sender, RoutedEventArgs e)

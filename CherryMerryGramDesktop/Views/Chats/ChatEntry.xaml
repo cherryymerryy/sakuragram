@@ -21,16 +21,12 @@
     
     <StackPanel x:Name="ChatEntryInfo" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         
-        <Border Width="42px"
-                Height="42px"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                CornerRadius="30"
-                Margin="10">
-            <Border.Background>
-                <ImageBrush x:Name="ChatEntryProfilePicture" />
-            </Border.Background>
-        </Border>
+        <PersonPicture x:Name="ChatEntryProfilePicture" 
+                       Width="46"
+                       Height="46"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       Margin="10"/>
         
         <Grid>
             <Grid.ColumnDefinitions>
@@ -39,7 +35,7 @@
             </Grid.ColumnDefinitions>
         </Grid>
         
-        <Grid Column="0" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+        <Grid Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <StackPanel Orientation="Vertical">
                 <TextBlock x:Name="TextBlockChatName" FontSize="14"/>
                 <TextBlock x:Name="TextBlockChatLastMessage" FontSize="10" />
