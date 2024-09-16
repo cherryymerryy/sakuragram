@@ -38,7 +38,18 @@
                                Margin="10"/>
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch">
                     <TextBlock x:Name="TextBlockChatName" FontSize="14" MaxLines="1" TextTrimming="Clip"/>
-                    <TextBlock x:Name="TextBlockChatLastMessage" FontSize="10" MaxLines="1" TextTrimming="Clip"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="TextBlockChatUsername"
+                                   FontSize="10" 
+                                   MaxLines="1" 
+                                   TextTrimming="Clip"
+                                   Foreground="{StaticResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="TextBlockChatLastMessage" 
+                                   FontSize="10" 
+                                   MaxLines="1" 
+                                   TextTrimming="Clip"
+                                   Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
             

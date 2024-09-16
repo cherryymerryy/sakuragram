@@ -183,56 +183,104 @@ namespace CherryMerryGramDesktop.Views.Chats
             _chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _chatWidget.UpdateChat(Chat.Id));
             ChatPage?.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatPage.Children.Add(_chatWidget));
         }
-
-        private static Task<TdApi.User> GetUser(TdApi.Message message)
-        {
-            var userId = message.SenderId switch {
-                TdApi.MessageSender.MessageSenderUser u => u.UserId,
-                _ => 0
-            };
-            
-            var user = _client.ExecuteAsync(new TdApi.GetUser
-            {
-                UserId = userId
-            });
-
-            return user;
-        }
         
         private void GetLastMessage(TdApi.Chat chat)
         {
-            try
+            switch (chat.Type)
             {
-                if (chat.Type is TdApi.ChatType.ChatTypePrivate) return;
-                if ((chat.Type as TdApi.ChatType.ChatTypeSupergroup)!.IsChannel) return;
-                
-                var user = GetUser(chat.LastMessage).Result;
-                var userFirstName = ""; //chat.Permissions.CanSendBasicMessages ? $"{user.FirstName}: " : "";
-                
-                TextBlockChatLastMessage.Text = chat.LastMessage.Content switch
+                case TdApi.ChatType.ChatTypePrivate:
+                    var privateId = chat.LastMessage.SenderId switch {
+                        TdApi.MessageSender.MessageSenderUser u => u.UserId,
+                        _ => 0
+                    };
+                    var currentUser = _client.GetMeAsync().Result;
+            
+                    if (privateId == currentUser.Id)
+                    {
+                        TextBlockChatUsername.Visibility = Visibility.Visible;
+                        TextBlockChatUsername.Text = "You: ";
+                    }
+                    else
+                    {
+                        TextBlockChatUsername.Visibility = Visibility.Collapsed;
+                    }
+                    
+                    break;
+                case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
                 {
-                    TdApi.MessageContent.MessageText messageText => $"{userFirstName}: {messageText.Text.Text}",
-                    TdApi.MessageContent.MessageAudio messageAudio =>
-                        $"{userFirstName}Audio message ({messageAudio.Audio.Duration})",
-                    TdApi.MessageContent.MessageVoiceNote messageVoiceNote =>
-                        $"{userFirstName}Voice message ({messageVoiceNote.VoiceNote.Duration})",
-                    TdApi.MessageContent.MessageVideo messageVideo =>
-                        $"{userFirstName}Video message ({messageVideo.Video.Duration} sec)",
-                    TdApi.MessageContent.MessagePhoto messagePhoto =>
-                        $"{userFirstName}Photo message ({messagePhoto.Photo.Minithumbnail.Width}x" +
-                        $"{messagePhoto.Photo.Minithumbnail.Height}), {messagePhoto.Caption.Text}",
-                    TdApi.MessageContent.MessageSticker messageSticker =>
-                        $"{userFirstName}{messageSticker.Sticker.Emoji} Sticker message",
-                    TdApi.MessageContent.MessagePoll messagePoll => $"{userFirstName}{messagePoll.Poll.Question} Poll message",
-                    TdApi.MessageContent.MessagePinMessage messagePinMessage =>
-                        $"{userFirstName}pinned {GetMessageText(chat.Id, messagePinMessage.MessageId)}",
-                    _ => TextBlockChatLastMessage.Text
-                };
+                    var supergroup = _client.GetSupergroupAsync(supergroupId: typeSupergroup.SupergroupId).Result;
+                    
+                    if (supergroup.IsChannel)
+                    {
+                        TextBlockChatUsername.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        TextBlockChatUsername.Visibility = Visibility.Visible;
+                        try
+                        {
+                            var id = chat.LastMessage.SenderId switch {
+                                TdApi.MessageSender.MessageSenderUser u => u.UserId,
+                                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
+                                _ => 0
+                            };
+            
+                            if (id > 0)
+                            {
+                                var user = _client.GetUserAsync(id).Result;
+                                TextBlockChatUsername.Text = user.FirstName + ": ";
+                            }
+                            else
+                            {
+                                TextBlockChatUsername.Text = chat.Title + ": ";
+                            }
+                        }
+                        catch {}
+                    }
+                    
+                    break;
+                }
             }
-            catch (Exception e)
+            
+            TextBlockChatLastMessage.Text = chat.LastMessage.Content switch
             {
-                Console.WriteLine(e);
-            }
+                TdApi.MessageContent.MessageText messageText => $"{messageText.Text.Text}",
+                TdApi.MessageContent.MessageAnimation messageAnimation => 
+                    $"GIF ({messageAnimation.Animation.Duration} sec), {messageAnimation.Caption.Text}",
+                TdApi.MessageContent.MessageAudio messageAudio =>
+                    $"Audio message ({messageAudio.Audio.Duration} sec) {messageAudio.Caption.Text}",
+                TdApi.MessageContent.MessageVoiceNote messageVoiceNote =>
+                    $"Voice message ({messageVoiceNote.VoiceNote.Duration} sec) {messageVoiceNote.Caption.Text}",
+                TdApi.MessageContent.MessageVideo messageVideo =>
+                    $"Video ({messageVideo.Video.Duration} sec)",
+                TdApi.MessageContent.MessageVideoNote messageVideoNote =>
+                    $"Video message ({messageVideoNote.VideoNote.Duration} sec)",
+                TdApi.MessageContent.MessagePhoto messagePhoto =>
+                    $"Photo, {messagePhoto.Caption.Text}",
+                TdApi.MessageContent.MessageSticker messageSticker =>
+                    $"{messageSticker.Sticker.Emoji} Sticker message",
+                TdApi.MessageContent.MessagePoll messagePoll => $"{messagePoll.Poll.Question} Poll message",
+                TdApi.MessageContent.MessagePinMessage messagePinMessage =>
+                    $"pinned {GetMessageText(chat.Id, messagePinMessage.MessageId)}",
+                
+                // Chat messages
+                TdApi.MessageContent.MessageChatAddMembers messageChatAddMembers => $"{messageChatAddMembers.MemberUserIds}",
+                TdApi.MessageContent.MessageChatChangeTitle messageChatChangeTitle => $"changed chat title to {messageChatChangeTitle.Title}",
+                TdApi.MessageContent.MessageChatChangePhoto => $"updated group photo",
+                
+                TdApi.MessageContent.MessageChatDeleteMember messageChatDeleteMember => 
+                    $"removed user {_client.GetUserAsync(userId: messageChatDeleteMember.UserId).Result.FirstName}",
+                TdApi.MessageContent.MessageChatDeletePhoto => $"deleted group photo",
+                
+                TdApi.MessageContent.MessageChatUpgradeFrom messageChatUpgradeFrom => 
+                    $"{messageChatUpgradeFrom.Title} upgraded to supergroup",
+                TdApi.MessageContent.MessageChatUpgradeTo messageChatUpgradeTo => $"",
+                
+                TdApi.MessageContent.MessageChatJoinByLink => $"joined by link",
+                TdApi.MessageContent.MessageChatJoinByRequest => $"joined by request",
+                
+                _ => "Unsupported message type"
+            };
         }
         
         private void ChatEntry_OnRightTapped(object sender, RightTappedRoutedEventArgs e)
