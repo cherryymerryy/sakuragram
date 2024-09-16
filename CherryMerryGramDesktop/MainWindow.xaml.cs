@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
@@ -47,18 +48,6 @@ namespace CherryMerryGramDesktop
             
 			UnreadMessagesCount.Value = _totalUnreadCount;
 			NavigationView.PaneTitle = "CherryMerryGram";
-			
-			// var folders = _client.ExecuteAsync(new TdApi.GetRecommendedChatFolders()).Result.ChatFolders;
-			// foreach (var folder in folders)
-			// {
-			// 	folder.Folder.ExcludeArchived = true;
-			// 	var folderItem = new NavigationViewItem
-			// 	{
-			// 		Tag = "ChatsView",
-			// 		Content = folder.Folder.Title
-			// 	};
-			// 	NavViewChats.MenuItems.Add(folderItem);
-			// }
 		}
 
 		private async Task ProcessUpdates(TdApi.Update update)
