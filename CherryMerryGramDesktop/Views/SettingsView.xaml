@@ -30,7 +30,7 @@
                     Loaded="FrameworkElement_OnLoaded"
                     SelectionChanged="NavigationView_OnSelectionChanged">
         <NavigationView.MenuItems>
-            <NavigationViewItem x:Name="NavViewAccount" Content="Account" Tag="Account" Icon="Contact"/>
+            <NavigationViewItem x:Name="NavViewEditProfile" Content="Edit profile" Tag="Profile" Icon="Contact"/>
             <NavigationViewItem x:Name="NavViewNotificationsAndSounds" Content="Notifications and Sounds" 
                                 Tag="NotificationsAndSounds" 
                                 Icon="Volume"/>

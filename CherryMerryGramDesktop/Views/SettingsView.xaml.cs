@@ -27,7 +27,7 @@ namespace CherryMerryGramDesktop.Views
             //StartUpdatingDcStatus();
             //UpdateDcStatus(Dc1Status, 1);
             
-            NavigateToView("Account");
+            NavigateToView("Profile");
         }
 
         private void TestVoid()
