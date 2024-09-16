@@ -30,7 +30,7 @@ namespace CherryMerryGramDesktop
 				Title = "CherryMerryGram";
 			}
 			#endif
-
+			
             ExtendsContentIntoTitleBar = true;
             NavigateToView("ChatsView");
             TrySetDesktopAcrylicBackdrop();
@@ -46,6 +46,7 @@ namespace CherryMerryGramDesktop
             }
             
 			UnreadMessagesCount.Value = _totalUnreadCount;
+			NavigationView.PaneTitle = "CherryMerryGram";
 			
 			// var folders = _client.ExecuteAsync(new TdApi.GetRecommendedChatFolders()).Result.ChatFolders;
 			// foreach (var folder in folders)
@@ -73,7 +74,7 @@ namespace CherryMerryGramDesktop
 				{
 					DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
 					{
-						Title = updateConnectionState.State switch
+						NavigationView.PaneTitle = updateConnectionState.State switch
 						{
 							TdApi.ConnectionState.ConnectionStateReady => "CherryMerryGram",
 							TdApi.ConnectionState.ConnectionStateUpdating => "Updating...",
@@ -126,6 +127,14 @@ namespace CherryMerryGramDesktop
 				return false;
 
 			ContentFrame.Navigate(view, null, new EntranceNavigationTransitionInfo());
+
+			NavigationView.PaneDisplayMode = clickedView switch
+			{
+				"SettingsView" => NavigationViewPaneDisplayMode.LeftCompact,
+				"ChatsView" => NavigationViewPaneDisplayMode.Left,
+				_ => NavigationView.PaneDisplayMode
+			};
+
 			return true;
         }
 
