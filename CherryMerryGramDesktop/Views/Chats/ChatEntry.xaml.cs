@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
 
@@ -79,7 +81,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             
             GetChatPhoto(Chat);
             GetLastMessage(_client.GetChatAsync(ChatId).Result); 
-                    
+            
             if (Chat.UnreadCount > 0)
             {
                 if (UnreadMessagesCount.Visibility == Visibility.Collapsed) UnreadMessagesCount.Visibility = Visibility.Visible;
@@ -88,6 +90,31 @@ namespace CherryMerryGramDesktop.Views.Chats
             else
             {
                 UnreadMessagesCount.Visibility = Visibility.Collapsed;
+            }
+
+            if (Chat.NotificationSettings.MuteFor <= 0)
+            {
+                UnreadMessagesCount.Background = new SolidColorBrush(Colors.Gray);
+            }
+            
+            switch (Chat.Type)
+            {
+                case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
+                {
+                    var supergroup = _client.GetSupergroupAsync(
+                            supergroupId: typeSupergroup.SupergroupId)
+                        .Result;
+                    if (supergroup.IsForum)
+                    {
+                        ChatEntryProfilePicture.CornerRadius = new CornerRadius(0);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    break;
+                }
             }
         }
         
