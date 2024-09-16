@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using TdLib;
 
 namespace CherryMerryGramDesktop.Views.Settings;
@@ -21,5 +22,13 @@ public partial class PrivacyAndSecurity : Page
         CardBlockedUsers.Description = $"There are currently {blockedUsers} blocked users";
         CardConnectedWebsites.Description = $"There are currently {connectedWebsites} connected websites";
         CardActiveSessions.Description = $"There are currently {activeSessions} active sessions";
+    }
+
+    private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+    }
+
+    private void ClearPaymentInfo_OnClick(object sender, RoutedEventArgs e)
+    {
     }
 }

@@ -389,7 +389,8 @@
                 <controls:SettingsCard Header="Clear Payment and Shipping Info"
                                        HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
                     <Button Content="Clear"
-                            Style="{StaticResource AccentButtonStyle}" />
+                            Style="{StaticResource AccentButtonStyle}" 
+                            Click="ClearPaymentInfo_OnClick"/>
                 </controls:SettingsCard>
                 
                 <!-- End of Bots and websites section -->
@@ -401,7 +402,7 @@
                 
                 <controls:SettingsCard Header="If away for..."
                                        HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
-                    <ComboBox>
+                    <ComboBox SelectionChanged="Selector_OnSelectionChanged">
                         <ComboBoxItem>1 month</ComboBoxItem>
                         <ComboBoxItem>3 month</ComboBoxItem>
                         <ComboBoxItem>6 month</ComboBoxItem>

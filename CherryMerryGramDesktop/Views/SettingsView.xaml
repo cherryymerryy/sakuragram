@@ -24,7 +24,8 @@
     
     <NavigationView IsSettingsVisible="False"
                     IsBackEnabled="False"
-                    PaneDisplayMode="Top"
+                    IsBackButtonVisible="Collapsed"
+                    PaneDisplayMode="Left"
                     ItemInvoked="NavigationView_OnItemInvoked"
                     Loaded="FrameworkElement_OnLoaded"
                     SelectionChanged="NavigationView_OnSelectionChanged">
