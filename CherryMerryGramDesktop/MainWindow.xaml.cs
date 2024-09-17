@@ -15,6 +15,7 @@ namespace CherryMerryGramDesktop
 	{
 		private NavigationViewItem _lastItem;
 		private static TdClient _client = App._client;
+		private static TdApi.User _user;
 		private NotificationService _notificationService;
 		
 		private int _totalUnreadCount = 0;
@@ -47,7 +48,9 @@ namespace CherryMerryGramDesktop
             }
             
 			UnreadMessagesCount.Value = _totalUnreadCount;
-			NavigationView.PaneTitle = "CherryMerryGram";
+			
+			_user = _client.GetMeAsync().Result;
+			NavigationView.PaneTitle = $"{_user.FirstName} ({_totalUnreadCount})";
 		}
 
 		private async Task ProcessUpdates(TdApi.Update update)
@@ -57,6 +60,11 @@ namespace CherryMerryGramDesktop
 				case TdApi.Update.UpdateNewMessage updateNewMessage:
 				{
 					//_notificationService.SendNotification(updateNewMessage.Message);
+					_totalUnreadCount += 1;
+					NavigationView.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+						() => NavigationView.PaneTitle = $"{_user.FirstName} ({_totalUnreadCount})");
+					UnreadMessagesCount.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+						() => UnreadMessagesCount.Value = _totalUnreadCount);
 					break;
 				}
 				case TdApi.Update.UpdateConnectionState updateConnectionState:
@@ -65,7 +73,7 @@ namespace CherryMerryGramDesktop
 					{
 						NavigationView.PaneTitle = updateConnectionState.State switch
 						{
-							TdApi.ConnectionState.ConnectionStateReady => "CherryMerryGram",
+							TdApi.ConnectionState.ConnectionStateReady => $"{_user.FirstName} ({_totalUnreadCount})",
 							TdApi.ConnectionState.ConnectionStateUpdating => "Updating...",
 							TdApi.ConnectionState.ConnectionStateConnecting => "Connecting...",
 							TdApi.ConnectionState.ConnectionStateWaitingForNetwork => "Waiting for network...",
