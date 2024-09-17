@@ -116,6 +116,19 @@ namespace CherryMerryGramDesktop.Views.Chats
                     break;
                 }
             }
+
+            try
+            {
+                DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                dateTime = dateTime.AddSeconds(Chat.LastMessage.Date).ToLocalTime();
+                string sendTime = dateTime.ToShortTimeString();
+
+                TextBlockSendTime.Text = sendTime;
+            }
+            catch (Exception e)
+            {
+                TextBlockSendTime.Text = e.Message;
+            }
         }
         
         private void GetChatPhoto(TdApi.Chat chat)

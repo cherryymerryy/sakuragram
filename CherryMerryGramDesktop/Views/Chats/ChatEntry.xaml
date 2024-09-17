@@ -53,10 +53,16 @@
                 </StackPanel>
             </StackPanel>
             
-            <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+            <StackPanel Grid.Column="1" 
+                        HorizontalAlignment="Right" 
+                        VerticalAlignment="Center"
+                        Margin="5, 0, 0, 0">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock x:Name="SendTime" />
-                    <InfoBadge x:Name="UnreadMessagesCount" />
+                    <TextBlock x:Name="TextBlockSendTime" 
+                               FontSize="14"
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
+                    <InfoBadge x:Name="UnreadMessagesCount" 
+                               HorizontalAlignment="Right"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
