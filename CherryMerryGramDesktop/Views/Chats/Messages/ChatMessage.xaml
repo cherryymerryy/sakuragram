@@ -5,18 +5,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     mc:Ignorable="d"
     DoubleTapped="ChatMessage_OnDoubleTapped"
     Tapped="ChatMessage_OnTapped">
 
     <StackPanel x:Name="Message" Orientation="Horizontal" Margin="0, 5, 0, 5">
-        <Border x:Name="BorderProfilePicture" Width="32" Height="32" CornerRadius="30" Margin="5" 
-                HorizontalAlignment="Left"
-                 VerticalAlignment="Bottom">
-            <Border.Background>
-                <ImageBrush x:Name="ProfilePicture" />
-            </Border.Background>
-        </Border>
+        <PersonPicture x:Name="ProfilePicture"
+                       Width="32"
+                       Height="32"
+                       Margin="5" 
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"/>
         <Border x:Name="MessageBackground" MinWidth="150" MaxWidth="300" Width="Auto" 
                 RightTapped="UIElement_OnRightTapped" 
                 Background="Black" 
@@ -38,7 +38,8 @@
                     </StackPanel>
                 </Border>
                 <Image x:Name="MessageSticker" />
-                <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" />
+                <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" 
+                           win:IsTextSelectionEnabled="True" />
             </StackPanel>
         </Border>
         
