@@ -92,7 +92,8 @@
                 
                 <controls:SettingsCard x:Name="CardConnectedChannel"
                                        Description="(connectedChannel)"
-                                       Header="Your channel">
+                                       Header="Your channel"
+                                       IsEnabled="False">
                     <Button x:Name="ButtonChangeConnectedChannel"
                             Content="Change"/>
                 </controls:SettingsCard>
@@ -125,7 +126,8 @@
                 </controls:SettingsCard>
                 
                 <controls:SettingsCard x:Name="CardPhoneNumber"
-                                       Header="Phone number">
+                                       Header="Phone number"
+                                       IsEnabled="False">
                     <Button x:Name="ButtonChangeNumber"
                             Content="Change"/>
                 </controls:SettingsCard>

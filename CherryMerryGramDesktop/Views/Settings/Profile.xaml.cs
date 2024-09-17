@@ -31,7 +31,7 @@ public partial class Profile : Page
         TextBoxUsername.Text = _currentUser.Usernames.EditableUsername;
         TextBoxBio.Text = _currentUserFullInfo.Bio.Text;
         
-        CardPhoneNumber.Description = $"Phone number: {_currentUser.PhoneNumber}";
+        CardPhoneNumber.Description = $"Phone number: +{_currentUser.PhoneNumber}";
         
         if (_currentUserFullInfo.Birthdate != null)
         {
