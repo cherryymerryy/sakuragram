@@ -77,6 +77,14 @@
                                 VerticalAlignment="Center"
                                 Content="New photo"
                                 IsEnabled="False"/>
+                        <Button x:Name="ButtonSave"
+                                Grid.Column="1"
+                                Grid.Row="1"
+                                Margin="0, 10, 0, 0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Content="Save"
+                                Click="ButtonSave_OnClick"/>
                     </Grid>
                 </Border>
                 
@@ -101,10 +109,11 @@
                                        Description="(currentDateOfBirth)" 
                                        Header="Your birthday">
                     <StackPanel Orientation="Horizontal">
-                        <Button x:Name="ButtonChange"
-                                Content="Change"/>
+                        <DatePicker x:Name="DatePicker"
+                                    Margin="0, 0, 4, 0"/>
                         <Button x:Name="ButtonRemoveDateOfBirth"
-                                Content="Remove"/>
+                                Content="Remove"
+                                Click="ButtonRemoveDateOfBirth_OnClick"/>
                     </StackPanel>
                 </controls:SettingsCard>
                 
