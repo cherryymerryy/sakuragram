@@ -255,7 +255,9 @@ namespace CherryMerryGramDesktop.Views.Chats
                     textMessage.UpdateMessage(message);
                     break;
                 }
-                case TdApi.MessageContent.MessageChatChangeTitle:
+                case TdApi.MessageContent.MessageChatChangeTitle or TdApi.MessageContent.MessageChatChangeTitle
+                    or TdApi.MessageContent.MessagePinMessage or TdApi.MessageContent.MessageGiftedPremium
+                    or TdApi.MessageContent.MessageGameScore or TdApi.MessageContent.MessageChatBoost:
                 {
                     var changeTitleMessage = new ChatServiceMessage();
                     MessagesList.Children.Add(changeTitleMessage);
@@ -274,6 +276,34 @@ namespace CherryMerryGramDesktop.Views.Chats
                     var videoMessage = new ChatVideoMessage();
                     MessagesList.Children.Add(videoMessage);
                     videoMessage.UpdateMessage(message);
+                    break;
+                }
+                case TdApi.MessageContent.MessagePhoto:
+                {
+                    var photoMessage = new ChatPhotoMessage();
+                    MessagesList.Children.Add(photoMessage);
+                    photoMessage.UpdateMessage(message);
+                    break;
+                }
+                case TdApi.MessageContent.MessageDocument:
+                {
+                    var documentMessage = new ChatDocumentMessage();
+                    MessagesList.Children.Add(documentMessage);
+                    documentMessage.UpdateMessage(message);
+                    break;
+                }
+                case TdApi.MessageContent.MessageVideoNote:
+                {
+                    var videoNoteMessage = new ChatVideoNoteMessage();
+                    MessagesList.Children.Add(videoNoteMessage);
+                    //videoNoteMessage.UpdateMessage(message);
+                    break;
+                }
+                case TdApi.MessageContent.MessageVoiceNote:
+                {
+                    var voiceNoteMessage = new ChatVoiceNoteMessage();
+                    MessagesList.Children.Add(voiceNoteMessage);
+                    voiceNoteMessage.UpdateMessage(message);
                     break;
                 }
             }
