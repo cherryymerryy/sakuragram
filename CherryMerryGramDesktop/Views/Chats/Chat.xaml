@@ -10,7 +10,7 @@
     VerticalAlignment="Stretch"
     HorizontalContentAlignment="Stretch"
     VerticalContentAlignment="Stretch"
-    Background="#2a2a2a">
+    KeyDown="Chat_OnKeyDown">
 
     <Border>
         <Border.Background>
@@ -75,7 +75,8 @@
             </Grid>
             
             <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="1">
-                    <ScrollViewer x:Name="MessagesScrollViewer" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" >
+                    <ScrollViewer x:Name="MessagesScrollViewer" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" 
+                                  ViewChanging="MessagesScrollViewer_OnViewChanging_">
                         <StackPanel x:Name="MessagesList" Loaded="MessagesList_OnLoaded" />
                     </ScrollViewer>
             </Grid>
@@ -88,15 +89,18 @@
                         Padding="5">
                     <Grid>
                         <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"
-                                 HorizontalAlignment="Stretch"
-                                 KeyDown="UserMessageInput_OnKeyDown"/>
-                        <Button x:Name="Stickers" Content="Stickers" MaxHeight="25" MaxWidth="25" 
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch" />
-                        <Button x:Name="SendMessage" Content="Send" MaxHeight="25" MaxWidth="25" 
-                                Click="SendMessage_OnClick"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch" />
+                                 HorizontalAlignment="Stretch"/>
+                        <StackPanel HorizontalAlignment="Right"
+                                    VerticalAlignment="Stretch"
+                                    Orientation="Horizontal">
+                            <Button x:Name="Stickers" Content="Stickers" MaxHeight="25" MaxWidth="25" 
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Stretch" />
+                            <Button x:Name="SendMessage" Content="Send" MaxHeight="25" MaxWidth="25" 
+                                    Click="SendMessage_OnClick"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Stretch" />
+                        </StackPanel>
                     </Grid>
                 </Border>
             </Grid>

@@ -7,8 +7,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     
-    <Border Background="Black" CornerRadius="4">
-        <TextBlock x:Name="MessageText" Padding="5" />
+    <Border Background="{StaticResource CardBackgroundFillColorDefaultBrush}" 
+            CornerRadius="15"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
+        <TextBlock x:Name="MessageText"
+                   Padding="12, 4, 12, 4" 
+                   Text="message"
+                   IsTextSelectionEnabled="True"/>
     </Border>
     
 </Page>

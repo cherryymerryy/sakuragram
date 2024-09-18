@@ -64,13 +64,19 @@
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard HorizontalContentAlignment="Left"
                                                ContentAlignment="Left">
-                            <StackPanel Margin="-12,0,0,0"
-                                        Orientation="Horizontal">
-                                <HyperlinkButton Content="Channel" NavigateUri="https://t.me/cherrymerrygram" />
-                                <HyperlinkButton Content="Forum" NavigateUri="https://t.me/cherrymerrygramchat" />
-                                <HyperlinkButton Content="Source code" 
-                                                 NavigateUri="https://github.com/cherryymerryy/CherryMerryGram" />
-                                <HyperlinkButton x:Name="HyperlinkButtonLatestRelease" Content="Latest release" />
+                            <StackPanel>
+                                <TextBlock x:Name="TextBlockVersionInfo"
+                                           IsTextSelectionEnabled="True"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
+                                <StackPanel Margin="-12,0,0,0"
+                                            Orientation="Horizontal">
+                                    <HyperlinkButton Content="Channel" NavigateUri="https://t.me/cherrymerrygram" />
+                                    <HyperlinkButton Content="Forum" NavigateUri="https://t.me/cherrymerrygramchat" />
+                                    <HyperlinkButton Content="Source code" 
+                                                     NavigateUri="https://github.com/cherryymerryy/CherryMerryGram" />
+                                    <HyperlinkButton x:Name="HyperlinkButtonLatestRelease" Content="Latest release" />
+                                </StackPanel>
                             </StackPanel>
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>

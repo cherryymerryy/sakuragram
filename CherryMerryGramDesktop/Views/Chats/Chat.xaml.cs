@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
 using CherryMerryGramDesktop.Services;
 using CherryMerryGramDesktop.Views.Calls;
+using CherryMerryGramDesktop.Views.Chats.Messages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -63,14 +65,12 @@ namespace CherryMerryGramDesktop.Views.Chats
                     {
                         MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
                         {
-                            var chatMessage = new ChatMessage
-                            {
-                                _replyService = _replyService,
-                                _messageService = _messageService
-                            };
-                            chatMessage.UpdateMessage(updateNewMessage.Message);
-                            MessagesList.Children.Add(chatMessage);
-                            _messagesList.Add(updateNewMessage.Message);
+                            GenerateMessageByType(updateNewMessage.Message);
+                            
+                            // For debug
+                            // var message = new ChatDebugMessage();
+                            // MessagesList.Children.Add(message);
+                            // message.UpdateMessage(updateNewMessage.Message);
                         });
                     }
                     break;
@@ -130,26 +130,26 @@ namespace CherryMerryGramDesktop.Views.Chats
                 }
                 case TdApi.Update.UpdateDeleteMessages updateDeleteMessages:
                 {
-                    if (updateDeleteMessages.ChatId == _chatId)
-                    {
-                        var messages = MessagesList.Children;
-                        var messagesToRemove = messages.OfType<ChatMessage>();
-                        
-                        foreach (var messageId in updateDeleteMessages.MessageIds)
-                        {
-                            MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                            {
-                                foreach (var messageToRemove in messagesToRemove)
-                                {
-                                    if (messageToRemove._messageId == messageId)
-                                    {
-                                        MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low,
-                                            () => MessagesList.Children.Remove(messageToRemove));
-                                    }
-                                }
-                            });
-                        }
-                    }
+                    // if (updateDeleteMessages.ChatId == _chatId)
+                    // {
+                    //     var messages = MessagesList.Children;
+                    //     var messagesToRemove = messages.OfType<ChatMessage>();
+                    //     
+                    //     foreach (var messageId in updateDeleteMessages.MessageIds)
+                    //     {
+                    //         MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                    //         {
+                    //             foreach (var messageToRemove in messagesToRemove)
+                    //             {
+                    //                 if (messageToRemove._messageId == messageId)
+                    //                 {
+                    //                     MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low,
+                    //                         () => MessagesList.Children.Remove(messageToRemove));
+                    //                 }
+                    //             }
+                    //         });
+                    //     }
+                    // }
                     break;
                 } 
             }
@@ -184,28 +184,36 @@ namespace CherryMerryGramDesktop.Views.Chats
                     ChatMembers.Text = basicGroupInfo.Members.Length + " members";
                     break;
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
-                    var supergroupInfo = _client.GetSupergroupFullInfoAsync(
-                        supergroupId: typeSupergroup.SupergroupId)
-                        .Result;
-                    var supergroup = _client.GetSupergroupAsync(
-                        supergroupId: typeSupergroup.SupergroupId)
-                        .Result;
-
-                    if (supergroup.IsChannel)
+                    try
                     {
-                        UserActionsPanel.Visibility = supergroup.Status switch
+                        var supergroup = _client.GetSupergroupAsync(
+                                supergroupId: typeSupergroup.SupergroupId)
+                            .Result;
+                        var supergroupInfo = _client.GetSupergroupFullInfoAsync(
+                                supergroupId: typeSupergroup.SupergroupId)
+                            .Result;
+
+                        if (supergroup.IsChannel)
                         {
-                            TdApi.ChatMemberStatus.ChatMemberStatusCreator => Visibility.Visible,
-                            TdApi.ChatMemberStatus.ChatMemberStatusAdministrator => Visibility.Visible,
-                            TdApi.ChatMemberStatus.ChatMemberStatusMember => Visibility.Collapsed,
-                            TdApi.ChatMemberStatus.ChatMemberStatusBanned => Visibility.Collapsed,
-                            TdApi.ChatMemberStatus.ChatMemberStatusRestricted => Visibility.Collapsed,
-                            TdApi.ChatMemberStatus.ChatMemberStatusLeft => Visibility.Collapsed,
-                            _ => Visibility.Collapsed
-                        };
+                            UserActionsPanel.Visibility = supergroup.Status switch
+                            {
+                                TdApi.ChatMemberStatus.ChatMemberStatusCreator => Visibility.Visible,
+                                TdApi.ChatMemberStatus.ChatMemberStatusAdministrator => Visibility.Visible,
+                                TdApi.ChatMemberStatus.ChatMemberStatusMember => Visibility.Collapsed,
+                                TdApi.ChatMemberStatus.ChatMemberStatusBanned => Visibility.Collapsed,
+                                TdApi.ChatMemberStatus.ChatMemberStatusRestricted => Visibility.Collapsed,
+                                TdApi.ChatMemberStatus.ChatMemberStatusLeft => Visibility.Collapsed,
+                                _ => Visibility.Collapsed
+                            };
+                        }
+
+                        ChatMembers.Text = supergroupInfo.MemberCount + " members";
                     }
-                    
-                    ChatMembers.Text = supergroupInfo.MemberCount + " members";
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
                     break;
             }
             
@@ -219,64 +227,56 @@ namespace CherryMerryGramDesktop.Views.Chats
                 $"{_memberCount} members";
         }
 
-        private Task GetMessagesAsync(long chatId)
+        private void GetMessagesAsync(long chatId)
         {
-            var offset = 0;
-            chatId = _chatId;
-            bool moreMessages = true;
-
-            while (moreMessages)
+            var messages = _client.ExecuteAsync(new TdApi.GetChatHistory
             {
-                var messages = _client.ExecuteAsync(new TdApi.GetChatHistory
-                {
-                    ChatId = chatId,
-                    Limit = 100,
-                    Offset = offset,
-                    FromMessageId = _chat.LastMessage.Id,
-                    OnlyLocal = false
-                }).Result;
+                ChatId = chatId,
+                Offset = -99,
+                Limit = 100,
+                OnlyLocal = false
+            }).Result;
 
-                if (messages.Messages_.Length == 0)
-                {
-                    moreMessages = false;
-                    break;
-                }
-
-                offset -= messages.Messages_.Length;
-
-                var chatMessages = messages.Messages_.Reverse().Select(message =>
-                {
-                    var chatMessage = new ChatMessage
-                    {
-                        _replyService = _replyService,
-                        _messageService = _messageService
-                    };
-                    chatMessage.UpdateMessage(message);
-                    return chatMessage;
-                }).ToList();
-
-                MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
-                {
-                    foreach (var chatMessage in chatMessages)
-                    {
-                        MessagesList.Children.Add(chatMessage);
-                    }
-
-                    _messagesList.AddRange(messages.Messages_);
-                });
+            foreach (var message in messages.Messages_)
+            {
+                GenerateMessageByType(message);
             }
-            return Task.CompletedTask;
         }
 
-        private static long GetId(TdApi.MessageSender sender)
+        private void GenerateMessageByType(TdApi.Message message)
         {
-            var userId = sender switch {
-                TdApi.MessageSender.MessageSenderUser u => u.UserId,
-                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
-                _ => 0
-            };
-
-            return userId;
+            switch (message.Content)
+            {
+                case TdApi.MessageContent.MessageText:
+                {
+                    var textMessage = new ChatTextMessage();
+                    textMessage._messageService = _messageService;
+                    MessagesList.Children.Add(textMessage);
+                    textMessage.UpdateMessage(message);
+                    break;
+                }
+                case TdApi.MessageContent.MessageChatChangeTitle:
+                {
+                    var changeTitleMessage = new ChatServiceMessage();
+                    MessagesList.Children.Add(changeTitleMessage);
+                    changeTitleMessage.UpdateMessage(message);
+                    break;
+                }
+                case TdApi.MessageContent.MessageSticker or TdApi.MessageContent.MessageAnimation:
+                {
+                    var stickerMessage = new ChatStickerMessage();
+                    MessagesList.Children.Add(stickerMessage);
+                    stickerMessage.UpdateMessage(message);
+                    break;
+                }
+                case TdApi.MessageContent.MessageVideo:
+                {
+                    var videoMessage = new ChatVideoMessage();
+                    MessagesList.Children.Add(videoMessage);
+                    videoMessage.UpdateMessage(message);
+                    break;
+                }
+            }
         }
         
         private async void SendMessage_OnClick(object sender, RoutedEventArgs e)
@@ -320,17 +320,9 @@ namespace CherryMerryGramDesktop.Views.Chats
             _ChatsView.CloseChat();
         }
 
-        private async void MessagesList_OnLoaded(object sender, RoutedEventArgs e)
+        private void MessagesList_OnLoaded(object sender, RoutedEventArgs e)
         {
-            await GetMessagesAsync(_chatId);
-        }
-
-        private void UserMessageInput_OnKeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (e.Key == VirtualKey.Enter && UserMessageInput.Text != "")
-            {
-                SendMessage_OnClick(sender, null);
-            }
+            GetMessagesAsync(_chatId);
         }
         
         private void ContextMenuNotifications_OnClick(object sender, RoutedEventArgs e)
@@ -406,6 +398,23 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             var videoCall = new VoiceCall();
             videoCall.Activate();
+        }
+
+        private void MessagesScrollViewer_OnViewChanging_(object sender, ScrollViewerViewChangingEventArgs e)
+        {
+        }
+
+        private void Chat_OnKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case VirtualKey.Enter when UserMessageInput.Text != "":
+                    SendMessage_OnClick(sender, null);
+                    break;
+                case VirtualKey.Escape:
+                    CloseChat();
+                    break;
+            }
         }
     }
 }

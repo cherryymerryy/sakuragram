@@ -109,7 +109,6 @@ namespace CherryMerryGramDesktop.Views
         public void CloseChat()
         {
             if (_currentChat == null) return;
-            _currentChat.CloseChat();
             Chat.Children.Remove(_currentChat);
         }
         
@@ -125,13 +124,11 @@ namespace CherryMerryGramDesktop.Views
             
             await foreach (var chat in chats)
             {
-                var chatEntry = new ChatEntry
-                {
-                    _ChatsView = this,
-                    ChatPage = Chat,
-                    Chat = chat,
-                    ChatId = chat.Id
-                };
+                var chatEntry = new ChatEntry();
+                chatEntry._ChatsView = this;
+                chatEntry.ChatPage = Chat;
+                chatEntry.Chat = chat;
+                chatEntry.ChatId = chat.Id;
                 _chatsIds.Add(chat.Id);
                 
                 chatEntry.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,

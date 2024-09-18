@@ -185,12 +185,9 @@ namespace CherryMerryGramDesktop.Views.Chats
                 _chatWidget = null;
             }
             
-            ChatEntry_OnRightTapped(null, null);
-            _chatWidget = new Chat
-            {
-                _ChatsView = _ChatsView,
-                _chatId = ChatId
-            };
+            _chatWidget = new Chat();
+            _chatWidget._ChatsView = _ChatsView;
+            _chatWidget._chatId = ChatId;
             _ChatsView._currentChat = _chatWidget;
             
             _chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _chatWidget.UpdateChat(Chat.Id));

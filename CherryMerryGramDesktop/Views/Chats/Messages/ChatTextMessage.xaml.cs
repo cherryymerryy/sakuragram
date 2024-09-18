@@ -14,7 +14,7 @@ using TdLib;
 
 namespace CherryMerryGramDesktop.Views.Chats
 {
-    public sealed partial class ChatMessage : Page
+    public sealed partial class ChatTextMessage : Page
     {
         private static TdClient _client = App._client;
         private bool _isContextMenuOpen = false;
@@ -28,7 +28,7 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private bool _bIsSelected = false;
         
-        public ChatMessage()
+        public ChatTextMessage()
         {
             InitializeComponent();
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
@@ -78,7 +78,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             return Task.CompletedTask;
         }
 
-        public async void UpdateMessage(TdApi.Message message)
+        public void UpdateMessage(TdApi.Message message)
         {
             try
             {
@@ -124,7 +124,10 @@ namespace CherryMerryGramDesktop.Views.Chats
                     {
                         GetChatPhoto(user);
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
                 }
                 else
                 {
@@ -170,37 +173,33 @@ namespace CherryMerryGramDesktop.Views.Chats
                     };
                 }
 
-                MessageContent.Text = message.Content switch
-                {
-                    TdApi.MessageContent.MessageText messageText => MessageContent.Text = messageText.Text.Text,
-                    TdApi.MessageContent.MessagePhoto messagePhoto => MessageContent.Text = messagePhoto.Caption.Text,
-                    TdApi.MessageContent.MessageVideo messageVideo => MessageContent.Text = messageVideo.Caption.Text,
-                    TdApi.MessageContent.MessageUnsupported => MessageContent.Text = "Your version of CherryMerryGram does not support this type of message, make sure that you are using the latest version of the client.",
-                    _ => MessageContent.Text
-                };
-
                 switch (message.Content)
                 {
-                    case TdApi.MessageContent.MessageText:
-                    {
-                        MessageContent.Visibility = Visibility.Visible;
-                        MessageSticker.Visibility = Visibility.Collapsed;
+                    case TdApi.MessageContent.MessageText messageText:
+                        MessageContent.Text = messageText.Text.Text;
+                        // foreach (var entity in messageText.Text.Entities)
+                        // {
+                        //     switch (entity.Type) 
+                        //     {
+                        //         case TdApi.TextEntityType.:
+                        //         
+                        //     }
+                        // }
                         break;
-                    }
-                    case TdApi.MessageContent.MessageSticker messageSticker:
-                    {
-                        MessageContent.Visibility = Visibility.Collapsed;
-                        MessageSticker.Visibility = Visibility.Visible;
-                        var stickerFile = await _client.ExecuteAsync(new TdApi.DownloadFile
-                        {
-                            FileId = messageSticker.Sticker.Sticker_.Id,
-                            Priority = 1
-                        });
-                        MessageSticker.Source = new BitmapImage(new Uri(stickerFile.Local.Path));
+                    case TdApi.MessageContent.MessageUnsupported messageUnsupported:
+                        MessageContent.Text = "Your version of CherryMerryGram does not support this type of message, make sure that you are using the latest version of the client.";
                         break;
-                    }
+                    default:
+                        MessageContent.Text = "Unsupported message type";
+                        break;
                 }
-                
+
+                MessageContent.Visibility = message.Content switch
+                {
+                    TdApi.MessageContent.MessageText => Visibility.Visible,
+                    _ => MessageContent.Visibility
+                };
+
                 if (chat.Permissions.CanPinMessages)
                 {
                     ContextMenuPin.IsEnabled = false;
