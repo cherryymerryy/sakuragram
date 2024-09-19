@@ -191,6 +191,7 @@ namespace CherryMerryGramDesktop.Views
             {
                 var chatEntry = new ChatEntry
                 {
+                    _ChatsView = this,
                     ChatPage = Chat,
                     Chat = chat,
                     ChatId = chat.Id
