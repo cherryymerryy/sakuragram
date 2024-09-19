@@ -48,12 +48,18 @@
                     <Button x:Name="ButtonDownloadDocument" 
                             Width="42"
                             Height="42"
+                            Margin="0, 0, 5, 0"
                             Click="ButtonDownloadDocument_OnClick">
-                        <FontIcon Glyph="&#xE896;" />
+                        <FontIcon x:Name="Icon" 
+                                  Glyph="&#xE896;" />
                     </Button>
                     <StackPanel>
-                        <TextBlock x:Name="DocumentName" Text="DocumentName"/>
-                        <TextBlock x:Name="DocumentSize" Text="DocumentSize"/>
+                        <TextBlock x:Name="DocumentName" 
+                                   Text="DocumentName"
+                                   Foreground="{StaticResource TextFillColorPrimaryBrush}"/>
+                        <TextBlock x:Name="DocumentSize"
+                                   Foreground="{StaticResource TextFillColorTertiaryBrush}"
+                                   Text="DocumentSize"/>
                     </StackPanel>
                 </StackPanel>
                 <TextBlock x:Name="MessageCaptionText" Text="MessageCaptionText" TextWrapping="Wrap" 
