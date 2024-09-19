@@ -255,8 +255,8 @@ namespace CherryMerryGramDesktop.Views.Chats
                     textMessage.UpdateMessage(message);
                     break;
                 }
-                case TdApi.MessageContent.MessageChatChangeTitle or TdApi.MessageContent.MessageChatChangeTitle
-                    or TdApi.MessageContent.MessagePinMessage or TdApi.MessageContent.MessageGiftedPremium
+                case TdApi.MessageContent.MessageChatChangeTitle or TdApi.MessageContent.MessagePinMessage 
+                    or TdApi.MessageContent.MessageGiftedPremium
                     or TdApi.MessageContent.MessageGameScore or TdApi.MessageContent.MessageChatBoost:
                 {
                     var changeTitleMessage = new ChatServiceMessage();
@@ -296,7 +296,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 {
                     var videoNoteMessage = new ChatVideoNoteMessage();
                     MessagesList.Children.Add(videoNoteMessage);
-                    //videoNoteMessage.UpdateMessage(message);
+                    videoNoteMessage.UpdateMessage(message);
                     break;
                 }
                 case TdApi.MessageContent.MessageVoiceNote:
