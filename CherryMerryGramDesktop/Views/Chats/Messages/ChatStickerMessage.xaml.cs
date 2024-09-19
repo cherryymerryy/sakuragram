@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
@@ -114,15 +115,25 @@ public partial class ChatStickerMessage : Page
 
     public void UpdateMessage(TdApi.Message message)
     {
+        _messageMediaContent = message.Content;
+        
         var sender = message.SenderId switch
         {
             TdApi.MessageSender.MessageSenderUser u => u.UserId,
             TdApi.MessageSender.MessageSenderChat c => c.ChatId,
             _ => 0
         };
-        var user = _client.GetUserAsync(userId: sender).Result;
-        _messageMediaContent = message.Content;
-        GetChatPhoto(user);
+
+        if (sender > 0) // if senderId > 0 then it's a user
+        {
+            var user = _client.GetUserAsync(userId: sender).Result;
+            GetChatPhoto(user);
+        }
+        else // if senderId < 0 then it's a chat
+        {
+            var chat = _client.GetChatAsync(chatId: sender).Result;
+            ProfilePicture.Visibility = Visibility.Collapsed;
+        }
         
         switch (message.Content)
         {

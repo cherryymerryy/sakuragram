@@ -62,18 +62,29 @@ public partial class ChatVideoMessage : Page
     public void UpdateMessage(TdApi.Message message)
     {
         _messageMediaContent = message.Content;
+        MediaPlayerElement.AutoPlay = true;
+        MediaPlayerElement.MediaPlayer.IsMuted = true;
+        MediaPlayerElement.MediaPlayer.IsLoopingEnabled = true;
+        
         var sender = message.SenderId switch
         {
             TdApi.MessageSender.MessageSenderUser u => u.UserId,
             TdApi.MessageSender.MessageSenderChat c => c.ChatId,
             _ => 0
         };
-        var user = _client.GetUserAsync(userId: sender).Result;
-        DisplayName.Text = user.FirstName + " " + user.LastName;
-        MediaPlayerElement.AutoPlay = true;
-        MediaPlayerElement.MediaPlayer.IsMuted = true;
-        MediaPlayerElement.MediaPlayer.IsLoopingEnabled = true;
-        GetChatPhoto(user);
+
+        if (sender > 0) // if senderId > 0 then it's a user
+        {
+            var user = _client.GetUserAsync(userId: sender).Result;
+            DisplayName.Text = user.FirstName + " " + user.LastName;
+            GetChatPhoto(user);
+        }
+        else // if senderId < 0 then it's a chat
+        {
+            var chat = _client.GetChatAsync(chatId: sender).Result;
+            DisplayName.Text = chat.Title;
+            ProfilePicture.Visibility = Visibility.Collapsed;
+        }
         
         try
         {
