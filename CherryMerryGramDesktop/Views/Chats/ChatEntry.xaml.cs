@@ -138,12 +138,12 @@ namespace CherryMerryGramDesktop.Views.Chats
                     () => ChatEntryProfilePicture.DisplayName = chat.Title);
                 return;
             }
-            if (chat.Photo.Big.Local.Path != "")
+            if (chat.Photo.Small.Local.Path != "")
             {
                 try
                 {
                     ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low,
-                        () => ChatEntryProfilePicture.ProfilePicture = new BitmapImage(new Uri(chat.Photo.Big.Local.Path)));
+                        () => ChatEntryProfilePicture.ProfilePicture = new BitmapImage(new Uri(chat.Photo.Small.Local.Path)));
                 }
                 catch (Exception e)
                 {
@@ -153,7 +153,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             }
             else
             {
-                _profilePhotoFileId = chat.Photo.Big.Id;
+                _profilePhotoFileId = chat.Photo.Small.Id;
                 
                 var file = _client.ExecuteAsync(new TdApi.DownloadFile
                 {
