@@ -31,6 +31,7 @@ public partial class ChatVideoNoteMessage : Page
             {
                 if (updateFile.File.Id == _videoNoteId)
                 {
+                    
                     switch (_messageContent)
                     {
                         case TdApi.MessageContent.MessageVideoNote messageVideoNote:
@@ -150,6 +151,8 @@ public partial class ChatVideoNoteMessage : Page
                 FileId = _profilePhotoFileId,
                 Priority = 1
             }).Result;
+            
+            ProgressRing.Visibility = Visibility.Visible;
         }
     }
 }

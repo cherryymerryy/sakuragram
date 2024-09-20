@@ -80,132 +80,69 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         public void UpdateMessage(TdApi.Message message)
         {
-            try
+            _chatId = message.ChatId;
+            _messageId = message.Id;
+            
+            if (message.ReplyTo != null)
             {
-                _chatId = message.ChatId;
-                _messageId = message.Id;
-
-                var user = GetUser(message).Result;
-                var chatMember = GetChatMember(message.ChatId, message.SenderId).Result;
-                var chat = GetChat(message.ChatId).Result;
-                var chatType = chat.Type;
+                var replyMessage = _client.ExecuteAsync(new TdApi.GetRepliedMessage
+                {
+                    ChatId = message.ChatId,
+                    MessageId = _messageId
+                }).Result;
                 
-                if (message.ReplyTo != null)
-                {
-                    var replyMessage = _client.ExecuteAsync(new TdApi.GetRepliedMessage
-                    {
-                        ChatId = message.ChatId,
-                        MessageId = _messageId
-                    }).Result;
-                    
-                    var replyUserId = replyMessage.SenderId switch {
-                        TdApi.MessageSender.MessageSenderUser u => u.UserId,
-                        TdApi.MessageSender.MessageSenderChat c => c.ChatId,
-                        _ => 0
-                    };
-                    
-                    var replyUser = _client.ExecuteAsync(new TdApi.GetUser{
-                        UserId = replyUserId
-                    }).Result;
-                    
-                    ReplyFirstName.Text = $"{replyUser.FirstName} {replyUser.LastName}";
-                    ReplyInputContent.Text  = replyMessage.Content switch
-                    {
-                        TdApi.MessageContent.MessageText messageText => ReplyInputContent.Text = messageText.Text.Text,
-                        _ => ReplyInputContent.Text
-                    };
-                    
-                    Reply.Visibility = Visibility.Visible;
-                }
+                var replyUserId = replyMessage.SenderId switch {
+                    TdApi.MessageSender.MessageSenderUser u => u.UserId,
+                    TdApi.MessageSender.MessageSenderChat c => c.ChatId,
+                    _ => 0
+                };
                 
-                if (chat.Type is not TdApi.ChatType.ChatTypePrivate && chat.Permissions.CanSendBasicMessages)
-                {
-                    try
-                    {
-                        GetChatPhoto(user);
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                }
-                else
-                {
-                    ProfilePicture.Visibility = Visibility.Collapsed;
-                }
-
-                DisplayName.Text = chat.Type switch
-                {
-                    TdApi.ChatType.ChatTypePrivate => DisplayName.Text = $"{user.FirstName} {user.LastName}",
-                    TdApi.ChatType.ChatTypeSecret => DisplayName.Text = $"{user.FirstName} {user.LastName}",
-                    TdApi.ChatType.ChatTypeBasicGroup => DisplayName.Text = chat.Title,
-                    _ => DisplayName.Text
-                };
-
-                if (chatType is TdApi.ChatType.ChatTypeSupergroup && chat.Permissions.CanSendBasicMessages)
-                {
-                    DisplayName.Text = $"{user.FirstName} {user.LastName}";
-                }
-                else if (chatType is TdApi.ChatType.ChatTypeSupergroup && !chat.Permissions.CanSendBasicMessages)
-                {
-                    DisplayName.Text = chat.Title;
-                }
+                var replyUser = _client.ExecuteAsync(new TdApi.GetUser{
+                    UserId = replyUserId
+                }).Result;
                 
-                Status.Visibility = chat.Type switch
+                ReplyFirstName.Text = $"{replyUser.FirstName} {replyUser.LastName}";
+                ReplyInputContent.Text  = replyMessage.Content switch
                 {
-                    TdApi.ChatType.ChatTypePrivate => Status.Visibility = Visibility.Collapsed,
-                    TdApi.ChatType.ChatTypeSecret => Status.Visibility = Visibility.Collapsed,
-                    TdApi.ChatType.ChatTypeSupergroup => Status.Visibility = Visibility.Visible,
-                    TdApi.ChatType.ChatTypeBasicGroup => Status.Visibility = Visibility.Collapsed,
-                    _ => Status.Visibility
+                    TdApi.MessageContent.MessageText messageText => ReplyInputContent.Text = messageText.Text.Text,
+                    _ => ReplyInputContent.Text
                 };
-
-                if (chatType is TdApi.ChatType.ChatTypeSupergroup && chat.Permissions.CanSendBasicMessages)
-                {
-                    Status.Text = chatMember.Status switch
-                    {
-                        TdApi.ChatMemberStatus.ChatMemberStatusCreator => Status.Text += " (creator)",
-                        TdApi.ChatMemberStatus.ChatMemberStatusAdministrator => Status.Text += " (admin)",
-                        TdApi.ChatMemberStatus.ChatMemberStatusMember => Status.Text += " (member)",
-                        TdApi.ChatMemberStatus.ChatMemberStatusLeft => Status.Text += " (left)",
-                        TdApi.ChatMemberStatus.ChatMemberStatusBanned => Status.Text += " (banned)",
-                        _ => Status.Text
-                    };
-                }
-
-                switch (message.Content)
-                {
-                    case TdApi.MessageContent.MessageText messageText:
-                        MessageContent.Text = messageText.Text.Text;
-                        // foreach (var entity in messageText.Text.Entities)
-                        // {
-                        //     switch (entity.Type) 
-                        //     {
-                        //         case TdApi.TextEntityType.:
-                        //         
-                        //     }
-                        // }
-                        break;
-                    case TdApi.MessageContent.MessageUnsupported messageUnsupported:
-                        MessageContent.Text = "Your version of CherryMerryGram does not support this type of message, make sure that you are using the latest version of the client.";
-                        break;
-                    default:
-                        MessageContent.Text = "Unsupported message type";
-                        break;
-                }
-
-                MessageContent.Visibility = message.Content switch
-                {
-                    TdApi.MessageContent.MessageText => Visibility.Visible,
-                    _ => MessageContent.Visibility
-                };
-
-                if (chat.Permissions.CanPinMessages)
-                {
-                    ContextMenuPin.IsEnabled = false;
-                }
+                
+                Reply.Visibility = Visibility.Visible;
             }
-            catch { }
+            
+            var sender = message.SenderId switch
+            {
+                TdApi.MessageSender.MessageSenderUser u => u.UserId,
+                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
+                _ => 0
+            };
+
+            if (sender > 0) // if senderId > 0 then it's a user
+            {
+                var user = _client.GetUserAsync(userId: sender).Result;
+                DisplayName.Text = user.FirstName + " " + user.LastName;
+                GetChatPhoto(user);
+            }
+            else // if senderId < 0 then it's a chat
+            {
+                var chat = _client.GetChatAsync(chatId: sender).Result;
+                DisplayName.Text = chat.Title;
+                ProfilePicture.Visibility = Visibility.Collapsed;
+            }
+
+            switch (message.Content)
+            {
+                case TdApi.MessageContent.MessageText messageText:
+                    MessageContent.Text = messageText.Text.Text;
+                    break;
+                case TdApi.MessageContent.MessageUnsupported:
+                    MessageContent.Text = "Your version of CherryMerryGram does not support this type of message, make sure that you are using the latest version of the client.";
+                    break;
+                default:
+                    MessageContent.Text = "Unsupported message type";
+                    break;
+            }
         }
         
         private void GetChatPhoto(TdApi.User user)
