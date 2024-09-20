@@ -31,7 +31,6 @@ namespace CherryMerryGramDesktop.Views.Chats
         public ChatTextMessage()
         {
             InitializeComponent();
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private Task ProcessUpdates(TdApi.Update update)
@@ -198,6 +197,8 @@ namespace CherryMerryGramDesktop.Views.Chats
                     MessageContent.Text = "Unsupported message type";
                     break;
             }
+            
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
         
         private void GetChatPhoto(TdApi.User user)

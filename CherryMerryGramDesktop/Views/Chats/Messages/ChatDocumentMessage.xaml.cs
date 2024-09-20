@@ -39,6 +39,11 @@ public partial class ChatDocumentMessage : Page
                         Icon.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => Icon.Glyph = "\uE7C3");
                     }
                 }
+                if (updateFile.File.Id == _profilePhotoFileId)
+                {
+                    ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                        () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
+                }
                 break;
             }
         }

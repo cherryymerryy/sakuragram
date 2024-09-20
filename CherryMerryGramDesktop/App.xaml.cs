@@ -37,7 +37,7 @@ namespace CherryMerryGramDesktop
 			
 			_config = new Config.Config();
 			_client = new TdClient();
-			_client.Bindings.SetLogVerbosityLevel(TdLogLevel.Debug);
+			_client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
 
 			_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
 

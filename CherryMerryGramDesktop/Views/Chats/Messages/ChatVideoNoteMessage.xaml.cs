@@ -31,7 +31,6 @@ public partial class ChatVideoNoteMessage : Page
             {
                 if (updateFile.File.Id == _videoNoteId)
                 {
-                    
                     switch (_messageContent)
                     {
                         case TdApi.MessageContent.MessageVideoNote messageVideoNote:
@@ -52,6 +51,11 @@ public partial class ChatVideoNoteMessage : Page
                             break;
                         }
                     }
+                }
+                if (updateFile.File.Id == _profilePhotoFileId)
+                {
+                    ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                        () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
                 }
                 break;
             }

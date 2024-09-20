@@ -16,6 +16,7 @@ public partial class ChatVideoMessage : Page
 {
     private static TdClient _client = App._client;
     private TdApi.MessageContent _messageMediaContent;
+    private TdApi.Message _message;
     private int _profilePhotoFileId;
     private int _mediaFileId;
     private bool _isPlaying = false;
@@ -24,8 +25,6 @@ public partial class ChatVideoMessage : Page
     public ChatVideoMessage()
     {
         InitializeComponent();
-        
-        _client.UpdateReceived += async (_, update) => { await ProcessUpdate(update); };
     }
 
     private async Task ProcessUpdate(TdApi.Update update)
@@ -57,17 +56,62 @@ public partial class ChatVideoMessage : Page
                         }
                     }
                 }
+                if (updateFile.File.Id == _profilePhotoFileId)
+                {
+                    ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                        () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
+                }
+                break;
+            }
+            case TdApi.Update.UpdateMessageEdited updateMessageEdited:
+            {
+                if (updateMessageEdited.MessageId == _message.Id)
+                {
+                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => { 
+                        var message = _client.ExecuteAsync(new TdApi.GetMessage{ChatId = _message.ChatId, MessageId = _message.Id}).Result;
+                        EditMessage(message); 
+                    });
+                }
                 break;
             }
         }
     }
-
+    
+    private void EditMessage(TdApi.Message editedMessage)
+    {
+        switch (editedMessage.Content)
+        {
+            case TdApi.MessageContent.MessageVideo messageVideo:
+            {
+                if (MediaPlayerElement.Source.ToString() != messageVideo.Video.Video_.Local.Path)
+                {
+                    _mediaFileId = messageVideo.Video.Video_.Id;
+                
+                    var file = _client.ExecuteAsync(new TdApi.DownloadFile
+                    {
+                        FileId = _mediaFileId,
+                        Priority = 1
+                    }).Result;
+                }
+                
+                if (MessageContent.Text != messageVideo.Caption.Text)
+                {
+                    MessageContent.Text = messageVideo.Caption.Text;
+                }
+                break;
+            }
+        }
+    }
+    
     public void UpdateMessage(TdApi.Message message)
     {
         _messageMediaContent = message.Content;
+        _message = message;
+        
         MediaPlayerElement.AutoPlay = true;
         MediaPlayerElement.MediaPlayer.IsMuted = true;
         MediaPlayerElement.MediaPlayer.IsLoopingEnabled = true;
+        MediaPlayerElement.MediaPlayer.MediaEnded += MediaPlayerElement_OnMediaEnded;
         
         var sender = message.SenderId switch
         {
@@ -190,6 +234,8 @@ public partial class ChatVideoMessage : Page
                 break;
             }
         }
+        
+        _client.UpdateReceived += async (_, update) => { await ProcessUpdate(update); };
     }
     
     private void GetChatPhoto(TdApi.User user)
@@ -234,7 +280,6 @@ public partial class ChatVideoMessage : Page
             MediaPlayerElement.MediaPlayer.IsMuted = false;
             MediaPlayerElement.MediaPlayer.PlaybackRate = 1;
             MediaPlayerElement.MediaPlayer.Volume = 0.5;
-            MediaPlayerElement.MediaPlayer.MediaEnded += MediaPlayerElement_OnMediaEnded;
             MediaPlayerElement.MediaPlayer.Play();
             _isPlaying = true;
         }
@@ -248,7 +293,10 @@ public partial class ChatVideoMessage : Page
 
     private void MediaPlayerElement_OnMediaEnded(MediaPlayer sender, object args)
     {
-        _isPlaying = false;
-        MediaPlayerElement.MediaPlayer.IsMuted = true;
+        if (_isPlaying)
+        {
+            _isPlaying = false;
+            MediaPlayerElement.MediaPlayer.IsMuted = true;
+        }
     }
 }

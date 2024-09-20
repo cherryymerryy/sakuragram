@@ -53,6 +53,11 @@ public partial class ChatVoiceNoteMessage : Page
                         });
                     }
                 }
+                if (updateFile.File.Id == _profilePhotoFileId)
+                {
+                    ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                        () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
+                }
                 break;
             }
         }
