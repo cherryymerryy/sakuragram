@@ -188,19 +188,74 @@ public partial class ChatVideoMessage : Page
             TextBlockForwardInfo.Visibility = Visibility.Collapsed;
         }
         
+        if (message.ReplyTo != null)
+        {
+            var replyMessage = _client.ExecuteAsync(new TdApi.GetRepliedMessage
+            {
+                ChatId = message.ChatId,
+                MessageId = message.Id
+            }).Result;
+                
+            var replyUserId = replyMessage.SenderId switch {
+                TdApi.MessageSender.MessageSenderUser u => u.UserId,
+                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
+                _ => 0
+            };
+                
+            var replyUser = _client.ExecuteAsync(new TdApi.GetUser{
+                UserId = replyUserId
+            }).Result;
+                
+            ReplyFirstName.Text = $"{replyUser.FirstName} {replyUser.LastName}";
+            ReplyInputContent.Text  = replyMessage.Content switch
+            {
+                TdApi.MessageContent.MessageText messageText => ReplyInputContent.Text = messageText.Text.Text,
+                _ => ReplyInputContent.Text
+            };
+                
+            Reply.Visibility = Visibility.Visible;
+        }
+        
         try
         {
             DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
             dateTime = dateTime.AddSeconds(message.Date).ToLocalTime();
             string sendTime = dateTime.ToShortTimeString();
 
-            SendTime.Text = sendTime;
+            TextBlockSendTime.Text = sendTime;
         } 
         catch 
         {
             // ignored
         }
-        
+
+        TextBlockEdited.Visibility = message.EditDate != 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        if (message.CanGetViewers && message.IsChannelPost)
+        {
+            TextBlockViews.Text = message.InteractionInfo.ViewCount + " views";
+            TextBlockViews.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            TextBlockViews.Text = string.Empty;
+            TextBlockViews.Visibility = Visibility.Collapsed;
+        }
+
+        if (message.InteractionInfo?.ReplyInfo != null)
+        {
+            if (message.InteractionInfo.ReplyInfo.ReplyCount > 0)
+            {
+                TextBlockReplies.Text = message.InteractionInfo.ReplyInfo.ReplyCount + " replies";
+                TextBlockReplies.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TextBlockReplies.Text = string.Empty;
+                TextBlockReplies.Visibility = Visibility.Collapsed;
+            }
+        }
+
         switch (message.Content)
         {
             case TdApi.MessageContent.MessageVideo messageVideo:
