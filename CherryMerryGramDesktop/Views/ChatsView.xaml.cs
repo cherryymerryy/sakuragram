@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using CherryMerryGramDesktop.Views.Chats;
 using Microsoft.UI.Dispatching;
@@ -14,7 +13,9 @@ namespace CherryMerryGramDesktop.Views
 {
     public sealed partial class ChatsView : Page
     {
-        private static TdClient _client = App._client;
+        private static readonly TdClient _client = App._client;
+        private static TdApi.Chats _defaultChats;
+        private static TdApi.Chats _defaultChatsInArchive;
         
         public Chat _currentChat;
         private bool _bInArchive = false;
@@ -25,10 +26,8 @@ namespace CherryMerryGramDesktop.Views
         public ChatsView()
         {
             InitializeComponent();
-            UpdateArchivedChatsCount();
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); }; 
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
-
         private Task ProcessUpdates(TdApi.Update update)
         {
             switch (update)
@@ -72,21 +71,20 @@ namespace CherryMerryGramDesktop.Views
 
             return Task.CompletedTask;
         }
-
+        
         private void UpdateArchivedChatsCount()
         {
-            var chatsIds = _client.ExecuteAsync(new TdApi.GetChats
-            {
-                Limit = 100, ChatList = new TdApi.ChatList.ChatListArchive()
-            }).Result.ChatIds;
+            if (_defaultChatsInArchive == null) return;
+
+            ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () => {
+                foreach (var chatId in _defaultChatsInArchive.ChatIds)
+                {
+                    var chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId}).Result;
+                    if (chat.UnreadCount > 0) _totalUnreadArchivedChatsCount++;
+                }
             
-            foreach (var chatId in chatsIds)
-            {
-                var chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId}).Result;
-                if (chat.UnreadCount > 0) _totalUnreadArchivedChatsCount++;
-            }
-            
-            ArchiveUnreadChats.Value = _totalUnreadArchivedChatsCount;
+                ArchiveUnreadChats.Value = _totalUnreadArchivedChatsCount;
+            });
         }
         
         private void OpenChat(long chatId)
@@ -112,51 +110,44 @@ namespace CherryMerryGramDesktop.Views
             Chat.Children.Remove(_currentChat);
         }
         
-        private async void GenerateChatEntries(TdApi.ChatList chatList)
+        private void GenerateChatEntries(TdApi.Chats chats)
         {
-            ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatsList.Children.Clear());
-            
-            var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats
+            if (chats == null) return;
+
+            ChatsList.Children.Clear();
+            _chatsIds.Clear();
+
+            Task.Run(() =>
             {
-                Limit = 10000,
-                ChatList = chatList
-            }).Result);
-            
-            await foreach (var chat in chats)
-            {
-                var chatEntry = new ChatEntry();
-                chatEntry._ChatsView = this;
-                chatEntry.ChatPage = Chat;
-                chatEntry.Chat = chat;
-                chatEntry.ChatId = chat.Id;
-                _chatsIds.Add(chat.Id);
-                
-                chatEntry.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
-                    () => chatEntry.UpdateChatInfo());
-                ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                    () => ChatsList.Children.Add(chatEntry));
-            }
-            
-            _firstGenerate = false;
+                var chatEntries = new List<ChatEntry>();
+
+                ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+                Parallel.ForEach(chats.ChatIds, parallelOptions, chatId => {
+                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                    {
+                        var chatEntry = new ChatEntry
+                        {
+                            _ChatsView = this,
+                            ChatPage = Chat,
+                            ChatId = chatId
+                        };
+                        chatEntries.Add(chatEntry);
+                    });
+                });
+
+                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    foreach (var chatEntry in chatEntries)
+                    {
+                        ChatsList.Children.Add(chatEntry);
+                        chatEntry.UpdateChatInfo();
+                        _chatsIds.Add(chatEntry.ChatId);
+                    }
+                });
+            });
         }
 
-        private static async IAsyncEnumerable<TdApi.Chat> GetChats(TdApi.Chats chats)
-        {
-            foreach (var chatId in chats.ChatIds)
-            {
-                var chat = _client.ExecuteAsync(new TdApi.GetChat
-                {
-                    ChatId = chatId
-                }).Result;
-
-                if (chat.Type is TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypeBasicGroup or TdApi.ChatType.ChatTypePrivate)
-                {
-                    yield return chat;
-                }
-            }
-        }
-
-        private async void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
+        private void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             if (TextBoxSearch.Text == "")
             {
@@ -166,43 +157,17 @@ namespace CherryMerryGramDesktop.Views
                     ArchiveUnreadChats.Visibility = Visibility.Visible;
                     _bInArchive = false;
                 }
-                GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+                GenerateChatEntries(_defaultChats);
                 return;
             }
-            
-            ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatsList.Children.Clear());
             
             var foundedChats = _client.ExecuteAsync(new TdApi.SearchChats
             {
                 Query = TextBoxSearch.Text,
                 Limit = 100
-            });
-
-            var foundedMessages = _client.ExecuteAsync(new TdApi.SearchMessages()
-            {
-                ChatList = new TdApi.ChatList.ChatListMain(),
-                Limit = 100,
-                OnlyInChannels = true
-            });
+            }).Result;
             
-            var chats = GetChats(foundedChats.Result);
-            
-            await foreach (var chat in chats)
-            {
-                var chatEntry = new ChatEntry
-                {
-                    _ChatsView = this,
-                    ChatPage = Chat,
-                    Chat = chat,
-                    ChatId = chat.Id
-                };
-                    
-                chatEntry.UpdateChatInfo();
-                ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
-                {
-                    ChatsList.Children.Add(chatEntry);
-                });
-            }
+            GenerateChatEntries(foundedChats);
         }
 
         private void ButtonArchive_OnClick(object sender, RoutedEventArgs e)
@@ -213,25 +178,20 @@ namespace CherryMerryGramDesktop.Views
                 ArchiveStatus.Text = "Back";
                 ArchiveUnreadChats.Visibility = Visibility.Collapsed;
                 _bInArchive = true;
-                GenerateChatEntries(new TdApi.ChatList.ChatListArchive());
+                GenerateChatEntries(_defaultChatsInArchive);
             }
             else
             {
                 ArchiveStatus.Text = "Archive";
                 ArchiveUnreadChats.Visibility = Visibility.Visible;
                 _bInArchive = false;
-                GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+                GenerateChatEntries(_defaultChats);
             }
         }
 
         private void ButtonSavedMessages_OnClick(object sender, RoutedEventArgs e)
         {
             OpenChat(_client.ExecuteAsync(new TdApi.GetMe()).Result.Id);
-        }
-
-        private void ChatList_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            GenerateChatEntries(new TdApi.ChatList.ChatListMain());
         }
 
         private void ButtonNewMessage_OnClick(object sender, RoutedEventArgs e)
@@ -278,6 +238,26 @@ namespace CherryMerryGramDesktop.Views
         {
             NewMessage.Hide();
             NewChannel.ShowAsync();
+        }
+
+        private void ChatsList_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            _defaultChats = _client.ExecuteAsync(new TdApi.GetChats
+            {
+                Limit = 10000,
+                ChatList = new TdApi.ChatList.ChatListMain()
+            }).Result;
+            GenerateChatEntries(_defaultChats);
+        }
+
+        private void ArchiveUnreadChats_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            _defaultChatsInArchive = _client.ExecuteAsync(new TdApi.GetChats
+            {
+                Limit = 10000,
+                ChatList = new TdApi.ChatList.ChatListArchive()
+            }).Result;
+            UpdateArchivedChatsCount();
         }
     }
 }
