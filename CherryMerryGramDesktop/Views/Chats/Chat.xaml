@@ -88,19 +88,90 @@
                 <Border Background="#1a1a1a" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" CornerRadius="4" 
                         Padding="5">
                     <Grid>
-                        <TextBox x:Name="UserMessageInput" PlaceholderText="Enter your message"
-                                 HorizontalAlignment="Stretch"/>
-                        <StackPanel HorizontalAlignment="Right"
-                                    VerticalAlignment="Stretch"
-                                    Orientation="Horizontal">
-                            <Button x:Name="Stickers" Content="Stickers" MaxHeight="25" MaxWidth="25" 
+                        <RelativePanel HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch">
+                            <Grid RelativePanel.AlignRightWithPanel="True"
+                                  RelativePanel.AlignLeftWithPanel="True"
+                                  RelativePanel.AlignBottomWithPanel="True"
+                                  RelativePanel.AlignTopWithPanel="True">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="500*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="ButtonAttachMedia" 
+                                    MaxHeight="36" 
+                                    MaxWidth="36"
+                                    Margin="0, 0, 5, 0"
+                                    Padding="5, 0, 5, 0"
                                     HorizontalAlignment="Left"
-                                    VerticalAlignment="Stretch" />
-                            <Button x:Name="SendMessage" Content="Send" MaxHeight="25" MaxWidth="25" 
-                                    Click="SendMessage_OnClick"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Stretch" />
-                        </StackPanel>
+                                    VerticalAlignment="Stretch"
+                                    Click="ButtonAttachMedia_OnClick">
+                                    <Button.Content>
+                                        <FontIcon Glyph="&#xE723;"
+                                                  FontSize="18"/>
+                                    </Button.Content>
+                                    <Button.Flyout>
+                                        <MenuFlyout x:Name="ContextMenuMedia" Placement="Top">
+                                            <MenuFlyoutItem x:Name="ContextMenuPhotoOrVideo"
+                                                            Text="Photo or Video"
+                                                            Click="ContextMenuPhotoOrVideo_OnClick"/>
+                                            <MenuFlyoutItem x:Name="ContextMenuCamera"
+                                                            Text="Camera"
+                                                            IsEnabled="False"/>
+                                            <MenuFlyoutItem x:Name="ContextMenuFile"
+                                                            Text="File"
+                                                            Click="ContextMenuFile_OnClick"/>
+                                            <MenuFlyoutItem x:Name="ContextMenuLocation"
+                                                            Text="Location"
+                                                            IsEnabled="False"/>
+                                            <MenuFlyoutItem x:Name="ContextMenuPoll"
+                                                            Text="Poll"
+                                                            Click="ContextMenuPoll_OnClick"/>
+                                            <MenuFlyoutItem x:Name="ContextMenuContact"
+                                                            Text="Contact"
+                                                            IsEnabled="False"/>
+                                            <MenuFlyoutSeparator />
+                                            <MenuFlyoutItem x:Name="ContextMenuWallet" 
+                                                            Text="Wallet"
+                                                            IsEnabled="False"/>
+                                        </MenuFlyout>
+                                    </Button.Flyout>
+                                </Button>
+                                <TextBox x:Name="UserMessageInput" 
+                                         PlaceholderText="Enter your message"
+                                         HorizontalAlignment="Stretch"
+                                         TextWrapping="Wrap"
+                                         Grid.Column="1"/>
+                                <Button x:Name="Stickers" 
+                                        MaxHeight="36" 
+                                        MaxWidth="36"
+                                        Margin="5, 0, 5, 0"
+                                        Padding="5, 0, 5, 0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Stretch"
+                                        Grid.Column="2">
+                                    <Button.Content>
+                                        <FontIcon Glyph="&#xF4AA;"
+                                                  FontSize="18"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button x:Name="SendMessage" 
+                                        MaxHeight="36" 
+                                        MaxWidth="36"
+                                        Padding="5, 0, 5, 0"
+                                        Click="SendMessage_OnClick"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Stretch"
+                                        Grid.Column="3">
+                                    <Button.Content>
+                                        <FontIcon Glyph="&#xE724;" 
+                                                  FontSize="18"/>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                        </RelativePanel>
                     </Grid>
                 </Border>
             </Grid>

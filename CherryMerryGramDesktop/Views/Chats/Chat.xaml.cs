@@ -178,7 +178,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 case TdApi.ChatType.ChatTypeBasicGroup typeBasicGroup:
                     var basicGroupInfo = _client.GetBasicGroupFullInfoAsync(
                         basicGroupId: typeBasicGroup.BasicGroupId
-                        ).Result;
+                    ).Result;
                     ChatMembers.Text = basicGroupInfo.Members.Length + " members";
                     break;
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
@@ -212,11 +212,12 @@ namespace CherryMerryGramDesktop.Views.Chats
                         Console.WriteLine(e);
                         throw;
                     }
+
                     break;
             }
-            
-            _client.ExecuteAsync(new TdApi.OpenChat {ChatId = chatId});
-            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+
+            _client.ExecuteAsync(new TdApi.OpenChat { ChatId = chatId });
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private void UpdateChatMembersText()
@@ -484,6 +485,26 @@ namespace CherryMerryGramDesktop.Views.Chats
                     CloseChat();
                     break;
             }
+        }
+
+        private void ButtonAttachMedia_OnClick(object sender, RoutedEventArgs e)
+        {
+            ContextMenuMedia.ShowAt(ButtonAttachMedia);
+        }
+
+        private void ContextMenuPhotoOrVideo_OnClick(object sender, RoutedEventArgs e)
+        {
+            // SendMediaMessage.ShowAsync();
+        }
+
+        private void ContextMenuFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            // SendFileMessage.ShowAsync();
+        }
+
+        private void ContextMenuPoll_OnClick(object sender, RoutedEventArgs e)
+        {
+            CreatePoll.ShowAsync();
         }
     }
 }
