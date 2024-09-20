@@ -50,10 +50,9 @@
                     </StackPanel>
                 </Border>
                 <RelativePanel>
-                    <MediaPlayerElement x:Name="MediaPlayerElement" 
-                              MaxWidth="400" 
-                              Height="270"
-                              CornerRadius="4">
+                    <MediaPlayerElement x:Name="MediaPlayerElement"
+                              CornerRadius="4"
+                              PointerPressed="MediaPlayerElement_OnPointerPressed">
                     </MediaPlayerElement>
                 </RelativePanel>
                 <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" 

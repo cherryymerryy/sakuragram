@@ -410,8 +410,13 @@ namespace CherryMerryGramDesktop.Views.Chats
             
             try
             {
-                _pollOptionsList.Insert(0, new TdApi.FormattedText { Text = DefaultPollOption.Text });
-
+                if (PollOptions.Children.Count < 2) return;
+                
+                foreach (var pollOption in PollOptions.Children.OfType<TextBox>())
+                {
+                    _pollOptionsList.Add(new TdApi.FormattedText {Text = pollOption.Text});
+                }
+                
                 _client.ExecuteAsync(new TdApi.SendMessage
                 {
                     ChatId = _chatId,
@@ -448,8 +453,9 @@ namespace CherryMerryGramDesktop.Views.Chats
                 
                 _pollOptionsCount += 1;
                 PollOptions.Children.Add(newPollOption);
-                _pollOptionsList.Add(new TdApi.FormattedText { Text = newPollOption.Text });
             });
+
+            CreatePoll.IsPrimaryButtonEnabled = PollOptions.Children.Count >= 2;
         }
 
         private void SearchMessages_OnClick(object sender, RoutedEventArgs e)

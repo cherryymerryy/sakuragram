@@ -2,9 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Media.Core;
+using Windows.Media.Playback;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
 
@@ -16,7 +18,8 @@ public partial class ChatVideoMessage : Page
     private TdApi.MessageContent _messageMediaContent;
     private int _profilePhotoFileId;
     private int _mediaFileId;
-    private int _videoDuration;
+    private bool _isPlaying = false;
+    private TimeSpan _pausedVideoPosition;
     
     public ChatVideoMessage()
     {
@@ -183,8 +186,6 @@ public partial class ChatVideoMessage : Page
                     MessageContent.Text = "";
                     MessageContent.Visibility = Visibility.Collapsed;
                 }
-
-                _videoDuration = messageVideo.Video.Duration;
                 
                 break;
             }
@@ -222,5 +223,32 @@ public partial class ChatVideoMessage : Page
                 Priority = 1
             }).Result;
         }
+    }
+
+    private void MediaPlayerElement_OnPointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (MediaPlayerElement.Source == null) return;
+        if (!_isPlaying)
+        {
+            MediaPlayerElement.MediaPlayer.Position = _pausedVideoPosition != TimeSpan.Zero ? _pausedVideoPosition : TimeSpan.Zero;
+            MediaPlayerElement.MediaPlayer.IsMuted = false;
+            MediaPlayerElement.MediaPlayer.PlaybackRate = 1;
+            MediaPlayerElement.MediaPlayer.Volume = 0.5;
+            MediaPlayerElement.MediaPlayer.MediaEnded += MediaPlayerElement_OnMediaEnded;
+            MediaPlayerElement.MediaPlayer.Play();
+            _isPlaying = true;
+        }
+        else
+        {
+            _pausedVideoPosition = MediaPlayerElement.MediaPlayer.Position;
+            MediaPlayerElement.MediaPlayer.Pause();
+            _isPlaying = false;
+        }
+    }
+
+    private void MediaPlayerElement_OnMediaEnded(MediaPlayer sender, object args)
+    {
+        _isPlaying = false;
+        MediaPlayerElement.MediaPlayer.IsMuted = true;
     }
 }
