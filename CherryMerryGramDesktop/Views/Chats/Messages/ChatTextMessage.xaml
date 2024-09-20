@@ -43,7 +43,8 @@
                 <Border x:Name="Reply" 
                         Visibility="Collapsed" 
                         Background="{StaticResource CardBackgroundFillColorSecondaryBrush}" 
-                        CornerRadius="4">
+                        CornerRadius="4"
+                        Margin="0,0,0,4">
                     <StackPanel Padding="4">
                         <TextBlock x:Name="ReplyFirstName" Foreground="#A4A4A4" />
                         <TextBlock x:Name="ReplyInputContent" 
