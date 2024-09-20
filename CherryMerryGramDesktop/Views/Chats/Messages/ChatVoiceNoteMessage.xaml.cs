@@ -80,6 +80,61 @@ public partial class ChatVoiceNoteMessage : Page
             ProfilePicture.Visibility = Visibility.Collapsed;
         }
         
+        if (message.ForwardInfo != null)
+        {
+            if (message.ForwardInfo.Source != null)
+            {
+                TextBlockForwardInfo.Text = $"Forwarded from {message.ForwardInfo.Source.SenderName}";
+                TextBlockForwardInfo.Visibility = Visibility.Visible;
+            }
+            else if (message.ForwardInfo.Origin != null)
+            {
+                switch (message.ForwardInfo.Origin)
+                {
+                    case TdApi.MessageOrigin.MessageOriginChannel channel:
+                    {
+                        string forwardInfo = string.Empty;
+                        var chat = _client.GetChatAsync(chatId: channel.ChatId).Result;
+
+                        forwardInfo = chat.Title;
+
+                        if (channel.AuthorSignature != string.Empty)
+                        {
+                            forwardInfo = forwardInfo + $" ({channel.AuthorSignature})";
+                        }
+                        
+                        TextBlockForwardInfo.Text = $"Forwarded from {forwardInfo}";
+                        TextBlockForwardInfo.Visibility = Visibility.Visible;
+                        break;
+                    }
+                    case TdApi.MessageOrigin.MessageOriginChat chat:
+                    {
+                        TextBlockForwardInfo.Text = $"Forwarded from {chat.AuthorSignature}";
+                        TextBlockForwardInfo.Visibility = Visibility.Visible;
+                        break;
+                    }
+                    case TdApi.MessageOrigin.MessageOriginUser user:
+                    {
+                        var originUser = _client.GetUserAsync(userId: user.SenderUserId).Result;
+                        TextBlockForwardInfo.Text = $"Forwarded from {originUser.FirstName} {originUser.LastName}";
+                        TextBlockForwardInfo.Visibility = Visibility.Visible;
+                        break;
+                    }
+                    case TdApi.MessageOrigin.MessageOriginHiddenUser hiddenUser:
+                    {
+                        TextBlockForwardInfo.Text = $"Forwarded from {hiddenUser.SenderName}";
+                        TextBlockForwardInfo.Visibility = Visibility.Visible;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            TextBlockForwardInfo.Text = string.Empty;
+            TextBlockForwardInfo.Visibility = Visibility.Collapsed;
+        }
+        
         switch (message.Content)
         {
             case TdApi.MessageContent.MessageVoiceNote messageVoiceNote:

@@ -32,6 +32,13 @@
                                HorizontalTextAlignment="Right" 
                                HorizontalAlignment="Right"/>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                    <TextBlock x:Name="TextBlockForwardInfo"
+                               Text="Forwarded from @forwarded"
+                               Foreground="{StaticResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
                 <Border x:Name="Reply" Visibility="Collapsed" Background="#1A1A1A" CornerRadius="4">
                     <StackPanel Padding="4">
                         <TextBlock x:Name="ReplyFirstName" Foreground="#A4A4A4" />
