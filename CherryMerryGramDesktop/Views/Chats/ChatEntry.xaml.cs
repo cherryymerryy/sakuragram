@@ -26,8 +26,6 @@ namespace CherryMerryGramDesktop.Views.Chats
         public ChatEntry()
         {
             InitializeComponent();
-            
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private Task ProcessUpdates(TdApi.Update update)
@@ -75,8 +73,7 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         public void UpdateChatInfo()
         {
-            if (Chat == null) return;
-            
+            Chat = _client.GetChatAsync(chatId: ChatId).Result;
             TextBlockChatName.Text = Chat.Title;
             
             GetChatPhoto(Chat);
@@ -129,13 +126,15 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 TextBlockSendTime.Text = e.Message;
             }
+            
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
         
         private void GetChatPhoto(TdApi.Chat chat)
         {
             if (chat.Photo == null)
             {
-                ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
+                ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, 
                     () => ChatEntryProfilePicture.DisplayName = chat.Title);
                 return;
             }
@@ -143,7 +142,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 try
                 {
-                    ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                    ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low,
                         () => ChatEntryProfilePicture.ProfilePicture = new BitmapImage(new Uri(chat.Photo.Big.Local.Path)));
                 }
                 catch (Exception e)
