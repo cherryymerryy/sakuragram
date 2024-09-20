@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Windows.System;
 using CherryMerryGramDesktop.Services;
@@ -10,9 +9,7 @@ using CherryMerryGramDesktop.Views.Calls;
 using CherryMerryGramDesktop.Views.Chats.Messages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media.Animation;
 using TdLib;
 using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
 
@@ -24,6 +21,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         private static TdApi.Chat _chat;
         public ChatsView _ChatsView;
         private List<TdApi.Message> _messagesList = [];
+        private List<TdApi.FormattedText> _pollOptionsList = [];
         
         public long _chatId;
         private int _backgroundId;
@@ -218,7 +216,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             }
             
             _client.ExecuteAsync(new TdApi.OpenChat {ChatId = chatId});
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            //_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
 
         private void UpdateChatMembersText()
@@ -408,15 +406,50 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void CreatePoll_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+            if (PollQuestion.Text == string.Empty) return;
+            
+            try
+            {
+                _pollOptionsList.Insert(0, new TdApi.FormattedText { Text = DefaultPollOption.Text });
+
+                _client.ExecuteAsync(new TdApi.SendMessage
+                {
+                    ChatId = _chatId,
+                    InputMessageContent = new TdApi.InputMessageContent.InputMessagePoll
+                    {
+                        Type = new TdApi.PollType.PollTypeRegular(),
+                        Question = new TdApi.FormattedText { Text = PollQuestion.Text },
+                        Options = _pollOptionsList.ToArray(),
+                        IsClosed = false,
+                        IsAnonymous = AnonymousVoting.IsChecked.Value,
+                    }
+                });
+                _pollOptionsList.Clear();
+            }
+            catch (TdException e)
+            {
+                CreatePoll.Hide();
+                TextBlockException.Text = e.Message;
+                ExceptionDialog.ShowAsync();
+                throw;
+            }
         }
 
         private void CreatePoll_OnSecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             if (_pollOptionsCount >= 10) return;
-            _pollOptionsCount += 1;
-            var NewPollOption = new TextBox();
-            NewPollOption.PlaceholderText = "Add an option";
-            PollOptions.Children.Add(NewPollOption);
+
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => {
+                var newPollOption = new TextBox
+                {
+                    PlaceholderText = "Add an option",
+                    Margin = new Thickness(0, 0, 0, 2)
+                };
+                
+                _pollOptionsCount += 1;
+                PollOptions.Children.Add(newPollOption);
+                _pollOptionsList.Add(new TdApi.FormattedText { Text = newPollOption.Text });
+            });
         }
 
         private void SearchMessages_OnClick(object sender, RoutedEventArgs e)

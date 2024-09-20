@@ -118,18 +118,29 @@
                     </DataTemplate>
                 </ContentDialog.TitleTemplate>
                 <StackPanel>
-                    <TextBox x:Name="PollQuestion" Header="Question" PlaceholderText="Ask a question" />
+                    <TextBox x:Name="PollQuestion" Header="Question" PlaceholderText="Ask a question" 
+                             Margin="0, 0, 0, 4"/>
                     <TextBlock Text="Poll options"/>
-                    <ScrollViewer MinHeight="50" MaxHeight="100">
+                    <ScrollViewer MinHeight="50" MaxHeight="100"  Margin="0, 0, 0, 4">
                         <StackPanel x:Name="PollOptions">
                             <TextBox x:Name="DefaultPollOption" PlaceholderText="Add an option"/>
                         </StackPanel>
                     </ScrollViewer>
                     <TextBlock Text="Settings"/>
                     <CheckBox x:Name="AnonymousVoting" Content="Anonymous voting" IsChecked="True" />
-                    <CheckBox x:Name="MultipleAnswers" Content="Multiple answers" IsChecked="False"/>
-                    <CheckBox x:Name="QuizMode" Content="Quiz mode" IsChecked="False"/>
+                    <CheckBox x:Name="MultipleAnswers" Content="Multiple answers" IsChecked="False" IsEnabled="False"/>
+                    <CheckBox x:Name="QuizMode" Content="Quiz mode" IsChecked="False" IsEnabled="False"/>
                 </StackPanel>
+            </ContentDialog>
+            
+            <ContentDialog x:Name="ExceptionDialog">
+                <ContentDialog.TitleTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="Exception" />
+                    </DataTemplate>
+                </ContentDialog.TitleTemplate>
+                <TextBlock x:Name="TextBlockException" 
+                           TextWrapping="Wrap"/>
             </ContentDialog>
         </Grid>
         
