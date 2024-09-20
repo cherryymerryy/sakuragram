@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /Config/*
 /CherryMerryGramDesktop/Config
 CherryMerryGramDesktop/Config/Config.cs
+/CherryMerryGramDesktop/.idea

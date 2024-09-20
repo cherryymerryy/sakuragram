@@ -37,7 +37,6 @@ namespace CherryMerryGramDesktop
             NavigateToView("ChatsView");
             TrySetDesktopAcrylicBackdrop();
             
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
             _notificationService = new NotificationService();
             
             var chatsIds = _client.ExecuteAsync(new TdApi.GetChats{Limit = 100}).Result.ChatIds;
@@ -51,7 +50,8 @@ namespace CherryMerryGramDesktop
 			
 			_user = _client.GetMeAsync().Result;
 			NavigationView.PaneTitle = $"{_user.FirstName} ({_totalUnreadCount})";
-		}
+            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+        }
 
 		private async Task ProcessUpdates(TdApi.Update update)
 		{
