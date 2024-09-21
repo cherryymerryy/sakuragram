@@ -411,9 +411,10 @@ namespace CherryMerryGramDesktop.Views.Chats
             
             try
             {
-                if (PollOptions.Children.Count < 2) return;
+                _pollOptionsList.Add(new TdApi.FormattedText {Text = DefaultPollOption.Text});
+                _pollOptionsList.Add(new TdApi.FormattedText {Text = DefaultSecondaryPollOption.Text});
                 
-                foreach (var pollOption in PollOptions.Children.OfType<TextBox>())
+                foreach (var pollOption in AdditionalPollOptions.Children.OfType<TextBox>())
                 {
                     _pollOptionsList.Add(new TdApi.FormattedText {Text = pollOption.Text});
                 }
@@ -423,14 +424,24 @@ namespace CherryMerryGramDesktop.Views.Chats
                     ChatId = _chatId,
                     InputMessageContent = new TdApi.InputMessageContent.InputMessagePoll
                     {
-                        Type = new TdApi.PollType.PollTypeRegular(),
+                        Type = QuizMode.IsChecked.Value ? new TdApi.PollType.PollTypeQuiz
+                        {
+                            CorrectOptionId = Convert.ToInt32(TextBoxCorrectAnswer.Text) - 1
+                        } : new TdApi.PollType.PollTypeRegular
+                        {
+                            AllowMultipleAnswers = MultipleAnswers.IsChecked.Value
+                        },
                         Question = new TdApi.FormattedText { Text = PollQuestion.Text },
                         Options = _pollOptionsList.ToArray(),
                         IsClosed = false,
                         IsAnonymous = AnonymousVoting.IsChecked.Value,
                     }
                 });
+                
                 _pollOptionsList.Clear();
+                AdditionalPollOptions.Children.Clear();
+                DefaultPollOption.Text = string.Empty;
+                DefaultSecondaryPollOption.Text = string.Empty;
             }
             catch (TdException e)
             {
@@ -443,20 +454,19 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void CreatePoll_OnSecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+            args.Cancel = true;
             if (_pollOptionsCount >= 10) return;
 
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => {
                 var newPollOption = new TextBox
                 {
                     PlaceholderText = "Add an option",
-                    Margin = new Thickness(0, 0, 0, 2)
+                    Margin = new Thickness(0, 0, 0, 4)
                 };
                 
                 _pollOptionsCount += 1;
-                PollOptions.Children.Add(newPollOption);
+                AdditionalPollOptions.Children.Add(newPollOption);
             });
-
-            CreatePoll.IsPrimaryButtonEnabled = PollOptions.Children.Count >= 2;
         }
 
         private void SearchMessages_OnClick(object sender, RoutedEventArgs e)
@@ -505,6 +515,12 @@ namespace CherryMerryGramDesktop.Views.Chats
         private void ContextMenuPoll_OnClick(object sender, RoutedEventArgs e)
         {
             CreatePoll.ShowAsync();
+        }
+
+        private void QuizMode_OnChecked(object sender, RoutedEventArgs e)
+        {
+            TextBoxCorrectAnswer.IsEnabled = QuizMode.IsChecked.Value;
+            MultipleAnswers.IsEnabled = !QuizMode.IsChecked.Value;
         }
     }
 }

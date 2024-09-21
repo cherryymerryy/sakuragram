@@ -56,16 +56,36 @@
                                     IsEnabled="True" >
                                 <Button.Flyout>
                                     <MenuFlyout x:Name="ContextMenu" Placement="Bottom">
-                                        <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
-                                        <MenuFlyoutItem Text="View group info" Click="ContextMenuViewGroupInfo_OnClick"/>
-                                        <MenuFlyoutItem Text="To beginning" Click="ContextMenuToBeginning_OnClick"/>
-                                        <MenuFlyoutItem Text="Manage group" Click="ContextMenuManageGroup_OnClick"/>
-                                        <MenuFlyoutItem Text="Boost group" Click="ContextMenuBoostGroup_OnClick"/>
-                                        <MenuFlyoutItem Text="Create poll" Click="ContextMenuCreatePoll_OnClick"/>
-                                        <MenuFlyoutItem Text="Report" Click="ContextMenuReport_OnClick"/>
-                                        <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
-                                        <MenuFlyoutItem Text="Clear history" Click="ContextMenuClearHistory_OnClick"/>
-                                        <MenuFlyoutItem Text="Leave" Click="ContextMenuLeaveGroup_OnClick"/>
+                                        <MenuFlyoutItem Text="Mute" 
+                                                        Click="ContextMenuNotifications_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="View group info" 
+                                                        Click="ContextMenuViewGroupInfo_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="To beginning" 
+                                                        Click="ContextMenuToBeginning_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="Manage group" 
+                                                        Click="ContextMenuManageGroup_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="Boost group" 
+                                                        Click="ContextMenuBoostGroup_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="Create poll" 
+                                                        Click="ContextMenuCreatePoll_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="Report" 
+                                                        Click="ContextMenuReport_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="Mute" 
+                                                        Click="ContextMenuNotifications_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="Clear history" 
+                                                        Click="ContextMenuClearHistory_OnClick"
+                                                        IsEnabled="False"/>
+                                        <MenuFlyoutItem Text="Leave" 
+                                                        Click="ContextMenuLeaveGroup_OnClick"
+                                                        IsEnabled="False"/>
                                     </MenuFlyout>
                                 </Button.Flyout>
                             </Button>
@@ -116,13 +136,15 @@
                                         <MenuFlyout x:Name="ContextMenuMedia" Placement="Top">
                                             <MenuFlyoutItem x:Name="ContextMenuPhotoOrVideo"
                                                             Text="Photo or Video"
-                                                            Click="ContextMenuPhotoOrVideo_OnClick"/>
+                                                            Click="ContextMenuPhotoOrVideo_OnClick"
+                                                            IsEnabled="False"/>
                                             <MenuFlyoutItem x:Name="ContextMenuCamera"
                                                             Text="Camera"
                                                             IsEnabled="False"/>
                                             <MenuFlyoutItem x:Name="ContextMenuFile"
                                                             Text="File"
-                                                            Click="ContextMenuFile_OnClick"/>
+                                                            Click="ContextMenuFile_OnClick"
+                                                            IsEnabled="False"/>
                                             <MenuFlyoutItem x:Name="ContextMenuLocation"
                                                             Text="Location"
                                                             IsEnabled="False"/>
@@ -151,7 +173,8 @@
                                         Padding="5, 0, 5, 0"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Stretch"
-                                        Grid.Column="2">
+                                        Grid.Column="2"
+                                        IsEnabled="False">
                                     <Button.Content>
                                         <FontIcon Glyph="&#xF4AA;"
                                                   FontSize="18"/>
@@ -194,13 +217,28 @@
                     <TextBlock Text="Poll options"/>
                     <ScrollViewer MinHeight="50" MaxHeight="100"  Margin="0, 0, 0, 4">
                         <StackPanel x:Name="PollOptions">
-                            <TextBox x:Name="DefaultPollOption" PlaceholderText="Add an option"/>
+                            <TextBox x:Name="DefaultPollOption" 
+                                     PlaceholderText="Add an option"
+                                     Margin="0, 0, 0, 4"/>
+                            <TextBox x:Name="DefaultSecondaryPollOption" 
+                                     PlaceholderText="Add an option"
+                                     Margin="0, 0, 0, 4"/>
+                            <StackPanel x:Name="AdditionalPollOptions" />
                         </StackPanel>
                     </ScrollViewer>
                     <TextBlock Text="Settings"/>
-                    <CheckBox x:Name="AnonymousVoting" Content="Anonymous voting" IsChecked="True" />
-                    <CheckBox x:Name="MultipleAnswers" Content="Multiple answers" IsChecked="False" IsEnabled="False"/>
-                    <CheckBox x:Name="QuizMode" Content="Quiz mode" IsChecked="False" IsEnabled="False"/>
+                    <CheckBox x:Name="AnonymousVoting" 
+                              Content="Anonymous voting" 
+                              IsChecked="True" />
+                    <CheckBox x:Name="MultipleAnswers" 
+                              Content="Multiple answers" 
+                              IsChecked="False"/> 
+                    <CheckBox x:Name="QuizMode" Content="Quiz mode" 
+                              IsChecked="False" 
+                              Checked="QuizMode_OnChecked"/>
+                    <TextBox x:Name="TextBoxCorrectAnswer" 
+                             IsEnabled="False"
+                             PlaceholderText="Correct answer (ID)"/>
                 </StackPanel>
             </ContentDialog>
             
