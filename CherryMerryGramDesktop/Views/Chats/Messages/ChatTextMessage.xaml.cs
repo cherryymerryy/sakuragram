@@ -130,6 +130,19 @@ namespace CherryMerryGramDesktop.Views.Chats
                 ProfilePicture.Visibility = Visibility.Collapsed;
             }
 
+            try
+            {
+                DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                dateTime = dateTime.AddSeconds(message.Date).ToLocalTime();
+                string sendTime = dateTime.ToShortTimeString();
+
+                TextBlockSendTime.Text = sendTime;
+            } 
+            catch 
+            {
+                // ignored
+            }
+            
             if (message.ForwardInfo != null)
             {
                 if (message.ForwardInfo.Source != null)

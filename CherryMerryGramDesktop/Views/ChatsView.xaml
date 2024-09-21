@@ -47,6 +47,7 @@
                               Height="Auto">
                     <StackPanel>
                         <StackPanel x:Name="PinnedChatsList" Width="350" Height="Auto"/>
+                        <MenuFlyoutSeparator Margin="0, 4, 0, 4" />
                         <StackPanel x:Name="ChatsList" Width="350" Height="Auto" Loaded="ChatList_OnLoaded" />
                     </StackPanel>
                 </ScrollViewer>

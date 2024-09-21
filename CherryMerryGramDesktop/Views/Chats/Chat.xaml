@@ -10,11 +10,12 @@
     VerticalAlignment="Stretch"
     HorizontalContentAlignment="Stretch"
     VerticalContentAlignment="Stretch"
+    Margin="4, 0, 0, 0"
     KeyDown="Chat_OnKeyDown">
 
-    <Border>
+    <Border CornerRadius="4">
         <Border.Background>
-            <ImageBrush x:Name="ThemeBackground"  />
+            <ImageBrush x:Name="ThemeBackground" />
         </Border.Background>
         
         <Grid>
@@ -95,8 +96,7 @@
             </Grid>
             
             <Grid VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="1">
-                    <ScrollViewer x:Name="MessagesScrollViewer" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" 
-                                  ViewChanging="MessagesScrollViewer_OnViewChanging_">
+                    <ScrollViewer x:Name="MessagesScrollViewer" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" >
                         <StackPanel x:Name="MessagesList" Loaded="MessagesList_OnLoaded" />
                     </ScrollViewer>
             </Grid>

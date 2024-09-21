@@ -51,6 +51,8 @@ namespace CherryMerryGramDesktop
 			_user = _client.GetMeAsync().Result;
 			NavigationView.PaneTitle = $"{_user.FirstName} ({_totalUnreadCount})";
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            
+			_client.ExecuteAsync(new TdApi.GetChatFolder {ChatFolderId = -1});
         }
 
 		private async Task ProcessUpdates(TdApi.Update update)

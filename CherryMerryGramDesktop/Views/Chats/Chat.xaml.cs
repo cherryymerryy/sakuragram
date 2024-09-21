@@ -10,6 +10,7 @@ using CherryMerryGramDesktop.Views.Chats.Messages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
 using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
 
@@ -19,16 +20,18 @@ namespace CherryMerryGramDesktop.Views.Chats
     {
         private static TdClient _client = App._client;
         private static TdApi.Chat _chat;
+        private static TdApi.Background _background;
         public ChatsView _ChatsView;
         private List<TdApi.Message> _messagesList = [];
         private List<TdApi.FormattedText> _pollOptionsList = [];
         
         public long _chatId;
+        private string _backgroundUrl;
         private int _backgroundId;
         private int _memberCount;
         private int _onlineMemberCount;
         private int _offset;
-        private int _pollOptionsCount = 1;
+        private int _pollOptionsCount = 2;
         
         private ReplyService _replyService;
         private MessageService _messageService;
@@ -149,7 +152,28 @@ namespace CherryMerryGramDesktop.Views.Chats
                     //     }
                     // }
                     break;
-                } 
+                }
+                case TdApi.Update.UpdateFile updateFile:
+                {
+                    if (updateFile.File.Id == _backgroundId)
+                    {
+                        if (_background.Document.Document_.Local.Path != string.Empty)
+                        {
+                            ThemeBackground.DispatcherQueue.TryEnqueue(() => 
+                                ThemeBackground.ImageSource = new BitmapImage(
+                                    new Uri(_background.Document.Document_.Local.Path)
+                                ));
+                        }
+                        else if (updateFile.File.Local.Path != string.Empty)
+                        {
+                            ThemeBackground.DispatcherQueue.TryEnqueue(() => 
+                                ThemeBackground.ImageSource = new BitmapImage(
+                                    new Uri(updateFile.File.Local.Path)
+                                ));
+                        }
+                    }
+                    break;
+                }
             }
         }
 
@@ -160,6 +184,25 @@ namespace CherryMerryGramDesktop.Views.Chats
             _chatId = chatId;
             ChatTitle.Text = chat.Title;
 
+            if (chat.Background != null)
+            {
+                _background = chat.Background.Background;
+                _backgroundId = _background.Document.Document_.Id;
+                
+                if (_background.Document.Document_.Local.Path != string.Empty)
+                {
+                    ThemeBackground.ImageSource = new BitmapImage(new Uri(_background.Document.Document_.Local.Path));
+                }
+                else
+                {
+                    var background = _client.ExecuteAsync(new TdApi.DownloadFile
+                    {
+                        FileId = _backgroundId,
+                        Priority = 1
+                    }).Result;
+                }
+            }
+            
             switch (chat.Type)
             {
                 case TdApi.ChatType.ChatTypePrivate typePrivate:
@@ -478,10 +521,6 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             var videoCall = new VoiceCall();
             videoCall.Activate();
-        }
-
-        private void MessagesScrollViewer_OnViewChanging_(object sender, ScrollViewerViewChangingEventArgs e)
-        {
         }
 
         private void Chat_OnKeyDown(object sender, KeyRoutedEventArgs e)

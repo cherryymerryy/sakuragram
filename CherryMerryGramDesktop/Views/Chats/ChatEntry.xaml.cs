@@ -79,6 +79,11 @@ namespace CherryMerryGramDesktop.Views.Chats
                     });
                     break;
                 }
+                case TdApi.Update.UpdateUnreadChatCount updateUnreadChatCount:
+                {
+                    UnreadMessagesCount.DispatcherQueue.TryEnqueue(() => UnreadMessagesCount.Value = updateUnreadChatCount.UnreadCount);
+                    break;
+                }
             }
 
             return Task.CompletedTask;
