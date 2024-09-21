@@ -19,9 +19,10 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private static readonly TdClient _client = App._client;
         
-        public TdApi.Chat Chat;
+        public TdApi.Chat _chat;
         public long ChatId;
         private int _profilePhotoFileId;
+        private bool _inArchive;
         
         public ChatEntry()
         {
@@ -45,7 +46,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 {
                     if (updateChatPhoto.ChatId == ChatId)
                     {
-                        ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(() => GetChatPhoto(Chat));
+                        ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(() => GetChatPhoto(_chat));
                     }
                     break;
                 }
@@ -61,7 +62,19 @@ namespace CherryMerryGramDesktop.Views.Chats
                         else
                         {
                             ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                                () => ChatEntryProfilePicture.DisplayName = Chat.Title);
+                                () => ChatEntryProfilePicture.DisplayName = _chat.Title);
+                        }
+                    });
+                    break;
+                }
+                case TdApi.Update.UpdateChatLastMessage updateChatLastMessage:
+                {
+                    TextBlockChatLastMessage.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                    {
+                        if (updateChatLastMessage.LastMessage == null) return;
+                        if (ChatId == updateChatLastMessage.LastMessage.ChatId)
+                        {
+                            GetLastMessage(_client.GetChatAsync(updateChatLastMessage.ChatId).Result);
                         }
                     });
                     break;
@@ -73,28 +86,28 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         public void UpdateChatInfo()
         {
-            Chat = _client.GetChatAsync(chatId: ChatId).Result;
-            TextBlockChatName.Text = Chat.Title;
+            _chat = _client.GetChatAsync(chatId: ChatId).Result;
+            TextBlockChatName.Text = _chat.Title;
             
-            GetChatPhoto(Chat);
+            GetChatPhoto(_chat);
             GetLastMessage(_client.GetChatAsync(ChatId).Result); 
             
-            if (Chat.UnreadCount > 0)
+            if (_chat.UnreadCount > 0)
             {
                 if (UnreadMessagesCount.Visibility == Visibility.Collapsed) UnreadMessagesCount.Visibility = Visibility.Visible;
-                UnreadMessagesCount.Value = Chat.UnreadCount;
+                UnreadMessagesCount.Value = _chat.UnreadCount;
             }
             else
             {
                 UnreadMessagesCount.Visibility = Visibility.Collapsed;
             }
 
-            if (Chat.NotificationSettings.MuteFor <= 0)
+            if (_chat.NotificationSettings.MuteFor <= 0)
             {
                 UnreadMessagesCount.Background = new SolidColorBrush(Colors.Gray);
             }
             
-            switch (Chat.Type)
+            switch (_chat.Type)
             {
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
                 {
@@ -117,7 +130,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             try
             {
                 DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                dateTime = dateTime.AddSeconds(Chat.LastMessage.Date).ToLocalTime();
+                dateTime = dateTime.AddSeconds(_chat.LastMessage.Date).ToLocalTime();
                 string sendTime = dateTime.ToShortTimeString();
 
                 TextBlockSendTime.Text = sendTime;
@@ -126,6 +139,18 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 TextBlockSendTime.Text = e.Message;
             }
+            
+            // foreach (var chatList in _chat.ChatLists)
+            // {
+            //     _inArchive = chatList switch
+            //     {
+            //         TdApi.ChatList.ChatListMain => false,
+            //         TdApi.ChatList.ChatListArchive => true,
+            //         _ => _inArchive
+            //     };
+            // }
+
+            // ContextMenuArchive.Text = _inArchive ? "Unarchive" : "Archive";
             
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
@@ -189,7 +214,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             _chatWidget._chatId = ChatId;
             _ChatsView._currentChat = _chatWidget;
             
-            _chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _chatWidget.UpdateChat(Chat.Id));
+            _chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _chatWidget.UpdateChat(_chat.Id));
             ChatPage?.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatPage.Children.Add(_chatWidget));
         }
         
@@ -307,32 +332,35 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         private void ContextMenuPin_OnClick(object sender, RoutedEventArgs e)
         {
-            _client.ExecuteAsync(new TdApi.SetPinnedChats { });
+            //_client.ExecuteAsync()
         }
 
         private void ContextMenuArchive_OnClick(object sender, RoutedEventArgs e)
         {
-            var chat = _client.ExecuteAsync(new TdApi.GetChat { ChatId = ChatId }).Result;
-
-            if (chat.ChatLists is TdApi.ChatList.ChatListMain)
+            if (_inArchive)
             {
                 _client.ExecuteAsync(new TdApi.AddChatToList
                 {
-                    ChatId = ChatId, 
+                    ChatId = ChatId,
                     ChatList = new TdApi.ChatList.ChatListArchive()
                 });
             }
-            else if (chat.ChatLists is TdApi.ChatList.ChatListArchive)
+            else
             {
                 _client.ExecuteAsync(new TdApi.AddChatToList
                 {
-                    ChatId = ChatId, 
+                    ChatId = ChatId,
                     ChatList = new TdApi.ChatList.ChatListMain()
                 });
             }
         }
 
         private void ContextMenuLeave_OnClick(object sender, RoutedEventArgs e)
+        {
+            LeaveChatConfirmation.ShowAsync();
+        }
+
+        private void LeaveChatConfirmation_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             _client.ExecuteAsync(new TdApi.LeaveChat { ChatId = ChatId });
         }

@@ -67,15 +67,38 @@
             </StackPanel>
         </Grid>
             
+        <ContentDialog x:Name="LeaveChatConfirmation"
+                       PrimaryButtonText="Leave"
+                       PrimaryButtonClick="LeaveChatConfirmation_OnPrimaryButtonClick"
+                       IsPrimaryButtonEnabled="True"
+                       CloseButtonText="Cancel"
+                       DefaultButton="Primary">
+            <ContentDialog.TitleTemplate>
+                <DataTemplate>
+                    <TextBlock Text="Are you sure you want to leave this chat?" />
+                </DataTemplate>
+            </ContentDialog.TitleTemplate>
+        </ContentDialog>
+        
     </Grid>
     
     <Button.Flyout>
         <MenuFlyout x:Name="ContextMenu" Placement="Bottom">
-            <MenuFlyoutItem Text="Archive" Click="ContextMenuArchive_OnClick"/>
-            <MenuFlyoutItem Text="Pin" Click="ContextMenuPin_OnClick"/>
-            <MenuFlyoutItem Text="Mute" Click="ContextMenuNotifications_OnClick"/>
-            <MenuFlyoutItem Text="Mark as" Click="ContextMenuMarkAs_OnClick"/>
-            <MenuFlyoutItem Text="Leave" Click="ContextMenuLeave_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuArchive" 
+                            Text="Archive" 
+                            Click="ContextMenuArchive_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuPin" 
+                            Text="Pin" 
+                            Click="ContextMenuPin_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuNotifications" 
+                            Text="Mute" 
+                            Click="ContextMenuNotifications_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuMarkAs" 
+                            Text="Mark as" 
+                            Click="ContextMenuMarkAs_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuLeave" 
+                            Text="Leave" 
+                            Click="ContextMenuLeave_OnClick"/>
         </MenuFlyout>
     </Button.Flyout>
 </Button>
