@@ -23,12 +23,6 @@
                                Text="@username" 
                                FontStyle="Oblique" 
                                Foreground="Orange" />
-                    <TextBlock x:Name="Status" 
-                               Text="Status" 
-                               FontStyle="Oblique" 
-                               Foreground="Gray" 
-                               HorizontalTextAlignment="Right" 
-                               HorizontalAlignment="Right"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Stretch"
@@ -58,10 +52,40 @@
                         <FontIcon x:Name="Icon"
                                   Glyph="&#xE896;" />
                     </Button>
+                    <Slider x:Name="SliderVoiceNote"
+                            Width="200"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"/>
                     <TextBlock x:Name="VoiceNoteDuration"/>
                 </StackPanel>
                 <TextBlock x:Name="MessageCaptionText" Text="MessageCaptionText" TextWrapping="Wrap" 
                            win:IsTextSelectionEnabled="True" />
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="TextBlockReplies"
+                               Visibility="Collapsed"
+                               Text="views"
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}"
+                               HorizontalTextAlignment="Right"
+                               HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="TextBlockViews"
+                               Visibility="Collapsed"
+                               Text="views"
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}"
+                               HorizontalTextAlignment="Right"
+                               HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="TextBlockEdited"
+                               Visibility="Collapsed"
+                               Text="edited"
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}"
+                               HorizontalTextAlignment="Right"
+                               HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="TextBlockSendTime"
+                               Text="SendTime"
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}" 
+                               HorizontalTextAlignment="Right" 
+                               HorizontalAlignment="Right"/>
+                </StackPanel>
             </StackPanel>
         </Border>
     </StackPanel>

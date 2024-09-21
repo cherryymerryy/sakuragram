@@ -150,13 +150,40 @@ public partial class ChatVideoNoteMessage : Page
             dateTime = dateTime.AddSeconds(message.Date).ToLocalTime();
             string sendTime = dateTime.ToShortTimeString();
 
-            SendTime.Text = sendTime;
+            TextBlockSendTime.Text = sendTime;
         } 
         catch 
         {
             // ignored
         }
 
+        TextBlockEdited.Visibility = message.EditDate != 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        if (message.CanGetViewers && message.IsChannelPost)
+        {
+            TextBlockViews.Text = message.InteractionInfo.ViewCount + " views";
+            TextBlockViews.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            TextBlockViews.Text = string.Empty;
+            TextBlockViews.Visibility = Visibility.Collapsed;
+        }
+
+        if (message.InteractionInfo?.ReplyInfo != null)
+        {
+            if (message.InteractionInfo.ReplyInfo.ReplyCount > 0)
+            {
+                TextBlockReplies.Text = message.InteractionInfo.ReplyInfo.ReplyCount + " replies";
+                TextBlockReplies.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TextBlockReplies.Text = string.Empty;
+                TextBlockReplies.Visibility = Visibility.Collapsed;
+            }
+        }
+        
         switch (_messageContent)
         {
             case TdApi.MessageContent.MessageVideoNote messageVideoNote:

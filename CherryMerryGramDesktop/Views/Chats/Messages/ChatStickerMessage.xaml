@@ -19,7 +19,9 @@
         <StackPanel Orientation="Vertical"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch">
-            <Border Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
+            <Border x:Name="BorderForwardInfo" 
+                    Visibility="Collapsed"
+                    Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
                     CornerRadius="4"
                     Margin="0, 0, 0, 4">
                 <StackPanel Orientation="Horizontal"

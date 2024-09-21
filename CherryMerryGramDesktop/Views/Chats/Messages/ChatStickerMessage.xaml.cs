@@ -146,6 +146,7 @@ public partial class ChatStickerMessage : Page
             {
                 TextBlockForwardInfo.Text = $"Forwarded from {message.ForwardInfo.Source.SenderName}";
                 TextBlockForwardInfo.Visibility = Visibility.Visible;
+                BorderForwardInfo.Visibility = Visibility.Visible;
             }
             else if (message.ForwardInfo.Origin != null)
             {
@@ -165,12 +166,14 @@ public partial class ChatStickerMessage : Page
                         
                         TextBlockForwardInfo.Text = $"Forwarded from {forwardInfo}";
                         TextBlockForwardInfo.Visibility = Visibility.Visible;
+                        BorderForwardInfo.Visibility = Visibility.Visible;
                         break;
                     }
                     case TdApi.MessageOrigin.MessageOriginChat chat:
                     {
                         TextBlockForwardInfo.Text = $"Forwarded from {chat.AuthorSignature}";
                         TextBlockForwardInfo.Visibility = Visibility.Visible;
+                        BorderForwardInfo.Visibility = Visibility.Visible;
                         break;
                     }
                     case TdApi.MessageOrigin.MessageOriginUser user:
@@ -178,12 +181,14 @@ public partial class ChatStickerMessage : Page
                         var originUser = _client.GetUserAsync(userId: user.SenderUserId).Result;
                         TextBlockForwardInfo.Text = $"Forwarded from {originUser.FirstName} {originUser.LastName}";
                         TextBlockForwardInfo.Visibility = Visibility.Visible;
+                        BorderForwardInfo.Visibility = Visibility.Visible;
                         break;
                     }
                     case TdApi.MessageOrigin.MessageOriginHiddenUser hiddenUser:
                     {
                         TextBlockForwardInfo.Text = $"Forwarded from {hiddenUser.SenderName}";
                         TextBlockForwardInfo.Visibility = Visibility.Visible;
+                        BorderForwardInfo.Visibility = Visibility.Visible;
                         break;
                     }
                 }
@@ -193,6 +198,7 @@ public partial class ChatStickerMessage : Page
         {
             TextBlockForwardInfo.Text = string.Empty;
             TextBlockForwardInfo.Visibility = Visibility.Collapsed;
+            BorderForwardInfo.Visibility = Visibility.Collapsed;
         }
         
         switch (message.Content)
@@ -281,12 +287,14 @@ public partial class ChatStickerMessage : Page
             {
                 ImageMedia.Height = sticker.Height / 3;
                 ImageMedia.Width = sticker.Width / 3;
+                BorderForwardInfo.Width = ImageMedia.Width;
                 break;
             }
             case TdApi.StickerFormat.StickerFormatWebm or TdApi.StickerFormat.StickerFormatTgs:
             {
                 MediaPlayerElement.Height = sticker.Height / 3;
                 MediaPlayerElement.Width = sticker.Width / 3;
+                BorderForwardInfo.Width = ImageMedia.Width;
                 break;
             }
         }

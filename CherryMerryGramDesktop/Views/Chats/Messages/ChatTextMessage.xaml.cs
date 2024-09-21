@@ -185,6 +185,33 @@ namespace CherryMerryGramDesktop.Views.Chats
                 TextBlockForwardInfo.Visibility = Visibility.Collapsed;
             }
             
+            TextBlockEdited.Visibility = message.EditDate != 0 ? Visibility.Visible : Visibility.Collapsed;
+
+            if (message.CanGetViewers && message.IsChannelPost)
+            {
+                TextBlockViews.Text = message.InteractionInfo.ViewCount + " views";
+                TextBlockViews.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TextBlockViews.Text = string.Empty;
+                TextBlockViews.Visibility = Visibility.Collapsed;
+            }
+
+            if (message.InteractionInfo?.ReplyInfo != null)
+            {
+                if (message.InteractionInfo.ReplyInfo.ReplyCount > 0)
+                {
+                    TextBlockReplies.Text = message.InteractionInfo.ReplyInfo.ReplyCount + " replies";
+                    TextBlockReplies.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    TextBlockReplies.Text = string.Empty;
+                    TextBlockReplies.Visibility = Visibility.Collapsed;
+                }
+            }
+            
             switch (message.Content)
             {
                 case TdApi.MessageContent.MessageText messageText:
