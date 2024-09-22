@@ -19,7 +19,6 @@ namespace CherryMerryGramDesktop
         }
         
         public static TdClient _client;
-        private static Config.Config _config;
 		private static readonly ManualResetEventSlim ReadyToAuthenticate = new();
 
 		public static bool _authNeeded;
@@ -30,12 +29,9 @@ namespace CherryMerryGramDesktop
 			using var jsonClient = new TdJsonClient();
 
 			const string json = "";
-			const double timeout = 1.0;
 
 			jsonClient.Send(json);
-			var result = jsonClient.Receive(timeout);
 			
-			_config = new Config.Config();
 			_client = new TdClient();
 			_client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
 
@@ -86,17 +82,14 @@ namespace CherryMerryGramDesktop
 					break;
 
 				case TdApi.Update.UpdateConnectionState { State: TdApi.ConnectionState.ConnectionStateReady }:
-					break;
-
-				default:
-					// ReSharper disable once EmptyStatement
-					;
-					// Add a breakpoint here to see other events
+					_authNeeded = false;
+					_passwordNeeded = false;
+					ReadyToAuthenticate.Set();
 					break;
 			}
 		}
         
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             PrepareTelegramApi();
 
