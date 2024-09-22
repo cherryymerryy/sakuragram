@@ -51,11 +51,9 @@ namespace CherryMerryGramDesktop
 			_user = _client.GetMeAsync().Result;
 			NavigationView.PaneTitle = $"{_user.FirstName} ({_totalUnreadCount})";
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
-            
-			_client.ExecuteAsync(new TdApi.GetChatFolder {ChatFolderId = -1});
-        }
+		}
 
-		private async Task ProcessUpdates(TdApi.Update update)
+		private Task ProcessUpdates(TdApi.Update update)
 		{
 			switch (update)
 			{
@@ -85,7 +83,25 @@ namespace CherryMerryGramDesktop
 					});
 					break;
 				}
+				case TdApi.Update.UpdateChatFolders updateChatFolders:
+				{
+					NavViewChats.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
+					{
+						foreach (var chatFolderInfo in updateChatFolders.ChatFolders)
+						{
+							var folder = new NavigationViewItem
+							{
+								Content = chatFolderInfo.Title,
+								Tag = "ChatsView"
+							};
+							NavViewChats.MenuItems.Add(folder);
+						}
+					});
+					break;
+				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private bool TrySetDesktopAcrylicBackdrop()
