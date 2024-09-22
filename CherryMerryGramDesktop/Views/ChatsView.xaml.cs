@@ -36,18 +36,18 @@ namespace CherryMerryGramDesktop.Views
             {
                 case TdApi.Update.UpdateNewMessage updateNewMessage:
                 {
-                    UpdateChatPosition(updateNewMessage.Message.ChatId, ChatsList, ChatsList);
+                    //UpdateChatPosition(updateNewMessage.Message.ChatId, ChatsList, ChatsList);
                     break;
                 }
                 case TdApi.Update.UpdateChatPosition updateChatPosition:
                 {
                     if (updateChatPosition.Position.IsPinned)
                     {
-                        UpdateChatPosition(updateChatPosition.ChatId, ChatsList, PinnedChatsList);
+                        //UpdateChatPosition(updateChatPosition.ChatId, ChatsList, PinnedChatsList);
                     }
                     else
                     {
-                        UpdateChatPosition(updateChatPosition.ChatId, PinnedChatsList, ChatsList);
+                        //UpdateChatPosition(updateChatPosition.ChatId, PinnedChatsList, ChatsList);
                     }
                     break;
                 }
@@ -139,7 +139,7 @@ namespace CherryMerryGramDesktop.Views
         private async void GenerateChatEntries(TdApi.ChatList chatList)
         {
             ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatsList.Children.Clear());
-            
+               
             var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats
             {
                 Limit = 10000,
