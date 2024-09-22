@@ -52,7 +52,8 @@ namespace CherryMerryGramDesktop.Views.Chats
                 CreateVideoCall.IsEnabled = false;
             }
             #endif
-            
+
+            UserMessageInput.Focus(FocusState.Keyboard);
             //var pinnedMessage = _client.ExecuteAsync(new TdApi.GetChatPinnedMessage {ChatId = ChatId});
         }
 
@@ -179,14 +180,13 @@ namespace CherryMerryGramDesktop.Views.Chats
 
         public void UpdateChat(long chatId)
         {
-            var chat = _client.GetChatAsync(chatId).Result;
-            _chat = chat;
+            _chat = _client.GetChatAsync(chatId).Result;
             _chatId = chatId;
-            ChatTitle.Text = chat.Title;
+            ChatTitle.Text = _chat.Title;
 
-            if (chat.Background != null)
+            if (_chat.Background != null)
             {
-                _background = chat.Background.Background;
+                _background = _chat.Background.Background;
                 _backgroundId = _background.Document.Document_.Id;
                 
                 if (_background.Document.Document_.Local.Path != string.Empty)
@@ -203,7 +203,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 }
             }
             
-            switch (chat.Type)
+            switch (_chat.Type)
             {
                 case TdApi.ChatType.ChatTypePrivate typePrivate:
                     var user = _client.GetUserAsync(userId: typePrivate.UserId).Result;
@@ -353,6 +353,8 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         private async void SendMessage_OnClick(object sender, RoutedEventArgs e)
         {
+            if (UserMessageInput.Text.Length <= 0) return;
+            
             if (_replyService.GetReplyMessageId() == 0)
             {
                 await _client.ExecuteAsync(new TdApi.SendMessage
@@ -371,7 +373,9 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 _replyService.ReplyOnMessage(_chatId, _replyService.GetReplyMessageId(), UserMessageInput.Text);
             }
-            
+
+            MessagesScrollViewer.ScrollToVerticalOffset(MessagesScrollViewer.ScrollableHeight);
+            //MessagesScrollViewer.ChangeView(0, 1, 1);
             UserMessageInput.ClearValue(TextBox.TextProperty);
         }
 
