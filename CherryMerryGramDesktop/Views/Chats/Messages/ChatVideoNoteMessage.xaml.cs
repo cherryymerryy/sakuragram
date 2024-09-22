@@ -15,7 +15,8 @@ public partial class ChatVideoNoteMessage : Page
     private TdApi.MessageContent _messageContent;
     private int _videoNoteId;
     private int _profilePhotoFileId;
-    
+    private TdApi.ProfilePhoto _profilePhoto;
+
     public ChatVideoNoteMessage()
     {
         InitializeComponent();
@@ -54,8 +55,16 @@ public partial class ChatVideoNoteMessage : Page
                 }
                 if (updateFile.File.Id == _profilePhotoFileId)
                 {
-                    ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                        () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
+                    if (updateFile.File.Local.Path != string.Empty)
+                    {
+                        ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                            () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
+                    }
+                    else if (_profilePhoto.Small.Local.Path != string.Empty)
+                    {
+                        ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                            () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(_profilePhoto.Small.Local.Path)));
+                    }
                 }
                 break;
             }
@@ -87,6 +96,48 @@ public partial class ChatVideoNoteMessage : Page
             var chat = _client.GetChatAsync(chatId: sender).Result;
             DisplayName.Text = chat.Title;
             ProfilePicture.Visibility = Visibility.Collapsed;
+        }
+        
+        if (message.ReplyTo != null)
+        {
+            var replyMessage = _client.ExecuteAsync(new TdApi.GetRepliedMessage
+            {
+                ChatId = message.ChatId,
+                MessageId = message.Id
+            }).Result;
+            
+            var replyUserId = replyMessage.SenderId switch {
+                TdApi.MessageSender.MessageSenderUser u => u.UserId,
+                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
+                _ => 0
+            };
+
+            if (replyUserId > 0) // if senderId > 0 then it's a user
+            {
+                var replyUser = _client.GetUserAsync(replyUserId).Result;
+                ReplyFirstName.Text = $"{replyUser.FirstName} {replyUser.LastName}";
+            }
+            else // if senderId < 0 then it's a chat
+            {
+                var replyChat = _client.GetChatAsync(replyUserId).Result;
+                ReplyFirstName.Text = replyChat.Title;
+            }
+            
+            ReplyInputContent.Text  = replyMessage.Content switch
+            {
+                TdApi.MessageContent.MessageText messageText => messageText.Text.Text,
+                TdApi.MessageContent.MessageAnimation messageAnimation => messageAnimation.Caption.Text,
+                TdApi.MessageContent.MessageAudio messageAudio => messageAudio.Caption.Text,
+                TdApi.MessageContent.MessageDocument messageDocument => messageDocument.Caption.Text,
+                TdApi.MessageContent.MessagePhoto messagePhoto => messagePhoto.Caption.Text,
+                TdApi.MessageContent.MessagePoll messagePoll => messagePoll.Poll.Question.Text,
+                TdApi.MessageContent.MessageVideo messageVideo => messageVideo.Caption.Text,
+                TdApi.MessageContent.MessagePinMessage => "pinned message",
+                TdApi.MessageContent.MessageVoiceNote messageVoiceNote => messageVoiceNote.Caption.Text,
+                _ => "Unsupported message type"
+            };
+            
+            Reply.Visibility = Visibility.Visible;
         }
         
         if (message.ForwardInfo != null)
@@ -215,12 +266,16 @@ public partial class ChatVideoNoteMessage : Page
                 () => ProfilePicture.DisplayName = user.FirstName + " " + user.LastName);
             return;
         }
-        if (user.ProfilePhoto.Big.Local.Path != string.Empty)
+        
+        _profilePhoto = user.ProfilePhoto;
+        _profilePhotoFileId = user.ProfilePhoto.Small.Id;
+        
+        if (user.ProfilePhoto.Small.Local.Path != "")
         {
             try
             {
                 ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                    () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Big.Local.Path)));
+                    () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Small.Local.Path)));
             }
             catch (Exception e)
             {
@@ -230,15 +285,11 @@ public partial class ChatVideoNoteMessage : Page
         }
         else
         {
-            _profilePhotoFileId = user.ProfilePhoto.Big.Id;
-                
             var file = _client.ExecuteAsync(new TdApi.DownloadFile
             {
                 FileId = _profilePhotoFileId,
                 Priority = 1
             }).Result;
-            
-            ProgressRing.Visibility = Visibility.Visible;
         }
     }
 }

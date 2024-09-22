@@ -22,12 +22,13 @@ namespace CherryMerryGramDesktop.Views.Chats
         private long _chatId;
         public long _messageId;
         private int _profilePhotoFileId;
+        private TdApi.ProfilePhoto _profilePhoto;
 
         public ReplyService _replyService;
         public MessageService _messageService;
 
         private bool _bIsSelected = false;
-        
+
         public ChatTextMessage()
         {
             InitializeComponent();
@@ -54,22 +55,19 @@ namespace CherryMerryGramDesktop.Views.Chats
                 }
                 case TdApi.Update.UpdateFile updateFile:
                 {
-                    if (updateFile.File.Id != _profilePhotoFileId) return Task.CompletedTask;
-                    ProfilePicture.DispatcherQueue.TryEnqueue(() =>
+                    if (updateFile.File.Id == _profilePhotoFileId)
                     {
-                        if (updateFile.File.Local.Path != "")
+                        if (updateFile.File.Local.Path != string.Empty)
                         {
-                            ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path));
+                            ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                                () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
                         }
-                        else
+                        else if (_profilePhoto.Small.Local.Path != string.Empty)
                         {
-                            ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                                () => ProfilePicture.DisplayName = GetUser(
-                                    _client.GetMessageAsync(chatId: _chatId, messageId: _messageId
-                                        ).Result
-                                    ).Result.FirstName);
+                            ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                                () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(_profilePhoto.Small.Local.Path)));
                         }
-                    });
+                    }
                     break;
                 }
             }
@@ -95,16 +93,30 @@ namespace CherryMerryGramDesktop.Views.Chats
                     TdApi.MessageSender.MessageSenderChat c => c.ChatId,
                     _ => 0
                 };
+
+                if (replyUserId > 0) // if senderId > 0 then it's a user
+                {
+                    var replyUser = _client.GetUserAsync(replyUserId).Result;
+                    ReplyFirstName.Text = $"{replyUser.FirstName} {replyUser.LastName}";
+                }
+                else // if senderId < 0 then it's a chat
+                {
+                    var replyChat = _client.GetChatAsync(replyUserId).Result;
+                    ReplyFirstName.Text = replyChat.Title;
+                }
                 
-                var replyUser = _client.ExecuteAsync(new TdApi.GetUser{
-                    UserId = replyUserId
-                }).Result;
-                
-                ReplyFirstName.Text = $"{replyUser.FirstName} {replyUser.LastName}";
                 ReplyInputContent.Text  = replyMessage.Content switch
                 {
-                    TdApi.MessageContent.MessageText messageText => ReplyInputContent.Text = messageText.Text.Text,
-                    _ => ReplyInputContent.Text
+                    TdApi.MessageContent.MessageText messageText => messageText.Text.Text,
+                    TdApi.MessageContent.MessageAnimation messageAnimation => messageAnimation.Caption.Text,
+                    TdApi.MessageContent.MessageAudio messageAudio => messageAudio.Caption.Text,
+                    TdApi.MessageContent.MessageDocument messageDocument => messageDocument.Caption.Text,
+                    TdApi.MessageContent.MessagePhoto messagePhoto => messagePhoto.Caption.Text,
+                    TdApi.MessageContent.MessagePoll messagePoll => messagePoll.Poll.Question.Text,
+                    TdApi.MessageContent.MessageVideo messageVideo => messageVideo.Caption.Text,
+                    TdApi.MessageContent.MessagePinMessage => "pinned message",
+                    TdApi.MessageContent.MessageVoiceNote messageVoiceNote => messageVoiceNote.Caption.Text,
+                    _ => "Unsupported message type"
                 };
                 
                 Reply.Visibility = Visibility.Visible;
@@ -249,12 +261,16 @@ namespace CherryMerryGramDesktop.Views.Chats
                     () => ProfilePicture.DisplayName = user.FirstName + " " + user.LastName);
                 return;
             }
-            if (user.ProfilePhoto.Big.Local.Path != "")
+        
+            _profilePhoto = user.ProfilePhoto;
+            _profilePhotoFileId = user.ProfilePhoto.Small.Id;
+        
+            if (user.ProfilePhoto.Small.Local.Path != "")
             {
                 try
                 {
                     ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                        () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Big.Local.Path)));
+                        () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Small.Local.Path)));
                 }
                 catch (Exception e)
                 {
@@ -264,51 +280,12 @@ namespace CherryMerryGramDesktop.Views.Chats
             }
             else
             {
-                _profilePhotoFileId = user.ProfilePhoto.Big.Id;
-                
                 var file = _client.ExecuteAsync(new TdApi.DownloadFile
                 {
                     FileId = _profilePhotoFileId,
                     Priority = 1
                 }).Result;
             }
-        }
-        
-        private static Task<TdApi.User> GetUser(TdApi.Message message)
-        {
-            long userId = message.SenderId switch {
-                TdApi.MessageSender.MessageSenderUser u => u.UserId,
-                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
-                _ => 0
-            };
-            
-            var user = _client.ExecuteAsync(new TdApi.GetUser
-            {
-                UserId = userId
-            });
-
-            return user;
-        }
-
-        private static Task<TdApi.ChatMember> GetChatMember(long chatId, TdApi.MessageSender user)
-        {
-            var chatMember = _client.ExecuteAsync(new TdApi.GetChatMember
-            {
-                ChatId = chatId,
-                MemberId = user
-            });
-            
-            return chatMember;
-        }
-
-        private static Task<TdApi.Chat> GetChat(long chatId)
-        {
-            var chat = _client.ExecuteAsync(new TdApi.GetChat
-            {
-                ChatId = chatId
-            });
-            
-            return chat;
         }
 
         private void ShowMenu(bool isTransient)

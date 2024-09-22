@@ -13,6 +13,7 @@ public partial class ChatStickerMessage : Page
 {
     private static TdClient _client = App._client;
     private TdApi.MessageContent _messageMediaContent;
+    private TdApi.ProfilePhoto _profilePhoto;
     private int _mediaFileId;
     private int _profilePhotoFileId;
     
@@ -90,8 +91,16 @@ public partial class ChatStickerMessage : Page
                         }
                         if (updateFile.File.Id == _profilePhotoFileId)
                         {
-                            ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                                () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
+                            if (updateFile.File.Local.Path != string.Empty)
+                            {
+                                ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                                    () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
+                            }
+                            else if (_profilePhoto.Small.Local.Path != string.Empty)
+                            {
+                                ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                                    () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(_profilePhoto.Small.Local.Path)));
+                            }
                         }
                         break;
                     }
@@ -315,12 +324,16 @@ public partial class ChatStickerMessage : Page
                 () => ProfilePicture.DisplayName = user.FirstName + " " + user.LastName);
             return;
         }
-        if (user.ProfilePhoto.Big.Local.Path != "")
+        
+        _profilePhoto = user.ProfilePhoto;
+        _profilePhotoFileId = user.ProfilePhoto.Small.Id;
+        
+        if (user.ProfilePhoto.Small.Local.Path != "")
         {
             try
             {
                 ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                    () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Big.Local.Path)));
+                    () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Small.Local.Path)));
             }
             catch (Exception e)
             {
@@ -330,8 +343,6 @@ public partial class ChatStickerMessage : Page
         }
         else
         {
-            _profilePhotoFileId = user.ProfilePhoto.Big.Id;
-                
             var file = _client.ExecuteAsync(new TdApi.DownloadFile
             {
                 FileId = _profilePhotoFileId,
