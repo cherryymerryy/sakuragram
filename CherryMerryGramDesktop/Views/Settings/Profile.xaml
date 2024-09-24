@@ -76,7 +76,8 @@
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Center"
                                 Content="New photo"
-                                IsEnabled="False"/>
+                                IsEnabled="True"
+                                Click="ButtonBase_OnClick"/>
                         <Button x:Name="ButtonSave"
                                 Grid.Column="1"
                                 Grid.Row="1"

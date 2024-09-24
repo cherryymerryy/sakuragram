@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Windows.Storage.Pickers;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -13,15 +15,45 @@ public partial class Profile : Page
     private static TdClient _client = App._client;
     private static TdApi.User _currentUser;
     private static TdApi.UserFullInfo _currentUserFullInfo;
+    private static TdApi.ProfilePhoto _profilePhoto;
     
     private int _profilePhotoFileId = 0;
     
     public Profile()
     {
         InitializeComponent();
-        
-        _currentUser = _client.GetMeAsync().Result;
-        _currentUserFullInfo = _client.GetUserFullInfoAsync(userId: _currentUser.Id).Result;
+        UpdateCurrentUser();
+    }
+    
+    private async Task ProcessUpdates(TdApi.Update update)
+    {
+        switch (update)
+        {
+            case TdApi.Update.UpdateFile updateFile:
+            {
+                if (updateFile.File.Id == _profilePhotoFileId)
+                {
+                    if (updateFile.File.Local.Path != string.Empty)
+                    {
+                        PersonPicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                            () => PersonPicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
+                    }
+                    else if (_profilePhoto.Small.Local.Path != string.Empty)
+                    {
+                        PersonPicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                            () => PersonPicture.ProfilePicture = new BitmapImage(new Uri(_profilePhoto.Small.Local.Path)));   
+                    }
+                }
+                break;
+            }
+            
+        }
+    }
+
+    private async void UpdateCurrentUser()
+    {
+        _currentUser = await _client.GetMeAsync();
+        _currentUserFullInfo = await _client.GetUserFullInfoAsync(userId: _currentUser.Id);
         
         PersonPicture.DisplayName = _currentUser.FirstName + " " + _currentUser.LastName;
         
@@ -57,30 +89,24 @@ public partial class Profile : Page
         
         _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
     }
-
-    private async Task ProcessUpdates(TdApi.Update update)
+    
+    private async void UpdateProfilePhoto()
     {
-        switch (update)
+        if (_currentUser.ProfilePhoto == null)
         {
-            case TdApi.Update.UpdateFile updateFile:
-            {
-                if (updateFile.File.Id != _profilePhotoFileId) return;
-                PersonPicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                    () => PersonPicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
-                break;
-            }
+            PersonPicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                () => PersonPicture.DisplayName = _currentUser.FirstName + " " + _currentUser.LastName);
+            return;
         }
-    }
-
-    private void UpdateProfilePhoto()
-    {
-        if (_currentUser.ProfilePhoto == null) return;
-        if (_currentUser.ProfilePhoto.Big.Local.Path != "")
+        
+        _profilePhoto = _currentUser.ProfilePhoto;
+        _profilePhotoFileId = _currentUser.ProfilePhoto.Small.Id;
+        if (_currentUser.ProfilePhoto.Small.Local.Path != "")
         {
             try
             {
                 PersonPicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                    () => PersonPicture.ProfilePicture = new BitmapImage(new Uri(_currentUser.ProfilePhoto.Big.Local.Path)));
+                    () => PersonPicture.ProfilePicture = new BitmapImage(new Uri(_currentUser.ProfilePhoto.Small.Local.Path)));
             }
             catch (Exception e)
             {
@@ -90,19 +116,17 @@ public partial class Profile : Page
         }
         else
         {
-            _profilePhotoFileId = _currentUser.ProfilePhoto.Big.Id;
-                
-            var file = _client.ExecuteAsync(new TdApi.DownloadFile
+            var file = await _client.ExecuteAsync(new TdApi.DownloadFile
             {
                 FileId = _profilePhotoFileId,
                 Priority = 1
-            }).Result;
+            });
         }
     }
 
-    private void UpdateBirthDate()
+    private async void UpdateBirthDate()
     {
-        _client.ExecuteAsync(new TdApi.SetBirthdate
+        await _client.ExecuteAsync(new TdApi.SetBirthdate
         {
             Birthdate = new TdApi.Birthdate
             {
@@ -116,18 +140,18 @@ public partial class Profile : Page
             $"Date of birth: {DatePicker.Date.Day}.{DatePicker.Date.Month}.{DatePicker.Date.Year}";
     }
     
-    private void ButtonLogOut_OnClick(object sender, RoutedEventArgs e)
+    private async void ButtonLogOut_OnClick(object sender, RoutedEventArgs e)
     {
-        _client.ExecuteAsync(new TdApi.LogOut());
-        _client.CloseAsync();
+        await _client.ExecuteAsync(new TdApi.LogOut());
+        await _client.CloseAsync();
         Application.Current.Exit();
     }
 
-    private void ButtonSave_OnClick(object sender, RoutedEventArgs e)
+    private async void ButtonSave_OnClick(object sender, RoutedEventArgs e)
     {
         if (TextBoxFirstName.Text != _currentUser.FirstName || TextBoxLastName.Text != _currentUser.LastName)
         {
-            _client.ExecuteAsync(new TdApi.SetName
+            await _client.ExecuteAsync(new TdApi.SetName
             {
                 FirstName = TextBoxFirstName.Text,
                 LastName = TextBoxLastName.Text
@@ -135,14 +159,14 @@ public partial class Profile : Page
         }
         if (TextBoxUsername.Text != _currentUser.Usernames.EditableUsername)
         {
-            _client.ExecuteAsync(new TdApi.SetUsername
+            await _client.ExecuteAsync(new TdApi.SetUsername
             {
                 Username = TextBoxUsername.Text
             });
         }
         if (TextBoxBio.Text != _currentUserFullInfo.Bio.Text)
         {
-            _client.ExecuteAsync(new TdApi.SetBio
+            await _client.ExecuteAsync(new TdApi.SetBio
             {
                 Bio = TextBoxBio.Text
             });
@@ -163,14 +187,61 @@ public partial class Profile : Page
         }
     }
 
-    private void ButtonRemoveDateOfBirth_OnClick(object sender, RoutedEventArgs e)
+    private async void ButtonRemoveDateOfBirth_OnClick(object sender, RoutedEventArgs e)
     {
         if (_currentUserFullInfo.Birthdate == null) return;
-        _client.ExecuteAsync(new TdApi.SetBirthdate
+        await _client.ExecuteAsync(new TdApi.SetBirthdate
         {
             Birthdate = null
         });
         ButtonRemoveDateOfBirth.IsEnabled = false;
         DatePicker.SelectedDate = null;
+    }
+
+    private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+    {
+        var task = SelectFile();
+        await task;
+    }
+
+    private async Task SelectFile()
+    {
+        var folderPicker = new FileOpenPicker();
+
+        var mainWindow = (Application.Current as App)?._mWindow;
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(mainWindow);
+
+        WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+        folderPicker.FileTypeFilter.Add(".png");
+        folderPicker.FileTypeFilter.Add(".jpg");
+        folderPicker.FileTypeFilter.Add(".jpeg");
+        folderPicker.FileTypeFilter.Add(".webm");
+        folderPicker.FileTypeFilter.Add(".webp");
+        var newPhotoFile = await folderPicker.PickSingleFileAsync();
+        
+        if (newPhotoFile != null)
+        {
+            var newPhoto = await _client.ExecuteAsync(new TdApi.SetProfilePhoto
+            {
+                Photo = new TdApi.InputChatPhoto.InputChatPhotoStatic
+                {
+                    Photo = new TdApi.InputFile.InputFileLocal
+                    {
+                        Path = newPhotoFile.Path
+                    }
+                }, 
+                IsPublic = false
+            });
+
+            _currentUser = _client.GetMeAsync().Result;
+            _profilePhoto = _currentUser.ProfilePhoto;
+            _profilePhotoFileId = _profilePhoto.Small.Id;
+            
+            var file = await _client.ExecuteAsync(new TdApi.DownloadFile
+            {
+                FileId = _profilePhotoFileId,
+                Priority = 1
+            });
+        }
     }
 }
