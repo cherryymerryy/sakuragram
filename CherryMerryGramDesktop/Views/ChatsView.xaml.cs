@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CherryMerryGramDesktop.Views.Chats;
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -110,11 +111,11 @@ namespace CherryMerryGramDesktop.Views
             });
         }
         
-        private void OpenChat(long chatId)
+        private async void OpenChat(long chatId)
         {
             try
             {
-                var chat = _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId}).Result;
+                var chat = await _client.ExecuteAsync(new TdApi.GetChat {ChatId = chatId});
             
                 _currentChat = new Chat
                 {
@@ -138,16 +139,20 @@ namespace CherryMerryGramDesktop.Views
         
         private async void GenerateChatEntries(TdApi.ChatList chatList)
         {
-            ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatsList.Children.Clear());
-               
-            var chats = GetChats(_client.ExecuteAsync(new TdApi.GetChats
+            await DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
             {
-                Limit = 10000,
-                ChatList = chatList
-            }).Result);
+                ChatsList.Children.Clear();
+                PinnedChatsList.Children.Clear();
+                _chatsIds.Clear();
+                _pinnedChats.Clear();
+            });
+
+            var chats = await _client.GetChatsAsync(chatList, 10000);
             
-            await foreach (var chat in chats)
+            foreach (var chatId in chats.ChatIds)
             {
+                var chat = await _client.GetChatAsync(chatId);
+                
                 foreach (var chatPosition in chat.Positions)
                 {
                     if (!chatPosition.IsPinned) continue;
@@ -162,25 +167,26 @@ namespace CherryMerryGramDesktop.Views
                     }
                 }
                 
-                var chatEntry = new ChatEntry();
-                chatEntry._ChatsView = this;
-                chatEntry.ChatPage = Chat;
-                chatEntry._chat = chat;
-                chatEntry.ChatId = chat.Id;
-                _chatsIds.Add(chat.Id);
-                
-                chatEntry.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
-                    () => chatEntry.UpdateChatInfo());
-                ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => {
-                        if (_pinnedChats.Contains(chat.Id))
-                        {
-                            PinnedChatsList.Children.Add(chatEntry);
-                        }
-                        else
-                        {
-                            ChatsList.Children.Add(chatEntry);
-                        }
+                await DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
+                {
+                    var chatEntry = new ChatEntry();
+                    chatEntry._ChatsView = this;
+                    chatEntry.ChatPage = Chat;
+                    chatEntry._chat = chat;
+                    chatEntry.ChatId = chat.Id;
+                    _chatsIds.Add(chat.Id);
+                    chatEntry.UpdateChatInfo();
+                    
+                    if (_pinnedChats.Contains(chat.Id))
+                    {
+                        PinnedChatsList.Children.Add(chatEntry);
+                    }
+                    else
+                    {
+                        ChatsList.Children.Add(chatEntry);
+                    }
                 });
+                //ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, Callback);
             }
             
             _firstGenerate = false;
