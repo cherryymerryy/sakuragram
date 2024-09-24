@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using CommunityToolkit.WinUI;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -89,13 +90,13 @@ namespace CherryMerryGramDesktop.Views.Chats
             return Task.CompletedTask;
         }
 
-        public void UpdateChatInfo()
+        public async void UpdateChatInfo()
         {
-            _chat = _client.GetChatAsync(chatId: ChatId).Result;
+            _chat = await _client.GetChatAsync(chatId: ChatId);
             TextBlockChatName.Text = _chat.Title;
             
             GetChatPhoto(_chat);
-            GetLastMessage(_client.GetChatAsync(ChatId).Result); 
+            GetLastMessage(_chat); 
             
             if (_chat.UnreadCount > 0)
             {
@@ -116,9 +117,8 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
                 {
-                    var supergroup = _client.GetSupergroupAsync(
-                            supergroupId: typeSupergroup.SupergroupId)
-                        .Result;
+                    var supergroup = await _client.GetSupergroupAsync(
+                            supergroupId: typeSupergroup.SupergroupId);
                     if (supergroup.IsForum)
                     {
                         ChatEntryProfilePicture.CornerRadius = new CornerRadius(0);
@@ -206,24 +206,24 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         private void Button_OnClick(object sender, RoutedEventArgs e)
         {
-            if (ChatPage != null && _chatWidget != null && _chatWidget._chatId != ChatId)
+            DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
             {
-                _chatWidget.CloseChat();
-                ChatPage.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                    () => ChatPage.Children.Remove(_chatWidget));
-                _chatWidget = null;
-            }
-            
-            _chatWidget = new Chat();
-            _chatWidget._ChatsView = _ChatsView;
-            _chatWidget._chatId = ChatId;
-            _ChatsView._currentChat = _chatWidget;
-            
-            _chatWidget.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _chatWidget.UpdateChat(_chat.Id));
-            ChatPage?.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatPage.Children.Add(_chatWidget));
+                _chatWidget = new Chat();
+                _chatWidget._ChatsView = _ChatsView;
+                _chatWidget._chatId = ChatId;
+                _chatWidget._chat = _client.GetChatAsync(ChatId).Result;
+                _ChatsView._currentChat = _chatWidget;
+                _chatWidget.UpdateChat(_chat.Id);
+                ChatPage.Children.Add(_chatWidget);
+                
+                if (ContextMenu.IsOpen)
+                {
+                    ContextMenu.Hide();
+                }
+            });
         }
         
-        private void GetLastMessage(TdApi.Chat chat)
+        private async void GetLastMessage(TdApi.Chat chat)
         {
             switch (chat.Type)
             {
@@ -232,7 +232,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                         TdApi.MessageSender.MessageSenderUser u => u.UserId,
                         _ => 0
                     };
-                    var currentUser = _client.GetMeAsync().Result;
+                    var currentUser = await _client.GetMeAsync();
             
                     if (privateId == currentUser.Id)
                     {
@@ -247,7 +247,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                     break;
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
                 {
-                    var supergroup = _client.GetSupergroupAsync(supergroupId: typeSupergroup.SupergroupId).Result;
+                    var supergroup = await _client.GetSupergroupAsync(supergroupId: typeSupergroup.SupergroupId);
                     
                     if (supergroup.IsChannel)
                     {
@@ -266,7 +266,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             
                             if (id > 0)
                             {
-                                var user = _client.GetUserAsync(id).Result;
+                                var user = await _client.GetUserAsync(id);
                                 TextBlockChatUsername.Text = user.FirstName + ": ";
                             }
                             else

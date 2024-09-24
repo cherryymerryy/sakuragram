@@ -2,16 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
 using CherryMerryGramDesktop.Services;
 using CherryMerryGramDesktop.Views.Calls;
 using CherryMerryGramDesktop.Views.Chats.Messages;
+using CommunityToolkit.WinUI;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
+using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
 
 namespace CherryMerryGramDesktop.Views.Chats
@@ -19,7 +23,7 @@ namespace CherryMerryGramDesktop.Views.Chats
     public sealed partial class Chat : Page
     {
         private static TdClient _client = App._client;
-        private static TdApi.Chat _chat;
+        public TdApi.Chat _chat;
         private static TdApi.Background _background;
         public ChatsView _ChatsView;
         private List<TdApi.Message> _messagesList = [];
@@ -53,11 +57,13 @@ namespace CherryMerryGramDesktop.Views.Chats
             }
             #endif
 
+            //_chat = _client.ExecuteAsync(new TdApi.GetChat{ChatId = _chatId}).Result;
+            
             UserMessageInput.Focus(FocusState.Keyboard);
             //var pinnedMessage = _client.ExecuteAsync(new TdApi.GetChatPinnedMessage {ChatId = ChatId});
         }
 
-        private async Task ProcessUpdates(TdApi.Update update)
+        private Task ProcessUpdates(TdApi.Update update)
         {
             switch (update)
             {
@@ -176,12 +182,23 @@ namespace CherryMerryGramDesktop.Views.Chats
                     break;
                 }
             }
+
+            return Task.CompletedTask;
         }
 
-        public void UpdateChat(long chatId)
+        private void ClearAllVariables()
         {
-            _chat = _client.GetChatAsync(chatId).Result;
-            _chatId = chatId;
+            _chat = null;
+            _background = null;
+            _backgroundId = 0;
+            _memberCount = 0;
+            _onlineMemberCount = 0;
+            _pollOptionsList.Clear(); 
+            MessagesList.Children.Clear();
+        }
+        
+        public async void UpdateChat(long chatId)
+        {
             ChatTitle.Text = _chat.Title;
 
             if (_chat.Background != null)
@@ -195,18 +212,18 @@ namespace CherryMerryGramDesktop.Views.Chats
                 }
                 else
                 {
-                    var background = _client.ExecuteAsync(new TdApi.DownloadFile
+                    await _client.ExecuteAsync(new TdApi.DownloadFile
                     {
                         FileId = _backgroundId,
                         Priority = 1
-                    }).Result;
+                    });
                 }
             }
             
             switch (_chat.Type)
             {
                 case TdApi.ChatType.ChatTypePrivate typePrivate:
-                    var user = _client.GetUserAsync(userId: typePrivate.UserId).Result;
+                    var user = await _client.GetUserAsync(userId: typePrivate.UserId).WaitAsync(new CancellationToken());
                     ChatMembers.Text = user.Status switch
                     {
                         TdApi.UserStatus.UserStatusOnline => "Online",
@@ -219,20 +236,18 @@ namespace CherryMerryGramDesktop.Views.Chats
                     };
                     break;
                 case TdApi.ChatType.ChatTypeBasicGroup typeBasicGroup:
-                    var basicGroupInfo = _client.GetBasicGroupFullInfoAsync(
+                    var basicGroupInfo = await _client.GetBasicGroupFullInfoAsync(
                         basicGroupId: typeBasicGroup.BasicGroupId
-                    ).Result;
+                    ).WaitAsync(new CancellationToken());
                     ChatMembers.Text = basicGroupInfo.Members.Length + " members";
                     break;
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
                     try
                     {
-                        var supergroup = _client.GetSupergroupAsync(
-                                supergroupId: typeSupergroup.SupergroupId)
-                            .Result;
-                        var supergroupInfo = _client.GetSupergroupFullInfoAsync(
-                                supergroupId: typeSupergroup.SupergroupId)
-                            .Result;
+                        var supergroup = await _client.GetSupergroupAsync(
+                                supergroupId: typeSupergroup.SupergroupId).WaitAsync(new CancellationToken());
+                        var supergroupInfo = await _client.GetSupergroupFullInfoAsync(
+                                supergroupId: typeSupergroup.SupergroupId).WaitAsync(new CancellationToken());
 
                         if (supergroup.IsChannel)
                         {
@@ -259,8 +274,11 @@ namespace CherryMerryGramDesktop.Views.Chats
                     break;
             }
 
-            _client.ExecuteAsync(new TdApi.OpenChat { ChatId = chatId });
-            _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            await _client.ExecuteAsync(new TdApi.OpenChat { ChatId = chatId });
+            if (_chat != null)
+            {
+                _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
+            }
         }
 
         private void UpdateChatMembersText()
@@ -269,20 +287,23 @@ namespace CherryMerryGramDesktop.Views.Chats
                 $"{_memberCount} members";
         }
 
-        private void GetMessagesAsync(long chatId)
+        private async void GetMessagesAsync(long chatId)
         {
-            var messages = _client.ExecuteAsync(new TdApi.GetChatHistory
+            await DispatcherQueue.GetForCurrentThread().EnqueueAsync(async () =>
             {
-                ChatId = chatId,
-                Offset = -99,
-                Limit = 100,
-                OnlyLocal = false
-            }).Result;
+                var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
+                {
+                    ChatId = chatId,
+                    Offset = -99,
+                    Limit = 100,
+                    OnlyLocal = false
+                });
 
-            foreach (var message in messages.Messages_)
-            {
-                GenerateMessageByType(message);
-            }
+                foreach (var message in messages.Messages_)
+                {
+                    GenerateMessageByType(message);
+                }
+            });
         }
 
         private void GenerateMessageByType(TdApi.Message message)
@@ -392,7 +413,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         public void CloseChat()
         {
             if (MessagesList.Children.Count > 0) MessagesList.Children.Clear();
-            _client.ExecuteAsync(new TdApi.CloseChat {ChatId = _chatId});
+            _client.CloseChatAsync(_chatId);
             _ChatsView.CloseChat();
         }
 
@@ -564,6 +585,14 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             TextBoxCorrectAnswer.IsEnabled = QuizMode.IsChecked.Value;
             MultipleAnswers.IsEnabled = !QuizMode.IsChecked.Value;
+        }
+
+        private void TopBar_OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
+            {
+                Profile.ShowAsync();
+            }
         }
     }
 }

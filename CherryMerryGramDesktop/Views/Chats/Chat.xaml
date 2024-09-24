@@ -25,14 +25,13 @@
                 <RowDefinition Height="50" />
             </Grid.RowDefinitions>
             
-            <Frame x:Name="ContentFrame"/>
-            
             <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50"
                         Grid.Row="0" 
                         Padding="5">
                 <Border x:Name="TopBar" Background="#1a1a1a" VerticalAlignment="Center" HorizontalAlignment="Stretch" 
                         CornerRadius="4" 
-                        Padding="5">
+                        Padding="5"
+                        PointerPressed="TopBar_OnPointerPressed">
                     <Grid x:Name="ChatInfo" HorizontalAlignment="Stretch"
                                 VerticalAlignment="Center">
                         <Button x:Name="Back" Content="Back" Click="Back_OnClick" HorizontalAlignment="Left" 
@@ -250,6 +249,91 @@
                 </ContentDialog.TitleTemplate>
                 <TextBlock x:Name="TextBlockException" 
                            TextWrapping="Wrap"/>
+            </ContentDialog>
+            
+            <ContentDialog x:Name="Profile">
+                <ContentDialog.TitleTemplate>
+                    <DataTemplate>
+                        <TextBlock x:Name="Title" 
+                                   Text="Title" />
+                    </DataTemplate>
+                </ContentDialog.TitleTemplate>
+                <ScrollViewer>
+                    <StackPanel>
+                        <Grid x:Name="MainInfo"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              Height="70">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <PersonPicture x:Name="ProfilePicture"
+                                           Grid.Column="0"
+                                           Width="70"
+                                           Height="70"/>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock x:Name="TextBlockName"/>
+                                <TextBlock x:Name="TextBlockMembersOrStatus"/>
+                            </StackPanel>
+                        </Grid>
+                        <MenuFlyoutSeparator Margin="0, 4, 0, 4" />
+                        <Grid x:Name="ChannelInfo"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              Height="60">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <PersonPicture x:Name="ChannelPicture"
+                                           Grid.Column="0"
+                                           Width="50"
+                                           Height="50"/>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock x:Name="TextBlockChannelName"/>
+                                <TextBlock x:Name="TextBlockLastMessage"/>
+                                <TextBlock x:Name="TextBlockMembers"/>
+                            </StackPanel>
+                        </Grid>
+                        <MenuFlyoutSeparator Margin="0, 4, 0, 4" />
+                        <StackPanel x:Name="GroupInfo">
+                            <TextBox x:Name="TextBoxDescription"
+                                     TextWrapping="Wrap"
+                                     PlaceholderText="Description"/>
+                            <TextBlock x:Name="TextBlockId"/>
+                        </StackPanel>
+                        <StackPanel x:Name="UserInfo"
+                                    HorizontalAlignment="Stretch">
+                            <TextBlock x:Name="TextBlockUsername"/>
+                            <TextBlock x:Name="TextBlockUserId"/>
+                            <Button x:Name="ButtonSendMessage"
+                                    Content="Send message"
+                                    Width="Auto"/>
+                        </StackPanel>
+                        <MenuFlyoutSeparator Margin="0, 4, 0, 4" />
+                        <StackPanel x:Name="AllMediaInChat">
+                            
+                        </StackPanel>
+                        <StackPanel x:Name="ContactInfo"
+                                    HorizontalAlignment="Stretch">
+                            <Button x:Name="ButtonShareContact"
+                                    Content="Share contact"
+                                    Width="Auto"/>
+                            <Button x:Name="ButtonEditContact"
+                                    Content="Edit contact"
+                                    Width="Auto"/>
+                            <Button x:Name="ButtonDeleteContact"
+                                    Content="Delete contact"
+                                    Width="Auto"/>
+                            <Button x:Name="ButtonBlockUser"
+                                    Content="Block user"
+                                    Width="Auto"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </ContentDialog>
         </Grid>
         

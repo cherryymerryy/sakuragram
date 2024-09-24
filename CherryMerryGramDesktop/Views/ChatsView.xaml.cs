@@ -122,8 +122,11 @@ namespace CherryMerryGramDesktop.Views
                     _ChatsView = this,
                     _chatId = chat.Id
                 };
-                _currentChat.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => _currentChat.UpdateChat(chat.Id));
-                Chat.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => Chat.Children.Add(_currentChat));
+                await DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
+                {
+                    _currentChat.UpdateChat(chat.Id);
+                    Chat.Children.Add(_currentChat);
+                });
             }
             catch
             {
@@ -186,7 +189,6 @@ namespace CherryMerryGramDesktop.Views
                         ChatsList.Children.Add(chatEntry);
                     }
                 });
-                //ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, Callback);
             }
             
             _firstGenerate = false;
