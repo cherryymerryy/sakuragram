@@ -188,6 +188,26 @@ namespace CherryMerryGramDesktop.Views.Chats
         {
             ChatTitle.Text = _chat.Title;
 
+            if (_chat.Photo != null)
+            {
+                if (_chat.Photo.Small.Local.Path != string.Empty)
+                {
+                    ChatPhoto.ProfilePicture = new BitmapImage(new Uri(_chat.Photo.Small.Local.Path));
+                }
+                else
+                {
+                    await _client.ExecuteAsync(new TdApi.DownloadFile
+                    {
+                        FileId = _chat.Photo.Small.Id,
+                        Priority = 1
+                    });
+                }
+            }
+            else
+            {
+                ChatPhoto.DisplayName = _chat.Title;
+            }
+
             if (_chat.Background != null)
             {
                 _background = _chat.Background.Background;
@@ -354,6 +374,13 @@ namespace CherryMerryGramDesktop.Views.Chats
                     var voiceNoteMessage = new ChatVoiceNoteMessage();
                     MessagesList.Children.Add(voiceNoteMessage);
                     voiceNoteMessage.UpdateMessage(message);
+                    break;
+                }
+                case TdApi.MessageContent.MessagePoll:
+                {
+                    var pollMessage = new ChatPollMessage();
+                    MessagesList.Children.Add(pollMessage);
+                    pollMessage.UpdateMessage(message);
                     break;
                 }
             }

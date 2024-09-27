@@ -22,10 +22,10 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="60" />
                 <RowDefinition Height="*" MaxHeight="1000" />
-                <RowDefinition Height="50" />
+                <RowDefinition MinHeight="50" MaxHeight="70" />
             </Grid.RowDefinitions>
             
-            <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" MaxHeight="50" MinHeight="50"
+            <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxHeight="70" MinHeight="50"
                         Grid.Row="0" 
                         Padding="5">
                 <Border x:Name="TopBar" Background="#1a1a1a" VerticalAlignment="Center" HorizontalAlignment="Stretch" 
@@ -34,11 +34,19 @@
                         PointerPressed="TopBar_OnPointerPressed">
                     <Grid x:Name="ChatInfo" HorizontalAlignment="Stretch"
                                 VerticalAlignment="Center">
-                        <Button x:Name="Back" Content="Back" Click="Back_OnClick" HorizontalAlignment="Left" 
-                                VerticalAlignment="Center" />
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock x:Name="ChatTitle" FontSize="14" FontStyle="Oblique" TextAlignment="Center" />
-                            <TextBlock x:Name="ChatMembers" FontSize="10" Foreground="Gray" TextAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" 
+                                    VerticalAlignment="Center" 
+                                    HorizontalAlignment="Left"
+                                    Margin="5"
+                                    MinWidth="200">
+                            <PersonPicture x:Name="ChatPhoto"
+                                           Width="30" 
+                                           Height="30"
+                                           Margin="0,0,4,0"/>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock x:Name="ChatTitle" FontSize="14" FontStyle="Oblique" TextAlignment="Left" />
+                                <TextBlock x:Name="ChatMembers" FontSize="10" Foreground="Gray" TextAlignment="Left"/>
+                            </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <Button x:Name="SearchMessages" Content="Search" Click="SearchMessages_OnClick" 
