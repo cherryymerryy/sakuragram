@@ -117,8 +117,8 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
                 {
-                    var supergroup = await _client.GetSupergroupAsync(
-                            supergroupId: typeSupergroup.SupergroupId);
+                    var supergroup = _client.GetSupergroupAsync(
+                            supergroupId: typeSupergroup.SupergroupId).Result;
                     if (supergroup.IsForum)
                     {
                         var topic = _client.ExecuteAsync(new TdApi.GetForumTopic
@@ -126,8 +126,8 @@ namespace CherryMerryGramDesktop.Views.Chats
                             ChatId = ChatId,
                             MessageThreadId = _chat.LastMessage.MessageThreadId
                         }).Result;
-                        TextBlockForumName.Visibility = Visibility.Visible;
                         TextBlockForumName.Text = topic.Info.Name;
+                        TextBlockForumName.Visibility = Visibility.Visible;
                     }
                     else
                     {
@@ -231,15 +231,17 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         private async void GetLastMessage(TdApi.Chat chat)
         {
+            var currentUser = await _client.GetMeAsync();
+            
             switch (chat.Type)
             {
                 case TdApi.ChatType.ChatTypePrivate:
                     var privateId = chat.LastMessage.SenderId switch {
                         TdApi.MessageSender.MessageSenderUser u => u.UserId,
+                        TdApi.MessageSender.MessageSenderChat c => c.ChatId,
                         _ => 0
                     };
-                    var currentUser = await _client.GetMeAsync();
-            
+                    
                     if (privateId == currentUser.Id)
                     {
                         TextBlockChatUsername.Visibility = Visibility.Visible;
@@ -270,6 +272,12 @@ namespace CherryMerryGramDesktop.Views.Chats
                                 _ => 0
                             };
             
+                            if (id == currentUser.Id)
+                            {
+                                TextBlockChatUsername.Visibility = Visibility.Visible;
+                                TextBlockChatUsername.Text = "You: ";
+                            }
+                            
                             if (id > 0)
                             {
                                 var user = await _client.GetUserAsync(id);
