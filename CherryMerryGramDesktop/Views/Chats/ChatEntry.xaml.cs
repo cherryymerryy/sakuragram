@@ -211,6 +211,7 @@ namespace CherryMerryGramDesktop.Views.Chats
         
         private void Button_OnClick(object sender, RoutedEventArgs e)
         {
+            _ChatsView.CloseChat();
             DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
             {
                 _chatWidget = new Chat();
