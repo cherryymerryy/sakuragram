@@ -303,7 +303,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                     $"Photo, {messagePhoto.Caption.Text}",
                 TdApi.MessageContent.MessageSticker messageSticker =>
                     $"{messageSticker.Sticker.Emoji} Sticker message",
-                TdApi.MessageContent.MessagePoll messagePoll => $"{messagePoll.Poll.Question} Poll message",
+                TdApi.MessageContent.MessagePoll messagePoll => $"📊 {messagePoll.Poll.Question.Text}",
                 TdApi.MessageContent.MessagePinMessage messagePinMessage =>
                     $"pinned {GetMessageText(chat.Id, messagePinMessage.MessageId)}",
                 
