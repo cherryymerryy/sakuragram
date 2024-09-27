@@ -212,6 +212,13 @@ public partial class ChatPollMessage : Page
         {
             case TdApi.MessageContent.MessagePoll messagePoll:
             {
+                PollType.Text = messagePoll.Poll.Type switch
+                {
+                    TdApi.PollType.PollTypeRegular => "Regular",
+                    TdApi.PollType.PollTypeQuiz => "Quiz",
+                    _ => "Unsupported poll type"
+                };
+                
                 if (messagePoll.Poll.Question.Text != string.Empty)
                 {
                     MessageContent.Text = messagePoll.Poll.Question.Text;
@@ -221,6 +228,17 @@ public partial class ChatPollMessage : Page
                 {
                     MessageContent.Text = string.Empty;
                     MessageContent.Visibility = Visibility.Collapsed;
+                }
+
+                if (messagePoll.Poll.TotalVoterCount > 0)
+                {
+                    PollTotalVoteCount.Text = ", " + messagePoll.Poll.TotalVoterCount + " votes";
+                    PollTotalVoteCount.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    PollTotalVoteCount.Text = string.Empty;
+                    PollTotalVoteCount.Visibility = Visibility.Collapsed;
                 }
                 
                 foreach (var pollOption in messagePoll.Poll.Options)
@@ -236,42 +254,15 @@ public partial class ChatPollMessage : Page
 
     private void GeneratePollOption(TdApi.PollOption pollOption)
     {
-        var pollOptionPanel = new StackPanel();
-        pollOptionPanel.Orientation = Orientation.Horizontal;
-        pollOptionPanel.HorizontalAlignment = HorizontalAlignment.Stretch;
-        pollOptionPanel.VerticalAlignment = VerticalAlignment.Stretch;
-        
-        var verticalStackPanel = new StackPanel();
-        verticalStackPanel.Orientation = Orientation.Vertical;
-        verticalStackPanel.HorizontalAlignment = HorizontalAlignment.Stretch;
-        verticalStackPanel.VerticalAlignment = VerticalAlignment.Stretch;
-        
-        var pollTextStackPanel = new StackPanel();
-        pollTextStackPanel.Orientation = Orientation.Horizontal;
-        pollTextStackPanel.HorizontalAlignment = HorizontalAlignment.Stretch;
-        pollTextStackPanel.VerticalAlignment = VerticalAlignment.Stretch;
-        
         var radioButton = new RadioButton();
-        radioButton.Tag = pollOption;
         radioButton.Click += RadioButtonPollOption_Click;
         radioButton.IsChecked = pollOption.IsChosen;
-        pollOptionPanel.Children.Add(radioButton);
-
-        var pollOptionVotePercentageText = new TextBlock();
-        pollOptionVotePercentageText.Text = pollOption.VotePercentage + "%";
-        pollTextStackPanel.Children.Add(pollOptionVotePercentageText);
         
         var pollOptionText = new TextBlock();
-        pollOptionText.Text = pollOption.Text.Text;
-        pollTextStackPanel.Children.Add(pollOptionText);
+        pollOptionText.Text = $"{pollOption.VotePercentage}% | {pollOption.Text.Text}";
         
-        var pollOptionProgressBar = new ProgressBar();
-        pollOptionProgressBar.Value = pollOption.VotePercentage;
-        
-        pollOptionPanel.Children.Add(verticalStackPanel);
-        verticalStackPanel.Children.Add(pollTextStackPanel);
-        verticalStackPanel.Children.Add(pollOptionProgressBar);
-        StackPanelPollOptions.Children.Add(pollOptionPanel);
+        radioButton.Content = pollOptionText;
+        StackPanelPollOptions.Children.Add(radioButton);
     }
 
     private void GetChatPhoto(TdApi.User user)
@@ -286,7 +277,7 @@ public partial class ChatPollMessage : Page
         _profilePhoto = user.ProfilePhoto;
         _profilePhotoFileId = user.ProfilePhoto.Small.Id;
         
-        if (user.ProfilePhoto.Small.Local.Path != "")
+        if (user.ProfilePhoto.Small.Local.Path != string.Empty)
         {
             try
             {

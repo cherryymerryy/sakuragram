@@ -45,8 +45,15 @@
                 </Border>
                 <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" 
                            IsTextSelectionEnabled="True" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="PollType" Text="pollType" TextWrapping="Wrap" 
+                               IsTextSelectionEnabled="True" 
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
+                    <TextBlock x:Name="PollTotalVoteCount" Text="pollTotalVoteCount" TextWrapping="Wrap" 
+                               IsTextSelectionEnabled="True" 
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
+                </StackPanel>
                 <StackPanel x:Name="StackPanelPollOptions" />
-                
                 <StackPanel Orientation="Horizontal" 
                             HorizontalAlignment="Stretch">
                     <TextBlock x:Name="TextBlockReplies"
