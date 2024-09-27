@@ -286,6 +286,13 @@ namespace CherryMerryGramDesktop.Views.Chats
                 }
             }
             
+            var sender = chat.LastMessage.SenderId switch
+            {
+                TdApi.MessageSender.MessageSenderUser u => u.UserId,
+                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
+                _ => 0
+            };
+            
             TextBlockChatLastMessage.Text = chat.LastMessage.Content switch
             {
                 TdApi.MessageContent.MessageText messageText => $"{messageText.Text.Text}",
@@ -310,7 +317,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 // Chat messages
                 TdApi.MessageContent.MessageChatAddMembers messageChatAddMembers => $"{messageChatAddMembers.MemberUserIds}",
                 TdApi.MessageContent.MessageChatChangeTitle messageChatChangeTitle => $"changed chat title to {messageChatChangeTitle.Title}",
-                TdApi.MessageContent.MessageChatChangePhoto => $"updated group photo",
+                TdApi.MessageContent.MessageChatChangePhoto => "updated group photo",
                 
                 TdApi.MessageContent.MessageChatDeleteMember messageChatDeleteMember => 
                     $"removed user {_client.GetUserAsync(userId: messageChatDeleteMember.UserId).Result.FirstName}",

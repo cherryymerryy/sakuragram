@@ -9,7 +9,8 @@
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
     HorizontalContentAlignment="Stretch"
-    VerticalContentAlignment="Stretch">
+    VerticalContentAlignment="Stretch"
+    KeyDown="ChatsView_OnKeyDown">
     
     <Grid Padding="0, 50, 0, 0">
         <Grid.ColumnDefinitions>

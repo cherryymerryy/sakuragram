@@ -4,12 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.System;
 using CherryMerryGramDesktop.Views.Chats;
 using CommunityToolkit.WinUI;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using TdLib;
+using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
+using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
 
 namespace CherryMerryGramDesktop.Views
 {
@@ -137,6 +140,7 @@ namespace CherryMerryGramDesktop.Views
         public void CloseChat()
         {
             if (_currentChat == null) return;
+            _client.CloseChatAsync(_currentChat._chatId);
             Chat.Children.Remove(_currentChat);
         }
         
@@ -332,6 +336,16 @@ namespace CherryMerryGramDesktop.Views
         {
             NewMessage.Hide();
             NewChannel.ShowAsync();
+        }
+
+        private void ChatsView_OnKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case VirtualKey.Escape:
+                    CloseChat();
+                    break;
+            }
         }
     }
 }
