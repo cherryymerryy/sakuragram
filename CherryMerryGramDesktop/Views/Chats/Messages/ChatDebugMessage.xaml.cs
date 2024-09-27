@@ -12,6 +12,6 @@ public partial class ChatDebugMessage : Page
 
     public void UpdateMessage(TdApi.Message message)
     {
-        TextBlockMessageType.Text = message.Content.ToString();
+        TextBlockMessageType.Text = message.Content + ", " + message.Id + ", " + message.MessageThreadId + ", " + message.ImportInfo + ", " + message.MediaAlbumId;
     }
 }

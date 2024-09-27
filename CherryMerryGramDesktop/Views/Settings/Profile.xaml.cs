@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -16,8 +19,11 @@ public partial class Profile : Page
     private static TdApi.User _currentUser;
     private static TdApi.UserFullInfo _currentUserFullInfo;
     private static TdApi.ProfilePhoto _profilePhoto;
+    private static TdApi.Chat _personalChat;
+    private static TdApi.Chats _personalChats;
     
     private int _profilePhotoFileId = 0;
+    private int _personalChatIdToSet = 0;
     
     public Profile()
     {
@@ -54,6 +60,16 @@ public partial class Profile : Page
     {
         _currentUser = await _client.GetMeAsync();
         _currentUserFullInfo = await _client.GetUserFullInfoAsync(userId: _currentUser.Id);
+        if (_currentUserFullInfo.PersonalChatId != 0)
+        {
+            _personalChat = await _client.GetChatAsync(chatId: _currentUserFullInfo.PersonalChatId);
+            CardConnectedChannel.Description = $"Connected channel: {_personalChat.Title}";
+        }
+        else
+        {
+            CardConnectedChannel.Description = "No connected channel";
+        }
+        _personalChats = await _client.GetSuitablePersonalChatsAsync();
         
         PersonPicture.DisplayName = _currentUser.FirstName + " " + _currentUser.LastName;
         
@@ -243,5 +259,118 @@ public partial class Profile : Page
                 Priority = 1
             });
         }
+    }
+
+    private void ButtonDeleteAccount_OnClick(object sender, RoutedEventArgs e)
+    {
+        ContentDialogAccountDeletion.ShowAsync();
+    }
+
+    private void ContentDialogAccountDeletion_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    {
+        _client.DeleteAccountAsync(reason: "The user wanted to delete the account");
+    }
+
+    private void ContentDialogAccountDeletion_OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
+    {
+        TextBlockAccountDeletionMessage.Text = "Attention: in this case, your Telegram account will be permanently deleted along with all the information that you store on Telegram servers.\n\nImportant: You can cancel the deletion and export the account data first so as not to lose it. (To do this, log in to your account using the latest version of Telegram for PC and select Settings > Export data from Telegram.)";
+    }
+
+    private void ButtonChangeConnectedChannel_OnClick(object sender, RoutedEventArgs e)
+    {
+        ContentDialogChangeConnectedChannel.ShowAsync();
+    }
+
+    private void ContentDialogChangeConnectedChannel_OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
+    {
+        foreach (var chatId in _personalChats.ChatIds)
+        {
+            if (_currentUserFullInfo.PersonalChatId == chatId) continue;
+            CreatePersonalChatEntry(chatId);
+        }
+    }
+
+    private void ContentDialogChangeConnectedChannel_OnClosed(ContentDialog sender, ContentDialogClosedEventArgs args)
+    {
+        StackPanelChats.Children.Clear();
+    }
+    
+    private async void CreatePersonalChatEntry(long chatId)
+    {
+        var chat = _client.GetChatAsync(chatId).Result;
+        //var supergroup = _client.GetSupergroupAsync(chatId).Result;
+        
+        var button = new Button();
+        button.Click += (sender, args) => ButtonPersonalChatEntry_OnClick(sender, args, chatId);
+        button.Margin = new Thickness(0, 4, 0, 4);
+        button.Width = 350;
+        button.Height = 60;
+            
+        var stackPanel = new StackPanel();
+        stackPanel.Orientation = Orientation.Horizontal;
+        stackPanel.HorizontalAlignment = HorizontalAlignment.Left;
+        stackPanel.VerticalAlignment = VerticalAlignment.Center;
+        
+        var chatPhoto = new PersonPicture();
+        chatPhoto.Width = 40;
+        chatPhoto.Height = 40;
+
+        if (chat.Photo != null)
+        {
+            if (chat.Photo.Small.Local.Path != string.Empty)
+            {
+                chatPhoto.ProfilePicture = new BitmapImage(new Uri(chat.Photo.Small.Local.Path));
+            }
+            else
+            {
+                chatPhoto.DisplayName = chat.Title;
+                var file = await _client.DownloadFileAsync(fileId: chat.Photo.Small.Id, priority: 1).WaitAsync(new CancellationToken());
+                chatPhoto.ProfilePicture = new BitmapImage(new Uri(file.Local.Path));
+            }
+        }
+        else
+        {
+            chatPhoto.DisplayName = chat.Title;
+        }
+        
+        stackPanel.Children.Add(chatPhoto);
+        
+        var verticalStackPanel = new StackPanel();
+        verticalStackPanel.Orientation = Orientation.Vertical;
+        verticalStackPanel.HorizontalAlignment = HorizontalAlignment.Left;
+        verticalStackPanel.VerticalAlignment = VerticalAlignment.Center;
+        
+        var chatTitle = new TextBlock();
+        chatTitle.Text = chat.Title;
+        verticalStackPanel.Children.Add(chatTitle);
+        
+        var chatSubscribers = new TextBlock();
+        chatSubscribers.FontSize = 12;
+        chatSubscribers.Text = " subscribers";
+        verticalStackPanel.Children.Add(chatSubscribers);
+        
+        stackPanel.Children.Add(verticalStackPanel);
+        button.Content = stackPanel;
+        StackPanelChats.Children.Add(button);
+    }
+
+    private async void ButtonPersonalChatEntry_OnClick(object sender, RoutedEventArgs e, long chatId)
+    {
+        try
+        {
+            await _client.ExecuteAsync(new TdApi.SetPersonalChat { ChatId = chatId });
+        }
+        catch (TdException exception)
+        {
+            Debug.WriteLine(exception.Message);
+            throw;
+        }
+        _currentUserFullInfo = _client.GetUserFullInfoAsync(_currentUser.Id).Result;
+        if (_currentUserFullInfo.PersonalChatId != 0)
+        {
+            _personalChat = await _client.GetChatAsync(chatId: _currentUserFullInfo.PersonalChatId);
+            CardConnectedChannel.Description = $"Connected channel: {_personalChat.Title}";
+        }
+        ContentDialogChangeConnectedChannel.Hide();
     }
 }

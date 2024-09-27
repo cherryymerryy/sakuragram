@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     
-    <TextBlock x:Name="TextBlockMessageType" />
+    <TextBlock x:Name="TextBlockMessageType"
+               TextWrapping="Wrap"/>
     
 </Page>

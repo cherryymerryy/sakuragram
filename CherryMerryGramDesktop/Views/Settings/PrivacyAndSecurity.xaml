@@ -80,7 +80,7 @@
                                        Description="(count)">
                     <Button Content="View"
                             Style="{StaticResource AccentButtonStyle}"
-                            IsEnabled="False" />
+                            Click="ButtonBase_OnClick" />
                 </controls:SettingsCard>
                 <!-- End of Security section -->
                 
@@ -411,6 +411,43 @@
                 </controls:SettingsCard>
                 
                 <!-- End of Delete my account section -->
+                
+                <ContentDialog x:Name="ContentDialogSessions"
+                               Opened="ContentDialogSessions_OnOpened"
+                               MaxHeight="500"
+                               CloseButtonText="Close">
+                    <ContentDialog.TitleTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Active sessions" />
+                        </DataTemplate>
+                    </ContentDialog.TitleTemplate>
+                    <ScrollViewer>
+                        <StackPanel>
+                            <StackPanel x:Name="ActiveSession"/>
+                            <Button x:Name="ButtonTerminateOtherSessions"
+                                    Content="Terminate other sessions"
+                                    Width="Auto"
+                                    Click="ButtonTerminateOtherSessions_OnClick"/>
+                            <MenuFlyoutSeparator Margin="0, 10, 0, 10" />
+                            <StackPanel x:Name="SessionList"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </ContentDialog>
+                
+                <ContentDialog x:Name="TerminatingContentDialog"
+                               PrimaryButtonText="Terminate"
+                               PrimaryButtonClick="TerminatingContentDialog_OnPrimaryButtonClick"
+                               CloseButtonText="Cancel"
+                               DefaultButton="Primary">
+                    <ContentDialog.TitleTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Terminating session" />
+                        </DataTemplate>
+                    </ContentDialog.TitleTemplate>
+                    <TextBlock>
+                        Are you sure you want to terminate all other sessions?
+                    </TextBlock>
+                </ContentDialog>
                 
             </StackPanel>
         </Grid>

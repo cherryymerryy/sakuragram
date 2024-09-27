@@ -16,7 +16,7 @@
                        VerticalAlignment="Bottom"/>
         <Border x:Name="MessageBackground" 
                 MinWidth="150" 
-                MaxWidth="300" 
+                MaxWidth="500" 
                 Width="Auto" 
                 Background="{StaticResource CardBackgroundFillColorDefaultBrush}" 
                 CornerRadius="10">
@@ -50,11 +50,22 @@
                     </StackPanel>
                 </Border>
                 <RelativePanel>
-                    <Border CornerRadius="4">
+                    <Border x:Name="BorderImage"
+                            CornerRadius="4"
+                            Visibility="Visible">
                         <Border.Background>
                             <ImageBrush x:Name="Image" />
                         </Border.Background>
                     </Border>
+                    <StackPanel x:Name="PanelAlbum">
+                        <FlipView x:Name="Gallery" MaxWidth="400" Height="270" ItemsSource="{x:Bind Photos}">
+                        </FlipView>
+                        <PipsPager x:Name="FlipViewPipsPager"
+                                   HorizontalAlignment="Center"
+                                   Margin="0, 12, 0, 0"
+                                   NumberOfPages="{x:Bind Photos.Count}"
+                                   SelectedPageIndex="{x:Bind Path=Gallery.SelectedIndex, Mode=TwoWay}" />
+                    </StackPanel>
                 </RelativePanel>
                 <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" 
                            IsTextSelectionEnabled="True" />

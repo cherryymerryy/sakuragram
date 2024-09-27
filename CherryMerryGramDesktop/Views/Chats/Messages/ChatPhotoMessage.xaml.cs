@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Media.Core;
@@ -14,9 +15,12 @@ public partial class ChatPhotoMessage : Page
 {
     private static TdClient _client = App._client;
     private TdApi.MessageContent _messageMediaContent;
+    private long _chatId;
     private int _profilePhotoFileId;
     private int _mediaFileId;
+    private long _mediaAlbumId;
     private TdApi.ProfilePhoto _profilePhoto;
+    private List<Image> Photos = [];
 
     public ChatPhotoMessage()
     {
@@ -37,6 +41,23 @@ public partial class ChatPhotoMessage : Page
                     {
                         case TdApi.MessageContent.MessagePhoto messagePhoto:
                         {
+                            if (messagePhoto.Photo.Sizes[1].Photo.Local.Path != string.Empty)
+                            {
+                                Image.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                                    () => {
+                                        Image.ImageSource =
+                                            new BitmapImage(new Uri(messagePhoto.Photo.Sizes[1].Photo.Local.Path));
+                                        SetImageTransform(messagePhoto);
+                                    });
+                            }
+                            else if (updateFile.File.Local.Path != string.Empty)
+                            {
+                                Image.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+                                    () => {
+                                        Image.ImageSource = new BitmapImage(new Uri(updateFile.File.Local.Path));
+                                        SetImageTransform(messagePhoto);
+                                    });
+                            }
                             break;
                         }
                     }
@@ -56,12 +77,39 @@ public partial class ChatPhotoMessage : Page
                 }
                 break;
             }
+            case TdApi.Update.UpdateNewMessage updateNewMessage:
+            {
+                if (updateNewMessage.Message.ChatId == _chatId)
+                {
+                    if (updateNewMessage.Message.MediaAlbumId == _mediaAlbumId)
+                    {
+                        switch (updateNewMessage.Message.Content)
+                        {
+                            case TdApi.MessageContent.MessagePhoto messagePhoto:
+                            {
+                                var photo = new Image();
+                                photo.Source = new BitmapImage(new Uri(messagePhoto.Photo.Sizes[1].Photo.Local.Path));
+                                Photos.Add(photo);
+                                
+                                if (Photos.Count > 0)
+                                {
+                                    BorderImage.Visibility = Visibility.Collapsed;
+                                    PanelAlbum.Visibility = Visibility.Visible;
+                                }
+                                break;
+                            }
+                        }
+                    }   
+                }
+                break;
+            }
         }
     }
 
     public void UpdateMessage(TdApi.Message message)
     {
         _messageMediaContent = message.Content;
+        _chatId = message.ChatId;
         
         var sender = message.SenderId switch
         {
@@ -192,11 +240,28 @@ public partial class ChatPhotoMessage : Page
         {
             // ignored
         }
+
+        if (message.MediaAlbumId != 0)
+        {
+            _mediaAlbumId = message.MediaAlbumId;
+        }
         
         switch (_messageMediaContent)
         {
             case TdApi.MessageContent.MessagePhoto messagePhoto:
             {
+                _mediaFileId = messagePhoto.Photo.Sizes[1].Photo.Id;
+                
+                if (messagePhoto.Photo.Sizes[1].Photo.Local.Path != string.Empty)
+                {
+                    Image.ImageSource = new BitmapImage(new Uri(messagePhoto.Photo.Sizes[1].Photo.Local.Path));
+                    SetImageTransform(messagePhoto);
+                }
+                else
+                {
+                    _client.DownloadFileAsync(fileId: messagePhoto.Photo.Sizes[1].Photo.Id, priority: 1);
+                }
+                
                 if (messagePhoto.Caption.Text != string.Empty)
                 {
                     MessageContent.Text = messagePhoto.Caption.Text;
@@ -210,6 +275,12 @@ public partial class ChatPhotoMessage : Page
                 break;
             }
         }
+    }
+
+    private void SetImageTransform(TdApi.MessageContent.MessagePhoto messagePhoto)
+    {
+        BorderImage.Width = messagePhoto.Photo.Sizes[1].Width / 2;
+        BorderImage.Height = messagePhoto.Photo.Sizes[1].Height / 2;
     }
     
     private void GetChatPhoto(TdApi.User user)

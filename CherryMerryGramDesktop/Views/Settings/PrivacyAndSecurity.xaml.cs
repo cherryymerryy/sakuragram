@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using CherryMerryGramDesktop.Views.Settings.AdditionalElements;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TdLib;
 
@@ -34,5 +35,42 @@ public partial class PrivacyAndSecurity : Page
 
     private void ClearPaymentInfo_OnClick(object sender, RoutedEventArgs e)
     {
+    }
+
+    private async void ContentDialogSessions_OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
+    {
+        var sessions = await _client.GetActiveSessionsAsync();
+
+        foreach (var session in sessions.Sessions_)
+        {
+            var sessionEntry = new Session();
+            sessionEntry.Update(session);
+
+            if (session.IsCurrent)
+            {
+                ActiveSession.Children.Add(sessionEntry);
+            }
+            else
+            {
+                SessionList.Children.Add(sessionEntry);
+            }
+        }
+    }
+
+    private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+    {
+        ContentDialogSessions.ShowAsync();
+    }
+
+    private void ButtonTerminateOtherSessions_OnClick(object sender, RoutedEventArgs e)
+    {
+        ContentDialogSessions.Hide();
+        TerminatingContentDialog.ShowAsync();
+    }
+
+    private void TerminatingContentDialog_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    {
+        _client.TerminateAllOtherSessionsAsync();
+        CardActiveSessions.Description = $"There are currently 1 active sessions";
     }
 }

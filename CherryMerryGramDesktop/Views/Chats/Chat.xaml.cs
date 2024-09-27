@@ -63,7 +63,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             //var pinnedMessage = _client.ExecuteAsync(new TdApi.GetChatPinnedMessage {ChatId = ChatId});
         }
 
-        private Task ProcessUpdates(TdApi.Update update)
+        private async Task ProcessUpdates(TdApi.Update update)
         {
             switch (update)
             {
@@ -71,10 +71,10 @@ namespace CherryMerryGramDesktop.Views.Chats
                 {
                     if (updateNewMessage.Message.ChatId == _chatId)
                     {
-                        MessagesList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
+                        MessagesList.DispatcherQueue.TryEnqueue(() =>
                         {
                             GenerateMessageByType(updateNewMessage.Message);
-                            
+
                             // For debug
                             // var message = new ChatDebugMessage();
                             // MessagesList.Children.Add(message);
@@ -182,19 +182,6 @@ namespace CherryMerryGramDesktop.Views.Chats
                     break;
                 }
             }
-
-            return Task.CompletedTask;
-        }
-
-        private void ClearAllVariables()
-        {
-            _chat = null;
-            _background = null;
-            _backgroundId = 0;
-            _memberCount = 0;
-            _onlineMemberCount = 0;
-            _pollOptionsList.Clear(); 
-            MessagesList.Children.Clear();
         }
         
         public async void UpdateChat(long chatId)

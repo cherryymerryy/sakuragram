@@ -121,13 +121,18 @@ namespace CherryMerryGramDesktop.Views.Chats
                             supergroupId: typeSupergroup.SupergroupId);
                     if (supergroup.IsForum)
                     {
-                        ChatEntryProfilePicture.CornerRadius = new CornerRadius(0);
+                        var topic = _client.ExecuteAsync(new TdApi.GetForumTopic
+                        {
+                            ChatId = ChatId,
+                            MessageThreadId = _chat.LastMessage.MessageThreadId
+                        }).Result;
+                        TextBlockForumName.Visibility = Visibility.Visible;
+                        TextBlockForumName.Text = topic.Info.Name;
                     }
                     else
                     {
-                        break;
+                        TextBlockForumName.Visibility = Visibility.Collapsed;
                     }
-
                     break;
                 }
             }
