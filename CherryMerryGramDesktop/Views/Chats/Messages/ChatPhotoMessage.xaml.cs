@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Media.Core;
+using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
 
@@ -110,14 +112,14 @@ public partial class ChatPhotoMessage : Page
     {
         _messageMediaContent = message.Content;
         _chatId = message.ChatId;
-        
+
         var sender = message.SenderId switch
         {
             TdApi.MessageSender.MessageSenderUser u => u.UserId,
             TdApi.MessageSender.MessageSenderChat c => c.ChatId,
             _ => 0
         };
-        
+
         if (sender > 0) // if senderId > 0 then it's a user
         {
             var user = _client.GetUserAsync(userId: sender).Result;
@@ -130,7 +132,7 @@ public partial class ChatPhotoMessage : Page
             DisplayName.Text = chat.Title;
             ProfilePicture.Visibility = Visibility.Collapsed;
         }
-        
+
         if (message.ReplyTo != null)
         {
             var replyMessage = _client.ExecuteAsync(new TdApi.GetRepliedMessage
@@ -138,8 +140,9 @@ public partial class ChatPhotoMessage : Page
                 ChatId = message.ChatId,
                 MessageId = message.Id
             }).Result;
-            
-            var replyUserId = replyMessage.SenderId switch {
+
+            var replyUserId = replyMessage.SenderId switch
+            {
                 TdApi.MessageSender.MessageSenderUser u => u.UserId,
                 TdApi.MessageSender.MessageSenderChat c => c.ChatId,
                 _ => 0
@@ -155,8 +158,8 @@ public partial class ChatPhotoMessage : Page
                 var replyChat = _client.GetChatAsync(replyUserId).Result;
                 ReplyFirstName.Text = replyChat.Title;
             }
-            
-            ReplyInputContent.Text  = replyMessage.Content switch
+
+            ReplyInputContent.Text = replyMessage.Content switch
             {
                 TdApi.MessageContent.MessageText messageText => messageText.Text.Text,
                 TdApi.MessageContent.MessageAnimation messageAnimation => messageAnimation.Caption.Text,
@@ -169,10 +172,10 @@ public partial class ChatPhotoMessage : Page
                 TdApi.MessageContent.MessageVoiceNote messageVoiceNote => messageVoiceNote.Caption.Text,
                 _ => "Unsupported message type"
             };
-            
+
             Reply.Visibility = Visibility.Visible;
         }
-        
+
         if (message.ForwardInfo != null)
         {
             if (message.ForwardInfo.Source != null)
@@ -195,7 +198,7 @@ public partial class ChatPhotoMessage : Page
                         {
                             forwardInfo = forwardInfo + $" ({channel.AuthorSignature})";
                         }
-                        
+
                         TextBlockForwardInfo.Text = $"Forwarded from {forwardInfo}";
                         TextBlockForwardInfo.Visibility = Visibility.Visible;
                         break;
@@ -227,7 +230,7 @@ public partial class ChatPhotoMessage : Page
             TextBlockForwardInfo.Text = string.Empty;
             TextBlockForwardInfo.Visibility = Visibility.Collapsed;
         }
-        
+
         try
         {
             DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -235,8 +238,8 @@ public partial class ChatPhotoMessage : Page
             string sendTime = dateTime.ToShortTimeString();
 
             SendTime.Text = sendTime;
-        } 
-        catch 
+        }
+        catch
         {
             // ignored
         }
@@ -275,12 +278,52 @@ public partial class ChatPhotoMessage : Page
                 break;
             }
         }
+        
+        var messageReactions = _client.ExecuteAsync(new TdApi.GetMessageAddedReactions
+        {
+            ChatId = message.ChatId,
+            MessageId = message.Id,
+            Limit = 100,
+        }).Result;
+
+        if (messageReactions != null)
+        {
+            foreach (var reaction in messageReactions.Reactions)
+            {
+                GenerateReaction(reaction);
+            }
+        }
     }
 
     private void SetImageTransform(TdApi.MessageContent.MessagePhoto messagePhoto)
     {
         BorderImage.Width = messagePhoto.Photo.Sizes[1].Width / 2;
         BorderImage.Height = messagePhoto.Photo.Sizes[1].Height / 2;
+    }
+    
+    private void GenerateReaction(TdApi.AddedReaction reaction)
+    {
+        var background = new Border();
+        background.CornerRadius = new CornerRadius(4);
+        background.Padding = new Thickness(5);
+        background.BorderBrush = new SolidColorBrush(Colors.Black);
+
+        switch (reaction.Type)
+        {
+            case TdApi.ReactionType.ReactionTypeEmoji emoji:
+            {
+                var text = new TextBlock();
+                text.Text = emoji.Emoji;
+                background.Child = text;
+                break;
+            }
+            case TdApi.ReactionType.ReactionTypeCustomEmoji customEmoji:
+            {
+                break;
+            }
+        }
+            
+        StackPanelReactions.Children.Add(background);
     }
     
     private void GetChatPhoto(TdApi.User user)

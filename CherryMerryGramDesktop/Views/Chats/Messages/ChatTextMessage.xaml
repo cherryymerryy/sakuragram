@@ -50,6 +50,7 @@
                 </Border>
                 <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" 
                            win:IsTextSelectionEnabled="True" />
+                <StackPanel x:Name="StackPanelReactions"/>
                 <StackPanel Orientation="Horizontal" 
                             HorizontalAlignment="Stretch">
                     <TextBlock x:Name="TextBlockReplies"

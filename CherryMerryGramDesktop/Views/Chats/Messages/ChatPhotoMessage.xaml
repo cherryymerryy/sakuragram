@@ -69,6 +69,7 @@
                 </RelativePanel>
                 <TextBlock x:Name="MessageContent" Text="messageContent" TextWrapping="Wrap" 
                            IsTextSelectionEnabled="True" />
+                <StackPanel x:Name="StackPanelReactions"/>
             </StackPanel>
         </Border>
     </StackPanel>

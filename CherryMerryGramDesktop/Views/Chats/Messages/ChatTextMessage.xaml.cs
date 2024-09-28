@@ -75,7 +75,7 @@ namespace CherryMerryGramDesktop.Views.Chats
             return Task.CompletedTask;
         }
 
-        public void UpdateMessage(TdApi.Message message)
+        public async void UpdateMessage(TdApi.Message message)
         {
             _chatId = message.ChatId;
             _messageId = message.Id;
@@ -141,7 +141,7 @@ namespace CherryMerryGramDesktop.Views.Chats
                 DisplayName.Text = chat.Title;
                 ProfilePicture.Visibility = Visibility.Collapsed;
             }
-
+            
             try
             {
                 DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -250,6 +250,21 @@ namespace CherryMerryGramDesktop.Views.Chats
                     break;
             }
             
+            var messageReactions = _client.ExecuteAsync(new TdApi.GetMessageAddedReactions
+            {
+                ChatId = message.ChatId,
+                MessageId = message.Id,
+                Limit = 100,
+            }).Result;
+            
+            if (messageReactions != null)
+            {
+                foreach (var reaction in messageReactions.Reactions)
+                {
+                    GenerateReaction(reaction);
+                }
+            }
+            
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }
         
@@ -288,6 +303,31 @@ namespace CherryMerryGramDesktop.Views.Chats
             }
         }
 
+        private void GenerateReaction(TdApi.AddedReaction reaction)
+        {
+            var background = new Border();
+            background.CornerRadius = new CornerRadius(4);
+            background.Padding = new Thickness(5);
+            background.BorderBrush = new SolidColorBrush(Colors.Black);
+
+            switch (reaction.Type)
+            {
+                case TdApi.ReactionType.ReactionTypeEmoji emoji:
+                {
+                    var text = new TextBlock();
+                    text.Text = emoji.Emoji;
+                    background.Child = text;
+                    break;
+                }
+                case TdApi.ReactionType.ReactionTypeCustomEmoji customEmoji:
+                {
+                    break;
+                }
+            }
+            
+            StackPanelReactions.Children.Add(background);
+        }
+        
         private void ShowMenu(bool isTransient)
         {
             _isContextMenuOpen = isTransient;
