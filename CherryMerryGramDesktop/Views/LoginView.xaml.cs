@@ -1,6 +1,9 @@
+using System;
 using System.Threading.Tasks;
+using Windows.System;
 using CherryMerryGramDesktop.Views.Auth;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
 using TdLib;
 
 namespace CherryMerryGramDesktop.Views
@@ -63,14 +66,26 @@ namespace CherryMerryGramDesktop.Views
 			switch (_loginState)
 			{
 				case 0:
-					if (TextBoxPhoneNumber.Text == "") return;
 					ButtonNext.IsEnabled = false;
 					TextBoxPhoneNumber.IsEnabled = false;
 					LoginProgress.Visibility = Visibility.Visible;
-					await _client.ExecuteAsync(new TdApi.SetAuthenticationPhoneNumber
+					try
 					{
-						PhoneNumber = TextBoxPhoneNumber.Text,
-					});
+						await _client.ExecuteAsync(new TdApi.SetAuthenticationPhoneNumber
+						{
+							PhoneNumber = TextBoxPhoneNumber.Text,
+						});
+					}
+					catch (TdException exception)
+					{
+						TdException.Text = exception.Message;
+						LoginProgress.Visibility = Visibility.Collapsed;
+						ButtonNext.IsEnabled = true;
+						TextBoxPhoneNumber.IsEnabled = true;
+						TdException.Visibility = Visibility.Visible;
+						return;
+					}
+					TdException.Visibility = Visibility.Collapsed;
 					LoginProgress.Visibility = Visibility.Collapsed;
 					_loginState++;
 					TextBlockCurrentAuthState.Text = "Phone verification";
@@ -80,14 +95,26 @@ namespace CherryMerryGramDesktop.Views
 					ButtonNext.IsEnabled = true;
 					break;
 				case 1:
-					if (TextBoxCode.Text == "") return;
 					ButtonNext.IsEnabled = false;
 					TextBoxCode.IsEnabled = false;
 					LoginProgress.Visibility = Visibility.Visible;
-                    await _client.ExecuteAsync(new TdApi.CheckAuthenticationCode
+					try
 					{
-						Code = TextBoxCode.Text
-					});
+						await _client.ExecuteAsync(new TdApi.CheckAuthenticationCode
+						{
+							Code = TextBoxCode.Text
+						});
+					}
+					catch (TdException exception)
+					{
+						TdException.Text = exception.Message;
+						LoginProgress.Visibility = Visibility.Collapsed;
+						ButtonNext.IsEnabled = true;
+						TextBoxCode.IsEnabled = true;
+						TdException.Visibility = Visibility.Visible;
+						return;
+					}
+					TdException.Visibility = Visibility.Collapsed;
 					LoginProgress.Visibility = Visibility.Collapsed;
 					TextBoxCode.Visibility = Visibility.Collapsed;
 					ButtonNext.IsEnabled = true;
@@ -109,15 +136,27 @@ namespace CherryMerryGramDesktop.Views
 					}
 					break;
 				case 2:
-					if (TextBoxPassword.Password == "") return;
 					ButtonNext.IsEnabled = false;
 					TextBoxPassword.IsEnabled = false;
 					LoginProgress.Visibility = Visibility.Visible;
-                    await _client.ExecuteAsync(new TdApi.CheckAuthenticationPassword
+					try
 					{
-						Password = TextBoxPassword.Password
-					});
-					LoginProgress.Visibility = Visibility.Collapsed;
+						await _client.ExecuteAsync(new TdApi.CheckAuthenticationPassword
+						{
+							Password = TextBoxPassword.Password
+						});
+						LoginProgress.Visibility = Visibility.Collapsed;
+					}
+					catch (TdException exception)
+					{
+						TdException.Text = exception.Message;
+						LoginProgress.Visibility = Visibility.Collapsed;
+						ButtonNext.IsEnabled = true;
+						TextBoxPassword.IsEnabled = true;
+						TdException.Visibility = Visibility.Visible;
+						return;
+					}
+					TdException.Visibility = Visibility.Collapsed;
 					_loginState = 0;
 					ButtonNext.IsEnabled = true;
 					_mWindow = new MainWindow();
@@ -132,6 +171,18 @@ namespace CherryMerryGramDesktop.Views
 			var window = new Auth_ForgotPassword();
 			window.Activate();
 			AppWindow.Destroy();
+		}
+
+		private void UIElement_OnKeyDown(object sender, KeyRoutedEventArgs e)
+		{
+			switch (e.Key)
+			{
+				case VirtualKey.Enter:
+				{
+					button_Next_Click(sender, null);
+					break;
+				}
+			}
 		}
 	}
 }
