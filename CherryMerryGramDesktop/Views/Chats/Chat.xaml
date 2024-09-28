@@ -3,6 +3,7 @@
     x:Class="CherryMerryGramDesktop.Views.Chats.Chat"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -44,24 +45,41 @@
                                            Height="30"
                                            Margin="0,0,4,0"/>
                             <StackPanel Orientation="Vertical">
-                                <TextBlock x:Name="ChatTitle" FontSize="14" FontStyle="Oblique" TextAlignment="Left" />
-                                <TextBlock x:Name="ChatMembers" FontSize="10" Foreground="Gray" TextAlignment="Left"/>
+                                <TextBlock x:Name="ChatTitle" FontSize="14" TextAlignment="Left" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="ChatMembers" FontSize="10" Foreground="Gray" TextAlignment="Left"/>
+                                    <TextBlock x:Name="OnlineChatMembers" FontSize="10" Foreground="Gray" TextAlignment="Left"/>
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <Button x:Name="SearchMessages" Content="Search" Click="SearchMessages_OnClick" 
+                            <Button x:Name="SearchMessages" 
+                                    Click="SearchMessages_OnClick" 
                                     HorizontalAlignment="Right" 
                                     VerticalAlignment="Center"
                                     IsEnabled="True"
-                                    Margin="0,0,5,0"/>
-                            <Button x:Name="CreateVideoCall" Content="Call" Click="CreateVideoCall_OnClick" 
+                                    Margin="0,0,5,0">
+                                <Button.Content>
+                                    <FontIcon Glyph="&#xE721;" />
+                                </Button.Content>
+                            </Button>
+                            <Button x:Name="CreateVideoCall" 
+                                    Click="CreateVideoCall_OnClick"
                                     HorizontalAlignment="Right" 
                                     VerticalAlignment="Center"
-                                    Margin="0,0,5,0"/>
-                            <Button x:Name="MoreActions" Content="..." Click="MoreActions_OnClick" 
+                                    Margin="0,0,5,0">
+                                <Button.Content>
+                                    <FontIcon Glyph="&#xF715;" />
+                                </Button.Content>
+                            </Button>
+                            <Button x:Name="MoreActions" 
+                                    Click="MoreActions_OnClick" 
                                     HorizontalAlignment="Right" 
                                     VerticalAlignment="Center"
                                     IsEnabled="True" >
+                                <Button.Content>
+                                    <FontIcon Glyph="&#xE712;" />
+                                </Button.Content>
                                 <Button.Flyout>
                                     <MenuFlyout x:Name="ContextMenu" Placement="Bottom">
                                         <MenuFlyoutItem Text="Mute" 
@@ -259,7 +277,11 @@
                            TextWrapping="Wrap"/>
             </ContentDialog>
             
-            <ContentDialog x:Name="Profile">
+            <ContentDialog x:Name="Profile"
+                           Opened="Profile_OnOpened"
+                           MaxWidth="300"
+                           MinWidth="300"
+                           Width="300">
                 <ContentDialog.TitleTemplate>
                     <DataTemplate>
                         <TextBlock x:Name="Title" 
@@ -274,52 +296,90 @@
                               Height="70">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="70" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             
                             <PersonPicture x:Name="ProfilePicture"
                                            Grid.Column="0"
-                                           Width="70"
-                                           Height="70"/>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock x:Name="TextBlockName"/>
-                                <TextBlock x:Name="TextBlockMembersOrStatus"/>
+                                           Width="60"
+                                           Height="60"
+                                           Margin="0,0,4,0"/>
+                            <StackPanel Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Left">
+                                <TextBlock x:Name="TextBlockName" 
+                                           FontSize="14"/>
+                                <TextBlock x:Name="TextBlockMembersOrStatus"
+                                           Foreground="{StaticResource TextFillColorTertiaryBrush}"
+                                           FontSize="12"/>
                             </StackPanel>
                         </Grid>
-                        <MenuFlyoutSeparator Margin="0, 4, 0, 4" />
+                        <MenuFlyoutSeparator x:Name="SeparatorMain" 
+                                             Margin="0, 4, 0, 4" />
                         <Grid x:Name="ChannelInfo"
                               HorizontalAlignment="Left"
                               VerticalAlignment="Center"
                               Height="60">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="55"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             
                             <PersonPicture x:Name="ChannelPicture"
                                            Grid.Column="0"
                                            Width="50"
-                                           Height="50"/>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock x:Name="TextBlockChannelName"/>
-                                <TextBlock x:Name="TextBlockLastMessage"/>
-                                <TextBlock x:Name="TextBlockMembers"/>
+                                           Height="50"
+                                           Margin="0,0,4,0"/>
+                            <StackPanel Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Left">
+                                <TextBlock x:Name="TextBlockChannelName"
+                                           FontSize="14"/>
+                                <TextBlock x:Name="TextBlockLastMessage"
+                                           FontSize="12"
+                                           Text="Last message"
+                                           MaxLines="1"
+                                           TextWrapping="NoWrap"
+                                           TextTrimming="Clip"/>
+                                <TextBlock x:Name="TextBlockMembers"
+                                           FontSize="12"/>
                             </StackPanel>
                         </Grid>
-                        <MenuFlyoutSeparator Margin="0, 4, 0, 4" />
+                        <MenuFlyoutSeparator x:Name="SeparatorGroup" 
+                                             Margin="0, 4, 0, 4" />
                         <StackPanel x:Name="GroupInfo">
-                            <TextBox x:Name="TextBoxDescription"
-                                     TextWrapping="Wrap"
-                                     PlaceholderText="Description"/>
-                            <TextBlock x:Name="TextBlockId"/>
+                            <controls:SettingsCard x:Name="CardLink"
+                                                   Width="Auto"
+                                                   Height="30"
+                                                   Description="Username"/>
+                            <controls:SettingsCard x:Name="CardDescription"
+                                                   Width="Auto"
+                                                   Height="Auto"
+                                                   Description="Bio"/>
+                            <controls:SettingsCard x:Name="CardChatId"
+                                                   Width="Auto"
+                                                   Height="30"
+                                                   Description="ID"/>
                         </StackPanel>
                         <StackPanel x:Name="UserInfo"
                                     HorizontalAlignment="Stretch">
-                            <TextBlock x:Name="TextBlockUsername"/>
-                            <TextBlock x:Name="TextBlockUserId"/>
+                            <controls:SettingsCard x:Name="CardUsername"
+                                                   Width="Auto"
+                                                   Height="30"
+                                                   Description="Username"/>
+                            <controls:SettingsCard x:Name="CardBio"
+                                                   Width="Auto"
+                                                   Height="30"
+                                                   Description="Bio"/>
+                            <controls:SettingsCard x:Name="CardUserId"
+                                                   Width="Auto"
+                                                   Height="30"
+                                                   Description="ID"/>
                             <Button x:Name="ButtonSendMessage"
                                     Content="Send message"
-                                    Width="Auto"/>
+                                    HorizontalContentAlignment="Left"
+                                    Width="300"
+                                    Margin="0, 4, 0, 0"/>
                         </StackPanel>
                         <MenuFlyoutSeparator Margin="0, 4, 0, 4" />
                         <StackPanel x:Name="AllMediaInChat">
@@ -329,16 +389,23 @@
                                     HorizontalAlignment="Stretch">
                             <Button x:Name="ButtonShareContact"
                                     Content="Share contact"
-                                    Width="Auto"/>
+                                    HorizontalContentAlignment="Left"
+                                    Width="300"/>
                             <Button x:Name="ButtonEditContact"
                                     Content="Edit contact"
-                                    Width="Auto"/>
+                                    HorizontalContentAlignment="Left"
+                                    Width="300"
+                                    Margin="0, 4, 0, 0"/>
                             <Button x:Name="ButtonDeleteContact"
                                     Content="Delete contact"
-                                    Width="Auto"/>
+                                    HorizontalContentAlignment="Left"
+                                    Width="300"
+                                    Margin="0, 4, 0, 0"/>
                             <Button x:Name="ButtonBlockUser"
                                     Content="Block user"
-                                    Width="Auto"/>
+                                    HorizontalContentAlignment="Left"
+                                    Width="300"
+                                    Margin="0, 4, 0, 0"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
