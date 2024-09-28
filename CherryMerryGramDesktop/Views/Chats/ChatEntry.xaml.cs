@@ -117,22 +117,22 @@ namespace CherryMerryGramDesktop.Views.Chats
             {
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
                 {
-                    var supergroup = _client.GetSupergroupAsync(
-                            supergroupId: typeSupergroup.SupergroupId).Result;
-                    if (supergroup.IsForum)
-                    {
-                        var topic = _client.ExecuteAsync(new TdApi.GetForumTopic
-                        {
-                            ChatId = ChatId,
-                            MessageThreadId = _chat.LastMessage.MessageThreadId
-                        }).Result;
-                        TextBlockForumName.Text = topic.Info.Name;
-                        TextBlockForumName.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        TextBlockForumName.Visibility = Visibility.Collapsed;
-                    }
+                    // var supergroup = _client.GetSupergroupAsync(
+                    //         supergroupId: typeSupergroup.SupergroupId).Result;
+                    // if (supergroup.IsForum)
+                    // {
+                    //     var topic = _client.ExecuteAsync(new TdApi.GetForumTopic
+                    //     {
+                    //         ChatId = ChatId,
+                    //         MessageThreadId = _chat.LastMessage.MessageThreadId
+                    //     }).Result;
+                    //     TextBlockForumName.Text = topic.Info.Name;
+                    //     TextBlockForumName.Visibility = Visibility.Visible;
+                    // }
+                    // else
+                    // {
+                    //     TextBlockForumName.Visibility = Visibility.Collapsed;
+                    // }
                     break;
                 }
             }
