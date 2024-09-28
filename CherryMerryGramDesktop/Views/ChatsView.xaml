@@ -80,29 +80,59 @@
             
             <ContentDialog x:Name="NewGroup" CloseButtonText="Cancel" PrimaryButtonText="Create"
                            DefaultButton="Primary"
-                           PrimaryButtonClick="NewGroup_OnPrimaryButtonClick">
+                           PrimaryButtonClick="NewGroup_OnPrimaryButtonClick"
+                           Opened="NewGroup_OnOpened"
+                           Closed="NewGroup_OnClosed">
                 <ContentDialog.TitleTemplate>
                     <DataTemplate>
                         <TextBlock Text="New Group" />
                     </DataTemplate>
                 </ContentDialog.TitleTemplate>
-                <StackPanel>
-                    <TextBox x:Name="TextBoxGroupName" PlaceholderText="Group name" />
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                        <PersonPicture x:Name="NewGroupPicture" />
+                        <Button x:Name="ButtonUploadGroupPhoto"
+                                Content="Upload"
+                                Click="ButtonUploadGroupPhoto_OnClick"/>
+                    </StackPanel>
+                    <TextBox x:Name="TextBoxGroupName" PlaceholderText="Group name"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Center"/>
+                    <TextBlock x:Name="TextBlockGroupCreateException"
+                               Visibility="Collapsed"/>
                 </StackPanel>
             </ContentDialog>
             
             <ContentDialog x:Name="NewChannel" CloseButtonText="Cancel" PrimaryButtonText="Create"
                            DefaultButton="Primary"
+                           Opened="NewChannel_OnOpened"
+                           Closed="NewChannel_OnClosed"
                            PrimaryButtonClick="NewChannel_OnPrimaryButtonClick">
                 <ContentDialog.TitleTemplate>
                     <DataTemplate>
-                        <TextBlock Text="New Group" />
+                        <TextBlock Text="New Channel" />
                     </DataTemplate>
                 </ContentDialog.TitleTemplate>
-                <StackPanel>
-                    <TextBox x:Name="TextBoxChannelName" PlaceholderText="Channel name " Margin="0, 0, 0, 4" />
-                    <TextBox x:Name="TextBoxChannelDescription" PlaceholderText="Channel description" MaxLength="255" 
-                             MaxWidth="270"/>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                        <PersonPicture x:Name="NewChannelPicture" />
+                        <Button x:Name="ButtonUploadChannelPhoto"
+                                Content="Upload"
+                                Click="ButtonUploadGroupPhoto_OnClick"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center">
+                        <TextBox x:Name="TextBoxChannelName" PlaceholderText="Channel name " Margin="0, 0, 0, 4" />
+                        <TextBox x:Name="TextBoxChannelDescription" PlaceholderText="Channel description" MaxLength="255" 
+                                 MaxWidth="270"/>
+                        <TextBlock x:Name="TextBlockChannelCreateException"
+                                   Visibility="Collapsed"/>
+                    </StackPanel>
                 </StackPanel>
             </ContentDialog>
         </Grid>

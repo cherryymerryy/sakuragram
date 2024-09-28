@@ -4,12 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.System;
 using CherryMerryGramDesktop.Views.Chats;
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Imaging;
 using TdLib;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
@@ -23,7 +26,10 @@ namespace CherryMerryGramDesktop.Views
         public Chat _currentChat;
         private bool _bInArchive = false;
         private bool _firstGenerate = true;
+        private bool _createChannelOpened = false;
+        private bool _createGroupOpened = false;
         private int _totalUnreadArchivedChatsCount = 0;
+        private StorageFile _newProfilePicture;
         private List<long> _chatsIds = [];
         private List<long> _pinnedChats = [];
         
@@ -299,31 +305,63 @@ namespace CherryMerryGramDesktop.Views
 
         private async void NewGroup_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            if (TextBoxGroupName.Text == "") return;
-            
-            var newGroup = await _client.ExecuteAsync(new TdApi.CreateNewBasicGroupChat
+            try
             {
-                Title = TextBoxGroupName.Text,
-                UserIds = null,
-            });
-            
-            // _client.ExecuteAsync(new TdApi.SetChatPhoto
-            // {
-            //     ChatId = newGroup.ChatId, 
-            //     Photo = 
-            // });
+                var newGroup = await _client.ExecuteAsync(new TdApi.CreateNewBasicGroupChat
+                {
+                    Title = TextBoxGroupName.Text,
+                    UserIds = null,
+                });
+
+                await _client.ExecuteAsync(new TdApi.SetChatPhoto
+                {
+                    ChatId = newGroup.ChatId,
+                    Photo = new TdApi.InputChatPhoto.InputChatPhotoStatic
+                    {
+                        Photo = new TdApi.InputFile.InputFileLocal
+                        {
+                            Path = _newProfilePicture.Path
+                        }
+                    }
+                });
+            }
+            catch (TdException e)
+            {
+                TextBlockGroupCreateException.Text = e.Message;
+                TextBlockGroupCreateException.Visibility = Visibility.Visible;
+                throw;
+            }
         }
         
-        private void NewChannel_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private async void NewChannel_OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            if (TextBoxChannelName.Text == "") return;
-
-            _client.ExecuteAsync(new TdApi.CreateNewSupergroupChat
+            try
             {
-                IsChannel = true,
-                Title = TextBoxChannelName.Text,
-                Description = TextBoxChannelDescription.Text
-            });
+                var newChannel = await _client.ExecuteAsync(new TdApi.CreateNewSupergroupChat
+                {
+                    IsChannel = true,
+                    Title = TextBoxChannelName.Text,
+                    Description = TextBoxChannelDescription.Text
+                });
+                
+                await _client.ExecuteAsync(new TdApi.SetChatPhoto
+                {
+                    ChatId = newChannel.Id, 
+                    Photo = new TdApi.InputChatPhoto.InputChatPhotoStatic
+                    {
+                        Photo = new TdApi.InputFile.InputFileLocal 
+                        {
+                            Path = _newProfilePicture.Path
+                        }
+                    }
+                });
+            }
+            catch (TdException e)
+            {
+                TextBlockChannelCreateException.Text = e.Message;
+                TextBlockChannelCreateException.Visibility = Visibility.Visible;
+                throw;
+            }
         }
         
         private void CreateNewGroup_OnClick(object sender, RoutedEventArgs e)
@@ -346,6 +384,56 @@ namespace CherryMerryGramDesktop.Views
                     CloseChat();
                     break;
             }
+        }
+
+        private async void ButtonUploadGroupPhoto_OnClick(object sender, RoutedEventArgs e)
+        {
+            var folderPicker = new FileOpenPicker();
+
+            var mainWindow = (Application.Current as App)?._mWindow;
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(mainWindow);
+
+            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+            folderPicker.FileTypeFilter.Add(".png");
+            folderPicker.FileTypeFilter.Add(".jpg");
+            folderPicker.FileTypeFilter.Add(".jpeg");
+            folderPicker.FileTypeFilter.Add(".webm");
+            folderPicker.FileTypeFilter.Add(".webp");
+            var newPhotoFile = await folderPicker.PickSingleFileAsync();
+        
+            if (newPhotoFile != null)
+            {
+                _newProfilePicture = newPhotoFile;
+                if (_createChannelOpened)
+                {
+                    NewChannelPicture.ProfilePicture = new BitmapImage(new Uri(_newProfilePicture.Path));
+                }
+
+                if (_createGroupOpened)
+                {
+                    NewGroupPicture.ProfilePicture = new BitmapImage(new Uri(_newProfilePicture.Path));
+                }
+            }
+        }
+
+        private void NewChannel_OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
+        {
+            _createChannelOpened = true;
+        }
+
+        private void NewChannel_OnClosed(ContentDialog sender, ContentDialogClosedEventArgs args)
+        {
+            _createChannelOpened = false;
+        }
+
+        private void NewGroup_OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
+        {
+            _createGroupOpened = true;
+        }
+
+        private void NewGroup_OnClosed(ContentDialog sender, ContentDialogClosedEventArgs args)
+        {
+            _createGroupOpened = false;
         }
     }
 }
