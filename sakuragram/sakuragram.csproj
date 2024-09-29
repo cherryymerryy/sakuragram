@@ -15,6 +15,13 @@
     <SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
 	<WindowsSdkPackageVersion>10.0.26100.38</WindowsSdkPackageVersion>
+	<ApplicationIcon>StoreLogo.scale-400.ico</ApplicationIcon>
+	<Title>sakuragram</Title>
+	<Authors>cherrymerry</Authors>
+	<PackageProjectUrl>https://github.com/cherryymerryy/sakuragram</PackageProjectUrl>
+	<PackageLicenseUrl>https://github.com/cherryymerryy/sakuragram/blob/master/LICENSE.txt</PackageLicenseUrl>
+	<RepositoryUrl>https://github.com/cherryymerryy/sakuragram</RepositoryUrl>
+	<RepositoryType>public</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
