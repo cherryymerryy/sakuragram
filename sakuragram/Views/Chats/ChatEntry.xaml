@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button
+    x:Class="sakuragram.Views.Chats.ChatEntry"
+    x:Name="ButtonChatEntry"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Click="Button_OnClick"
+    RightTapped="ChatEntry_OnRightTapped"
+    HorizontalContentAlignment="Stretch"
+    VerticalContentAlignment="Center"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    Margin="0, 2, 0, 2"
+    MinWidth="340"
+    CornerRadius="4"
+    MaxHeight="80">
+    
+    <Grid x:Name="ChatEntryInfo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280*" />
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Center">
+                <PersonPicture x:Name="ChatEntryProfilePicture" 
+                               Width="46"
+                               Height="46"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               Margin="10"/>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="TextBlockChatName" 
+                               FontSize="14" 
+                               MaxLines="1" 
+                               TextTrimming="Clip"/>
+                    <TextBlock x:Name="TextBlockForumName" 
+                               FontSize="10" 
+                               MaxLines="1" 
+                               TextTrimming="Clip" 
+                               Visibility="Collapsed"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="TextBlockChatUsername"
+                                   FontSize="10" 
+                                   MaxLines="1" 
+                                   TextTrimming="Clip"
+                                   Foreground="{StaticResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="TextBlockChatLastMessage" 
+                                   FontSize="10" 
+                                   MaxLines="1" 
+                                   TextTrimming="Clip"
+                                   Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" 
+                        HorizontalAlignment="Right" 
+                        VerticalAlignment="Center"
+                        Margin="5, 0, 0, 0">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock x:Name="TextBlockSendTime" 
+                               FontSize="14"
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
+                    <InfoBadge x:Name="UnreadMessagesCount" 
+                               HorizontalAlignment="Right"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+            
+        <ContentDialog x:Name="LeaveChatConfirmation"
+                       PrimaryButtonText="Leave"
+                       PrimaryButtonClick="LeaveChatConfirmation_OnPrimaryButtonClick"
+                       IsPrimaryButtonEnabled="True"
+                       CloseButtonText="Cancel"
+                       DefaultButton="Primary">
+            <ContentDialog.TitleTemplate>
+                <DataTemplate>
+                    <TextBlock Text="Are you sure you want to leave this chat?" />
+                </DataTemplate>
+            </ContentDialog.TitleTemplate>
+        </ContentDialog>
+        
+    </Grid>
+    
+    <Button.Flyout>
+        <MenuFlyout x:Name="ContextMenu" Placement="Bottom">
+            <MenuFlyoutItem x:Name="ContextMenuArchive" 
+                            Text="Archive" 
+                            Click="ContextMenuArchive_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuPin" 
+                            Text="Pin" 
+                            Click="ContextMenuPin_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuNotifications" 
+                            Text="Mute" 
+                            Click="ContextMenuNotifications_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuMarkAs" 
+                            Text="Mark as" 
+                            Click="ContextMenuMarkAs_OnClick"/>
+            <MenuFlyoutItem x:Name="ContextMenuLeave" 
+                            Text="Leave" 
+                            Click="ContextMenuLeave_OnClick"/>
+        </MenuFlyout>
+    </Button.Flyout>
+</Button>

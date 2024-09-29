@@ -1,0 +1,456 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="sakuragram.Views.Settings.PrivacyAndSecurity"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    mc:Ignorable="d">
+    <Page.Resources>
+
+        <x:Double x:Key="SettingsCardSpacing">4</x:Double>
+
+        <Style x:Key="SettingsSectionHeaderTextBlockStyle"
+               BasedOn="{StaticResource BodyStrongTextBlockStyle}"
+               TargetType="TextBlock">
+            <Style.Setters>
+                <Setter Property="Margin" Value="1,30,0,6" />
+            </Style.Setters>
+        </Style>
+    </Page.Resources>
+    
+    <ScrollViewer>
+        <Grid>
+            <StackPanel MaxWidth="1000"
+                        HorizontalAlignment="Stretch"
+                        Spacing="{StaticResource SettingsCardSpacing}">
+                <win:StackPanel.ChildrenTransitions>
+                    <win:EntranceThemeTransition FromVerticalOffset="50" />
+                    <win:RepositionThemeTransition IsStaggeringEnabled="False" />
+                </win:StackPanel.ChildrenTransitions>
+                
+                <!-- Security section -->
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                           Text="Security" />
+
+                <controls:SettingsCard Description="This is a default card, with the Header, HeaderIcon, Description and Content set."
+                                       Header="Auto-Delete messages"
+                                       HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                    <ComboBox SelectedIndex="0">
+                        <ComboBoxItem>Off</ComboBoxItem>
+                        <ComboBoxItem>After 1 day</ComboBoxItem>
+                        <ComboBoxItem>After 1 week</ComboBoxItem>
+                        <ComboBoxItem>After 1 month</ComboBoxItem>
+                        <ComboBoxItem>Set custom time</ComboBoxItem>
+                    </ComboBox>
+                </controls:SettingsCard>
+                
+                <controls:SettingsCard Header="Two-Step Verification">
+                    <Button Content="Change"
+                            Style="{StaticResource AccentButtonStyle}" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Header="Local passcode">
+                    <Button Content="Change"
+                            Style="{StaticResource AccentButtonStyle}"
+                            IsEnabled="False" />
+                </controls:SettingsCard>
+                
+                <controls:SettingsCard x:Name="CardBlockedUsers"
+                                       Header="Blocked users"
+                                       Description="blocked (count) users">
+                    <Button Content="View"
+                            Style="{StaticResource AccentButtonStyle}"
+                            IsEnabled="False" />
+                </controls:SettingsCard>
+                
+                <controls:SettingsCard x:Name="CardConnectedWebsites"
+                                       Header="Connected websites"
+                                       Description="(count)">
+                    <Button Content="View"
+                            Style="{StaticResource AccentButtonStyle}"
+                            IsEnabled="False" />
+                </controls:SettingsCard>
+                
+                <controls:SettingsCard x:Name="CardActiveSessions"
+                                       Header="Active sessions"
+                                       Description="(count)">
+                    <Button Content="View"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Click="ButtonBase_OnClick" />
+                </controls:SettingsCard>
+                <!-- End of Security section -->
+                
+                <!-- Privacy section -->
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                           Text="Privacy" />
+                
+                <controls:SettingsExpander Header="Phone number">
+                    <TextBlock x:Name="PhoneNumber" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Description="Users who add your number to their contact will see it on Telegram only if they are your contacts"
+                                               Header="Who can see my phone number"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Header="Who can find me by my number"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Description="Add users or groups to override the settings above"
+                                               Header="Always share with"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Last Seen and Online">
+                    <TextBlock x:Name="LastSeenAndOnline" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Description="Unless you are a Premium user, you won't see Last Seen or Online statuses for people with whom you don't share yours."
+                                               Header="Who can see my last seen time"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Header="Hide read time">
+                            <ToggleSwitch />
+                        </controls:SettingsCard>
+
+                        
+                        <controls:SettingsCard Description="Add users or groups to override the settings above"
+                                               Header="Always share with"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Profile photos">
+                    <TextBlock x:Name="ProfilePhotos" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Header="Who can see my profile photos"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Header="Set public photo">
+                            <Button Content="Edit"
+                                    IsEnabled="False"
+                                    Style="{StaticResource AccentButtonStyle}"/>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Description="You can add users or entire groups that will not see your profile photo."
+                                               Header="Never share with"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Bio">
+                    <TextBlock x:Name="Bio" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Header="Who can see my bio"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Description="These users will or will not be able to see your date of birth regardless of the settings above."
+                                               Header="Never share with"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Date of birth">
+                    <TextBlock x:Name="DateOfBirth" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Header="Who can see my date of birth"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Description="These users will or will not be able to see your date of birth regardless of the settings above."
+                                               Header="Never share with"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Forwarded messages">
+                    <TextBlock x:Name="ForwardedMessages" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Description="Messages you send will not link back to your account when forwarded by other users."
+                                               Header="Who can add a link to my account when forwarding my messages"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Description="These settings will override the settings above."
+                                               Header="Never share with"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Calls">
+                    <TextBlock x:Name="Calls" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Header="Who can call me"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Description="These users will or will not be able to call you regardless of the settings above."
+                                               Header="Always allow"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Description="These users will or will not be able to call you regardless of the settings above."
+                                               Header="Never allow"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Groups and Channels">
+                    <TextBlock x:Name="GroupsAndChannels" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Header="Who can add me to groups and channels"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Description="These users will or will not be able to add you to groups and channels regardless of the settings above."
+                                               Header="Always allow"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Description="These users will or will not be able to add you to groups and channels regardless of the settings above."
+                                               Header="Never allow"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Voice messages">
+                    <TextBlock x:Name="VoiceMessages" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Header="Who can send me voice messages"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts</ComboBoxItem>
+                                <ComboBoxItem>Nobody</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+                        
+                        <controls:SettingsCard Description="These users will or will not be able to send voice and video messages to you regardless of the settings above."
+                                               Header="Never share with"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <Button Content="Edit"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False" />
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <controls:SettingsExpander Header="Messages">
+                    <TextBlock x:Name="Messages" Text="Everybody" win:IsTextSelectionEnabled="True"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <controls:SettingsExpander.Items>
+                        
+                        <controls:SettingsCard Description="You can restrict messages from users who are not in your contacts and don't have Premium."
+                                               Header="Who can send me messages"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                            <ComboBox SelectedIndex="0">
+                                <ComboBoxItem>Everybody</ComboBoxItem>
+                                <ComboBoxItem>My contacts and Premium users</ComboBoxItem>
+                            </ComboBox>
+                        </controls:SettingsCard>
+
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                
+                <!-- End of Privacy section -->
+                
+                <!-- Frequent contacts section -->
+
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                           Text="Frequent contacts" />
+                
+                <controls:SettingsCard Description="Display people you message frequently at the top of the search section for quick access."
+                                       Header="Suggest frequent contacts"
+                                       HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                    <ToggleSwitch IsOn="True" />
+                </controls:SettingsCard>
+                
+                <!-- End of Frequent contacts section -->
+                
+                <!-- Bots and websites section -->
+                
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                           Text="Bots and websites" />
+                
+                <controls:SettingsCard Header="Clear Payment and Shipping Info"
+                                       HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                    <Button Content="Clear"
+                            Style="{StaticResource AccentButtonStyle}" 
+                            Click="ClearPaymentInfo_OnClick"/>
+                </controls:SettingsCard>
+                
+                <!-- End of Bots and websites section -->
+                
+                <!-- Delete my account section -->
+                
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                           Text="Delete my account" />
+                
+                <controls:SettingsCard Header="If away for..."
+                                       HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
+                    <ComboBox SelectionChanged="Selector_OnSelectionChanged">
+                        <ComboBoxItem>1 month</ComboBoxItem>
+                        <ComboBoxItem>3 month</ComboBoxItem>
+                        <ComboBoxItem>6 month</ComboBoxItem>
+                        <ComboBoxItem>1 year</ComboBoxItem>
+                    </ComboBox>
+                </controls:SettingsCard>
+                
+                <!-- End of Delete my account section -->
+                
+                <ContentDialog x:Name="ContentDialogSessions"
+                               Opened="ContentDialogSessions_OnOpened"
+                               MaxHeight="500"
+                               CloseButtonText="Close">
+                    <ContentDialog.TitleTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Active sessions" />
+                        </DataTemplate>
+                    </ContentDialog.TitleTemplate>
+                    <ScrollViewer>
+                        <StackPanel>
+                            <StackPanel x:Name="ActiveSession"/>
+                            <Button x:Name="ButtonTerminateOtherSessions"
+                                    Content="Terminate other sessions"
+                                    Width="Auto"
+                                    Click="ButtonTerminateOtherSessions_OnClick"/>
+                            <MenuFlyoutSeparator Margin="0, 10, 0, 10" />
+                            <StackPanel x:Name="SessionList"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </ContentDialog>
+                
+                <ContentDialog x:Name="TerminatingContentDialog"
+                               PrimaryButtonText="Terminate"
+                               PrimaryButtonClick="TerminatingContentDialog_OnPrimaryButtonClick"
+                               CloseButtonText="Cancel"
+                               DefaultButton="Primary">
+                    <ContentDialog.TitleTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Terminating session" />
+                        </DataTemplate>
+                    </ContentDialog.TitleTemplate>
+                    <TextBlock>
+                        Are you sure you want to terminate all other sessions?
+                    </TextBlock>
+                </ContentDialog>
+                
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+    
+</Page>

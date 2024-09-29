@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="sakuragram.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d">
+    <Page.Resources>
+
+        <x:Double x:Key="SettingsCardSpacing">4</x:Double>
+
+        <Style x:Key="SettingsSectionHeaderTextBlockStyle"
+               BasedOn="{StaticResource BodyStrongTextBlockStyle}"
+               TargetType="TextBlock">
+            <Style.Setters>
+                <Setter Property="Margin" Value="1,30,0,6" />
+            </Style.Setters>
+        </Style>
+    </Page.Resources>
+    
+    <NavigationView IsSettingsVisible="False"
+                    IsBackEnabled="False"
+                    IsBackButtonVisible="Collapsed"
+                    PaneDisplayMode="Left"
+                    ItemInvoked="NavigationView_OnItemInvoked"
+                    Loaded="FrameworkElement_OnLoaded"
+                    SelectionChanged="NavigationView_OnSelectionChanged">
+        <NavigationView.MenuItems>
+            <NavigationViewItem x:Name="NavViewEditProfile" Content="Edit profile" Tag="Profile" Icon="Contact"/>
+            <NavigationViewItem x:Name="NavViewNotificationsAndSounds" Content="Notifications and Sounds" 
+                                Tag="NotificationsAndSounds" 
+                                Icon="Volume"/>
+            <NavigationViewItem x:Name="NavViewPrivacyAndSecurity" Content="Privacy and Security" 
+                                Tag="PrivacyAndSecurity" 
+                                Icon="Volume"/>
+            <NavigationViewItem x:Name="NavViewChatSettings" Content="Chat settings" 
+                                Tag="ChatSettings"
+                                Icon="People"/>
+            <NavigationViewItem x:Name="NavViewFolders" Content="Folders" 
+                                Tag="Folders"
+                                Icon="Folder"/>
+            <NavigationViewItem x:Name="NavViewAdvanced" Content="Advanced" 
+                                Tag="Advanced"
+                                Icon="List"/>
+            <NavigationViewItem x:Name="NavViewSpeakersAndCamera" Content="Speakers and Camera" 
+                                Tag="SpeakersAndCamera"
+                                Icon="Camera"/>
+            <NavigationViewItem x:Name="NavViewBatteryAndAnimations" Content="Battery and Animations" 
+                                Tag="BatteryAndAnimations"
+                                Icon="People"/>
+            <NavigationViewItem x:Name="NavViewUpdateManager" Content="Update settings" 
+                                Tag="UpdateManager"
+                                Icon="Sync"/>
+        </NavigationView.MenuItems>
+        <Frame x:Name="ContentFrame" />
+    </NavigationView>
+    
+</Page>
