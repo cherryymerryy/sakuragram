@@ -361,8 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
 /.idea
 /Config/*
-/CherryMerryGramDesktop/Config
-CherryMerryGramDesktop/Config/Config.cs
-/CherryMerryGramDesktop/.idea
+/sakuragram/Config
+sakuragram/Config/Config.cs
+/sakuragram/.idea
