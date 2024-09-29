@@ -16,26 +16,29 @@ public partial class UpdateManager : Page
 
         #region Settings
 
-        if (_localSettings.Values["AutoUpdate"] != null)
+        if (_localSettings != null)
         {
-            bool autoUpdateValue = (bool)_localSettings.Values["AutoUpdate"];
-            ToggleSwitchAutoUpdate.IsOn = autoUpdateValue;
-        }
-        else
-        {
-            ToggleSwitchAutoUpdate.IsOn = true;
-            _localSettings.Values["AutoUpdate"] = true;
-        }
+            if (_localSettings.Values["AutoUpdate"] != null)
+            {
+                bool autoUpdateValue = (bool)_localSettings.Values["AutoUpdate"];
+                ToggleSwitchAutoUpdate.IsOn = autoUpdateValue;
+            }
+            else
+            {
+                ToggleSwitchAutoUpdate.IsOn = true;
+                _localSettings.Values["AutoUpdate"] = true;
+            }
         
-        if (_localSettings.Values["InstallBeta"] != null)
-        {
-            bool installBetaValue = (bool)_localSettings.Values["InstallBeta"];
-            ToggleSwitchInstallBeta.IsOn = installBetaValue;
-        }
-        else
-        {
-            ToggleSwitchInstallBeta.IsOn = false;
-            _localSettings.Values["InstallBeta"] = false;
+            if (_localSettings.Values["InstallBeta"] != null)
+            {
+                bool installBetaValue = (bool)_localSettings.Values["InstallBeta"];
+                ToggleSwitchInstallBeta.IsOn = installBetaValue;
+            }
+            else
+            {
+                ToggleSwitchInstallBeta.IsOn = false;
+                _localSettings.Values["InstallBeta"] = false;
+            }
         }
 
         #endregion
