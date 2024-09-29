@@ -188,16 +188,9 @@ namespace sakuragram.Views.Chats
             {
                 _chatWidget = new Chat();
                 _chatWidget._ChatsView = _ChatsView;
-                _chatWidget._chatId = ChatId;
-                _chatWidget._chat = _client.GetChatAsync(ChatId).Result;
-                _ChatsView._currentChat = _chatWidget;
                 _chatWidget.UpdateChat(_chat.Id);
+                _ChatsView._currentChat = _chatWidget;
                 ChatPage.Children.Add(_chatWidget);
-                
-                if (ContextMenu.IsOpen)
-                {
-                    ContextMenu.Hide();
-                }
             });
         }
         
