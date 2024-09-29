@@ -23,7 +23,8 @@
 		           Margin="0, 0, 0, 8" />
 		<TextBox x:Name="TextBoxPhoneNumber" PlaceholderText="Phone number" Width="200" Margin="0, 0, 0, 4" />
 		<TextBox x:Name="TextBoxCode" PlaceholderText="Code" Visibility="Collapsed" Width="200" 
-		         Margin="0, 0, 0, 4" />
+		         Margin="0, 0, 0, 4" 
+		         TextChanging="TextBoxCode_OnTextChanging"/>
 		<PasswordBox x:Name="TextBoxPassword" PlaceholderText="Password" Width="200"
 		             Visibility="Collapsed" 
 		             PasswordChar="*"

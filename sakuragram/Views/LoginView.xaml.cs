@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Windows.System;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using sakuragram.Views.Auth;
 using TdLib;
@@ -13,6 +14,7 @@ namespace sakuragram.Views
 		private int _loginState = 0;
 		private Window _mWindow;
 		private string _passwordHint;
+		private int _passwordLength;
 
 		public LoginView()
 		{
@@ -52,7 +54,7 @@ namespace sakuragram.Views
 			if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
 			{
 				Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop DesktopAcrylicBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop();
-				this.SystemBackdrop = DesktopAcrylicBackdrop;
+				SystemBackdrop = DesktopAcrylicBackdrop;
 
 				return true;
 			}
@@ -181,6 +183,14 @@ namespace sakuragram.Views
 					button_Next_Click(sender, null);
 					break;
 				}
+			}
+		}
+
+		private void TextBoxCode_OnTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+		{
+			if (TextBoxCode.Text.Length == 5)
+			{
+				button_Next_Click(null, null);
 			}
 		}
 	}
