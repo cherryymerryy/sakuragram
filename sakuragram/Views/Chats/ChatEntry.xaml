@@ -50,6 +50,7 @@
                         <TextBlock x:Name="TextBlockChatUsername"
                                    FontSize="10" 
                                    MaxLines="1" 
+                                   Margin="0, 0, 3, 0"
                                    TextTrimming="Clip"
                                    Foreground="{StaticResource TextFillColorSecondaryBrush}"/>
                         <TextBlock x:Name="TextBlockChatLastMessage" 

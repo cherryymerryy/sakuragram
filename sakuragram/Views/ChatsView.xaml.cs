@@ -44,18 +44,18 @@ namespace sakuragram.Views
             {
                 case TdApi.Update.UpdateNewMessage updateNewMessage:
                 {
-                    //UpdateChatPosition(updateNewMessage.Message.ChatId, ChatsList, ChatsList);
+                    UpdateChatPosition(updateNewMessage.Message.ChatId, ChatsList, ChatsList);
                     break;
                 }
                 case TdApi.Update.UpdateChatPosition updateChatPosition:
                 {
                     if (updateChatPosition.Position.IsPinned)
                     {
-                        //UpdateChatPosition(updateChatPosition.ChatId, ChatsList, PinnedChatsList);
+                        UpdateChatPosition(updateChatPosition.ChatId, ChatsList, PinnedChatsList);
                     }
                     else
                     {
-                        //UpdateChatPosition(updateChatPosition.ChatId, PinnedChatsList, ChatsList);
+                        UpdateChatPosition(updateChatPosition.ChatId, PinnedChatsList, ChatsList);
                     }
                     break;
                 }
@@ -78,6 +78,11 @@ namespace sakuragram.Views
                             });
                         }
                     }
+                    break;
+                }
+                case TdApi.Update.UpdateChatDraftMessage updateChatDraftMessage:
+                {
+                    DispatcherQueue.TryEnqueue(() => UpdateChatPosition(updateChatDraftMessage.ChatId, ChatsList, ChatsList));
                     break;
                 }
             }

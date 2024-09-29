@@ -38,11 +38,13 @@ namespace sakuragram.Views.Chats
         private int _memberCount;
         private int _onlineMemberCount;
         private int _offset;
+        private long _lastMessageId;
         private int _pollOptionsCount = 2;
         private bool _isProfileOpened = false;
         
         private ReplyService _replyService;
         private MessageService _messageService;
+        private MediaService _mediaService = new MediaService();
 
         public Chat()
         {
@@ -216,25 +218,7 @@ namespace sakuragram.Views.Chats
             _chatId = _chat.Id;
             ChatTitle.Text = _chat.Title;
             
-            if (_chat.Photo != null)
-            {
-                if (_chat.Photo.Small.Local.Path != string.Empty)
-                {
-                    ChatPhoto.ProfilePicture = new BitmapImage(new Uri(_chat.Photo.Small.Local.Path));
-                }
-                else
-                {
-                    await _client.ExecuteAsync(new TdApi.DownloadFile
-                    {
-                        FileId = _chat.Photo.Small.Id,
-                        Priority = 1
-                    });
-                }
-            }
-            else
-            {
-                ChatPhoto.DisplayName = _chat.Title;
-            }
+            _mediaService.GetChatPhoto(_chat, ChatPhoto);
 
             if (_chat.Background != null)
             {
@@ -354,17 +338,49 @@ namespace sakuragram.Views.Chats
         {
             await DispatcherQueue.GetForCurrentThread().EnqueueAsync(async () =>
             {
-                var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
+                int offset = -99;
+                int limit = 100;
+                List<long> addedMessages = new(); 
+
+                var firstMessages = await _client.ExecuteAsync(new TdApi.GetChatHistory
                 {
                     ChatId = chatId,
-                    Offset = -99,
-                    Limit = 100,
+                    Offset = offset,
+                    Limit = limit,
                     OnlyLocal = false
                 });
-
-                foreach (var message in messages.Messages_)
+                
+                foreach (var message in firstMessages.Messages_)
                 {
+                    if (addedMessages.Contains(message.Id)) continue;
                     GenerateMessageByType(message);
+                    addedMessages.Add(message.Id);
+                    _lastMessageId = message.Id;
+                }
+                
+                while (true)
+                {
+                    var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
+                    {
+                        ChatId = chatId,
+                        Offset = offset,
+                        Limit = limit,
+                        FromMessageId = _lastMessageId,
+                        OnlyLocal = false
+                    });
+
+                    if (messages.Messages_.Length == 0)
+                        break;
+
+                    foreach (var message in messages.Messages_)
+                    {
+                        if (addedMessages.Contains(message.Id)) continue;
+                        GenerateMessageByType(message);
+                        addedMessages.Add(message.Id);
+                        _lastMessageId = message.Id;
+                    }
+
+                    offset += 1;
                 }
             });
         }
@@ -760,7 +776,7 @@ namespace sakuragram.Views.Chats
                     TextBlockName.Text = _chat.Title;
                     TextBlockMembersOrStatus.Text = $"{fullInfo.MemberCount} members";
                     CardChatId.Header = _chat.Id;
-
+                    
                     if (fullInfo.Description != string.Empty)
                     {
                         CardDescription.Header = fullInfo.Description;
@@ -776,12 +792,6 @@ namespace sakuragram.Views.Chats
                         if (fullInfo.InviteLink.InviteLink != string.Empty)
                         {
                             CardLink.Header = fullInfo.InviteLink.InviteLink;
-                            CardLink.Description = "Link";
-                            CardLink.Visibility = Visibility.Visible;
-                        }
-                        if (fullInfo.InviteLink.Name != string.Empty)
-                        {
-                            CardLink.Header = fullInfo.InviteLink.Name;
                             CardLink.Description = "Link";
                             CardLink.Visibility = Visibility.Visible;
                         }

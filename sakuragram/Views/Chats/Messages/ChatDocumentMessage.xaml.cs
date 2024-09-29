@@ -5,6 +5,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
+using sakuragram.Services;
 using TdLib;
 
 namespace sakuragram.Views.Chats.Messages;
@@ -13,8 +14,7 @@ public partial class ChatDocumentMessage : Page
 {
     private static TdClient _client = App._client;
     private TdApi.MessageContent.MessageDocument _messageDocument;
-    private int _profilePhotoFileId;
-    private TdApi.ProfilePhoto _profilePhoto;
+    private MediaService _mediaService;
 
     public ChatDocumentMessage()
     {
@@ -40,19 +40,6 @@ public partial class ChatDocumentMessage : Page
                         Icon.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => Icon.Glyph = "\uE7C3");
                     }
                 }
-                if (updateFile.File.Id == _profilePhotoFileId)
-                {
-                    if (updateFile.File.Local.Path != string.Empty)
-                    {
-                        ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                            () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
-                    }
-                    else if (_profilePhoto.Small.Local.Path != string.Empty)
-                    {
-                        ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                            () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(_profilePhoto.Small.Local.Path)));
-                    }
-                }
                 break;
             }
         }
@@ -71,13 +58,13 @@ public partial class ChatDocumentMessage : Page
         {
             var user = _client.GetUserAsync(userId: sender).Result;
             DisplayName.Text = user.FirstName + " " + user.LastName;
-            GetChatPhoto(user);
+            _mediaService.GetUserPhoto(user, ProfilePicture);
         }
         else // if senderId < 0 then it's a chat
         {
             var chat = _client.GetChatAsync(chatId: sender).Result;
             DisplayName.Text = chat.Title;
-            ProfilePicture.Visibility = Visibility.Collapsed;
+            _mediaService.GetChatPhoto(chat, ProfilePicture);
         }
         
         if (message.ReplyTo != null)
@@ -249,41 +236,6 @@ public partial class ChatDocumentMessage : Page
                 
                 break;
             }
-        }
-    }
-    
-    private void GetChatPhoto(TdApi.User user)
-    {
-        if (user.ProfilePhoto == null)
-        {
-            ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                () => ProfilePicture.DisplayName = user.FirstName + " " + user.LastName);
-            return;
-        }
-        
-        _profilePhoto = user.ProfilePhoto;
-        _profilePhotoFileId = user.ProfilePhoto.Small.Id;
-        
-        if (user.ProfilePhoto.Small.Local.Path != "")
-        {
-            try
-            {
-                ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                    () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Small.Local.Path)));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-        else
-        {
-            var file = _client.ExecuteAsync(new TdApi.DownloadFile
-            {
-                FileId = _profilePhotoFileId,
-                Priority = 1
-            }).Result;
         }
     }
 

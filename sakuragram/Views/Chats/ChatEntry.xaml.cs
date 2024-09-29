@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using sakuragram.Services;
 using TdLib;
 
 namespace sakuragram.Views.Chats
@@ -21,9 +22,12 @@ namespace sakuragram.Views.Chats
         private static readonly TdClient _client = App._client;
         
         public TdApi.Chat _chat;
+        public TdApi.ChatPhotoInfo _chatPhoto;
         public long ChatId;
         private int _profilePhotoFileId;
         private bool _inArchive;
+        
+        private MediaService _mediaService = new MediaService();
         
         public ChatEntry()
         {
@@ -47,25 +51,8 @@ namespace sakuragram.Views.Chats
                 {
                     if (updateChatPhoto.ChatId == ChatId)
                     {
-                        ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(() => GetChatPhoto(_chat));
+                        DispatcherQueue.TryEnqueue(() => _mediaService.GetChatPhoto(_chat, ChatEntryProfilePicture));
                     }
-                    break;
-                }
-                case TdApi.Update.UpdateFile updateFile:
-                {
-                    if (updateFile.File.Id != _profilePhotoFileId) return Task.CompletedTask;
-                    ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(() =>
-                    {
-                        if (updateFile.File.Local.Path != "")
-                        {
-                            ChatEntryProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path));
-                        }
-                        else
-                        {
-                            ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                                () => ChatEntryProfilePicture.DisplayName = _chat.Title);
-                        }
-                    });
                     break;
                 }
                 case TdApi.Update.UpdateChatLastMessage updateChatLastMessage:
@@ -85,6 +72,24 @@ namespace sakuragram.Views.Chats
                     UnreadMessagesCount.DispatcherQueue.TryEnqueue(() => UnreadMessagesCount.Value = updateUnreadChatCount.UnreadCount);
                     break;
                 }
+                case TdApi.Update.UpdateChatDraftMessage updateChatDraftMessage:
+                {
+                    DispatcherQueue.TryEnqueue(() =>
+                    {
+                        if (updateChatDraftMessage.ChatId == ChatId)
+                        {
+                            TextBlockChatLastMessage.Text = updateChatDraftMessage.DraftMessage.InputMessageText switch
+                            {
+                                TdApi.InputMessageContent.InputMessageText inputMessageText => "Draft:" + inputMessageText.Text.Text,
+                                _ => "Draft message"
+                            };
+                            
+                            TextBlockChatUsername.Text = string.Empty;
+                            TextBlockChatUsername.Visibility = Visibility.Collapsed;
+                        }
+                    });
+                    break;
+                }
             }
 
             return Task.CompletedTask;
@@ -94,8 +99,8 @@ namespace sakuragram.Views.Chats
         {
             _chat = await _client.GetChatAsync(chatId: ChatId);
             TextBlockChatName.Text = _chat.Title;
-            
-            GetChatPhoto(_chat);
+
+            _mediaService.GetChatPhoto(_chat, ChatEntryProfilePicture);
             GetLastMessage(_chat); 
             
             if (_chat.UnreadCount > 0)
@@ -163,39 +168,6 @@ namespace sakuragram.Views.Chats
             // ContextMenuArchive.Text = _inArchive ? "Unarchive" : "Archive";
             
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
-        }
-        
-        private void GetChatPhoto(TdApi.Chat chat)
-        {
-            if (chat.Photo == null)
-            {
-                ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, 
-                    () => ChatEntryProfilePicture.DisplayName = chat.Title);
-                return;
-            }
-            if (chat.Photo.Small.Local.Path != "")
-            {
-                try
-                {
-                    ChatEntryProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low,
-                        () => ChatEntryProfilePicture.ProfilePicture = new BitmapImage(new Uri(chat.Photo.Small.Local.Path)));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
-            }
-            else
-            {
-                _profilePhotoFileId = chat.Photo.Small.Id;
-                
-                var file = _client.ExecuteAsync(new TdApi.DownloadFile
-                {
-                    FileId = _profilePhotoFileId,
-                    Priority = 1
-                }).Result;
-            }
         }
 
         private static string GetMessageText(long chatId, long messageId)
@@ -294,53 +266,59 @@ namespace sakuragram.Views.Chats
                     break;
                 }
             }
-            
-            var sender = chat.LastMessage.SenderId switch
+
+            if (chat.DraftMessage != null)
             {
-                TdApi.MessageSender.MessageSenderUser u => u.UserId,
-                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
-                _ => 0
-            };
-            
-            TextBlockChatLastMessage.Text = chat.LastMessage.Content switch
+                TextBlockChatLastMessage.Text = chat.DraftMessage.InputMessageText switch
+                {
+                    TdApi.InputMessageContent.InputMessageText messageText => $"Draft: {messageText.Text.Text}",
+                    _ => "Draft message"
+                };
+                TextBlockChatUsername.Text = string.Empty;
+                TextBlockChatUsername.Visibility = Visibility.Collapsed;
+            }
+            else
             {
-                TdApi.MessageContent.MessageText messageText => $"{messageText.Text.Text}",
-                TdApi.MessageContent.MessageAnimation messageAnimation => 
-                    $"GIF ({messageAnimation.Animation.Duration} sec), {messageAnimation.Caption.Text}",
-                TdApi.MessageContent.MessageAudio messageAudio =>
-                    $"Audio message ({messageAudio.Audio.Duration} sec) {messageAudio.Caption.Text}",
-                TdApi.MessageContent.MessageVoiceNote messageVoiceNote =>
-                    $"Voice message ({messageVoiceNote.VoiceNote.Duration} sec) {messageVoiceNote.Caption.Text}",
-                TdApi.MessageContent.MessageVideo messageVideo =>
-                    $"Video ({messageVideo.Video.Duration} sec)",
-                TdApi.MessageContent.MessageVideoNote messageVideoNote =>
-                    $"Video message ({messageVideoNote.VideoNote.Duration} sec)",
-                TdApi.MessageContent.MessagePhoto messagePhoto =>
-                    $"Photo, {messagePhoto.Caption.Text}",
-                TdApi.MessageContent.MessageSticker messageSticker =>
-                    $"{messageSticker.Sticker.Emoji} Sticker message",
-                TdApi.MessageContent.MessagePoll messagePoll => $"📊 {messagePoll.Poll.Question.Text}",
-                TdApi.MessageContent.MessagePinMessage messagePinMessage =>
-                    $"pinned {GetMessageText(chat.Id, messagePinMessage.MessageId)}",
-                
-                // Chat messages
-                TdApi.MessageContent.MessageChatAddMembers messageChatAddMembers => $"{messageChatAddMembers.MemberUserIds}",
-                TdApi.MessageContent.MessageChatChangeTitle messageChatChangeTitle => $"changed chat title to {messageChatChangeTitle.Title}",
-                TdApi.MessageContent.MessageChatChangePhoto => "updated group photo",
-                
-                TdApi.MessageContent.MessageChatDeleteMember messageChatDeleteMember => 
-                    $"removed user {_client.GetUserAsync(userId: messageChatDeleteMember.UserId).Result.FirstName}",
-                TdApi.MessageContent.MessageChatDeletePhoto => $"deleted group photo",
-                
-                TdApi.MessageContent.MessageChatUpgradeFrom messageChatUpgradeFrom => 
-                    $"{messageChatUpgradeFrom.Title} upgraded to supergroup",
-                TdApi.MessageContent.MessageChatUpgradeTo messageChatUpgradeTo => $"",
-                
-                TdApi.MessageContent.MessageChatJoinByLink => $"joined by link",
-                TdApi.MessageContent.MessageChatJoinByRequest => $"joined by request",
-                
-                _ => "Unsupported message type"
-            };
+                TextBlockChatLastMessage.Text = chat.LastMessage.Content switch
+                {
+                    TdApi.MessageContent.MessageText messageText => $"{messageText.Text.Text}",
+                    TdApi.MessageContent.MessageAnimation messageAnimation => 
+                        $"GIF ({messageAnimation.Animation.Duration} sec), {messageAnimation.Caption.Text}",
+                    TdApi.MessageContent.MessageAudio messageAudio =>
+                        $"Audio message ({messageAudio.Audio.Duration} sec) {messageAudio.Caption.Text}",
+                    TdApi.MessageContent.MessageVoiceNote messageVoiceNote =>
+                        $"Voice message ({messageVoiceNote.VoiceNote.Duration} sec) {messageVoiceNote.Caption.Text}",
+                    TdApi.MessageContent.MessageVideo messageVideo =>
+                        $"Video ({messageVideo.Video.Duration} sec)",
+                    TdApi.MessageContent.MessageVideoNote messageVideoNote =>
+                        $"Video message ({messageVideoNote.VideoNote.Duration} sec)",
+                    TdApi.MessageContent.MessagePhoto messagePhoto =>
+                        $"Photo, {messagePhoto.Caption.Text}",
+                    TdApi.MessageContent.MessageSticker messageSticker =>
+                        $"{messageSticker.Sticker.Emoji} Sticker message",
+                    TdApi.MessageContent.MessagePoll messagePoll => $"📊 {messagePoll.Poll.Question.Text}",
+                    TdApi.MessageContent.MessagePinMessage messagePinMessage =>
+                        $"pinned {GetMessageText(chat.Id, messagePinMessage.MessageId)}",
+                    
+                    // Chat messages
+                    TdApi.MessageContent.MessageChatAddMembers messageChatAddMembers => $"{messageChatAddMembers.MemberUserIds}",
+                    TdApi.MessageContent.MessageChatChangeTitle messageChatChangeTitle => $"changed chat title to {messageChatChangeTitle.Title}",
+                    TdApi.MessageContent.MessageChatChangePhoto => "updated group photo",
+                    
+                    TdApi.MessageContent.MessageChatDeleteMember messageChatDeleteMember => 
+                        $"removed user {_client.GetUserAsync(userId: messageChatDeleteMember.UserId).Result.FirstName}",
+                    TdApi.MessageContent.MessageChatDeletePhoto => $"deleted group photo",
+                    
+                    TdApi.MessageContent.MessageChatUpgradeFrom messageChatUpgradeFrom => 
+                        $"{messageChatUpgradeFrom.Title} upgraded to supergroup",
+                    TdApi.MessageContent.MessageChatUpgradeTo messageChatUpgradeTo => $"",
+                    
+                    TdApi.MessageContent.MessageChatJoinByLink => $"joined by link",
+                    TdApi.MessageContent.MessageChatJoinByRequest => $"joined by request",
+                    
+                    _ => "Unsupported message type"
+                };
+            }
         }
         
         private void ChatEntry_OnRightTapped(object sender, RightTappedRoutedEventArgs e)

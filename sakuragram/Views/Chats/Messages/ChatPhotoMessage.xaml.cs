@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using sakuragram.Services;
 using TdLib;
 
 namespace sakuragram.Views.Chats.Messages;
@@ -16,12 +17,10 @@ public partial class ChatPhotoMessage : Page
     private static TdClient _client = App._client;
     private TdApi.MessageContent _messageMediaContent;
     private long _chatId;
-    private int _profilePhotoFileId;
     private int _mediaFileId;
-    private long _mediaAlbumId;
-    private TdApi.ProfilePhoto _profilePhoto;
     private List<Image> Photos = [];
-
+    private MediaService _mediaService = new MediaService();
+    
     public ChatPhotoMessage()
     {
         InitializeComponent();
@@ -62,45 +61,6 @@ public partial class ChatPhotoMessage : Page
                         }
                     }
                 }
-                if (updateFile.File.Id == _profilePhotoFileId)
-                {
-                    if (updateFile.File.Local.Path != string.Empty)
-                    {
-                        ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                            () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
-                    }
-                    else if (_profilePhoto.Small.Local.Path != string.Empty)
-                    {
-                        ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                            () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(_profilePhoto.Small.Local.Path)));
-                    }
-                }
-                break;
-            }
-            case TdApi.Update.UpdateNewMessage updateNewMessage:
-            {
-                if (updateNewMessage.Message.ChatId == _chatId)
-                {
-                    if (updateNewMessage.Message.MediaAlbumId == _mediaAlbumId)
-                    {
-                        switch (updateNewMessage.Message.Content)
-                        {
-                            case TdApi.MessageContent.MessagePhoto messagePhoto:
-                            {
-                                var photo = new Image();
-                                photo.Source = new BitmapImage(new Uri(messagePhoto.Photo.Sizes[1].Photo.Local.Path));
-                                Photos.Add(photo);
-                                
-                                if (Photos.Count > 0)
-                                {
-                                    BorderImage.Visibility = Visibility.Collapsed;
-                                    PanelAlbum.Visibility = Visibility.Visible;
-                                }
-                                break;
-                            }
-                        }
-                    }   
-                }
                 break;
             }
         }
@@ -122,13 +82,13 @@ public partial class ChatPhotoMessage : Page
         {
             var user = _client.GetUserAsync(userId: sender).Result;
             DisplayName.Text = user.FirstName + " " + user.LastName;
-            GetChatPhoto(user);
+            _mediaService.GetUserPhoto(user, ProfilePicture);
         }
         else // if senderId < 0 then it's a chat
         {
             var chat = _client.GetChatAsync(chatId: sender).Result;
             DisplayName.Text = chat.Title;
-            ProfilePicture.Visibility = Visibility.Collapsed;
+            _mediaService.GetChatPhoto(chat, ProfilePicture);
         }
 
         if (message.ReplyTo != null)
@@ -241,11 +201,6 @@ public partial class ChatPhotoMessage : Page
         {
             // ignored
         }
-
-        if (message.MediaAlbumId != 0)
-        {
-            _mediaAlbumId = message.MediaAlbumId;
-        }
         
         switch (_messageMediaContent)
         {
@@ -322,40 +277,5 @@ public partial class ChatPhotoMessage : Page
         }
             
         StackPanelReactions.Children.Add(background);
-    }
-    
-    private void GetChatPhoto(TdApi.User user)
-    {
-        if (user.ProfilePhoto == null)
-        {
-            ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                () => ProfilePicture.DisplayName = user.FirstName + " " + user.LastName);
-            return;
-        }
-        
-        _profilePhoto = user.ProfilePhoto;
-        _profilePhotoFileId = user.ProfilePhoto.Small.Id;
-        
-        if (user.ProfilePhoto.Small.Local.Path != "")
-        {
-            try
-            {
-                ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                    () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Small.Local.Path)));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-        else
-        {
-            var file = _client.ExecuteAsync(new TdApi.DownloadFile
-            {
-                FileId = _profilePhotoFileId,
-                Priority = 1
-            }).Result;
-        }
     }
 }

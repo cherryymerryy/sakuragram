@@ -21,11 +21,11 @@ namespace sakuragram.Views.Chats.Messages
         
         private long _chatId;
         public long _messageId;
-        private int _profilePhotoFileId;
         private TdApi.ProfilePhoto _profilePhoto;
 
         public ReplyService _replyService;
         public MessageService _messageService;
+        private MediaService _mediaService = new MediaService();
 
         private bool _bIsSelected = false;
 
@@ -53,29 +53,12 @@ namespace sakuragram.Views.Chats.Messages
                     };
                     break;
                 }
-                case TdApi.Update.UpdateFile updateFile:
-                {
-                    if (updateFile.File.Id == _profilePhotoFileId)
-                    {
-                        if (updateFile.File.Local.Path != string.Empty)
-                        {
-                            ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                                () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(updateFile.File.Local.Path)));
-                        }
-                        else if (_profilePhoto.Small.Local.Path != string.Empty)
-                        {
-                            ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                                () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(_profilePhoto.Small.Local.Path)));
-                        }
-                    }
-                    break;
-                }
             }
             
             return Task.CompletedTask;
         }
 
-        public async void UpdateMessage(TdApi.Message message)
+        public void UpdateMessage(TdApi.Message message)
         {
             _chatId = message.ChatId;
             _messageId = message.Id;
@@ -133,13 +116,13 @@ namespace sakuragram.Views.Chats.Messages
             {
                 var user = _client.GetUserAsync(userId: sender).Result;
                 DisplayName.Text = user.FirstName + " " + user.LastName;
-                GetChatPhoto(user);
+                _mediaService.GetUserPhoto(user, ProfilePicture);
             }
             else // if senderId < 0 then it's a chat
             {
                 var chat = _client.GetChatAsync(chatId: sender).Result;
                 DisplayName.Text = chat.Title;
-                ProfilePicture.Visibility = Visibility.Collapsed;
+                _mediaService.GetChatPhoto(chat, ProfilePicture);
             }
             
             try
@@ -266,41 +249,6 @@ namespace sakuragram.Views.Chats.Messages
             }
             
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
-        }
-        
-        private void GetChatPhoto(TdApi.User user)
-        {
-            if (user.ProfilePhoto == null)
-            {
-                ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, 
-                    () => ProfilePicture.DisplayName = user.FirstName + " " + user.LastName);
-                return;
-            }
-        
-            _profilePhoto = user.ProfilePhoto;
-            _profilePhotoFileId = user.ProfilePhoto.Small.Id;
-        
-            if (user.ProfilePhoto.Small.Local.Path != "")
-            {
-                try
-                {
-                    ProfilePicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                        () => ProfilePicture.ProfilePicture = new BitmapImage(new Uri(user.ProfilePhoto.Small.Local.Path)));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
-            }
-            else
-            {
-                var file = _client.ExecuteAsync(new TdApi.DownloadFile
-                {
-                    FileId = _profilePhotoFileId,
-                    Priority = 1
-                }).Result;
-            }
         }
 
         private void GenerateReaction(TdApi.AddedReaction reaction)
