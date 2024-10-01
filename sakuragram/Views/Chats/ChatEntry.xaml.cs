@@ -57,9 +57,9 @@ namespace sakuragram.Views.Chats
                 }
                 case TdApi.Update.UpdateChatLastMessage updateChatLastMessage:
                 {
-                    TextBlockChatLastMessage.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                    if (updateChatLastMessage.LastMessage == null) break;
+                    DispatcherQueue.TryEnqueue(() =>
                     {
-                        if (updateChatLastMessage.LastMessage == null) return;
                         if (ChatId == updateChatLastMessage.LastMessage.ChatId)
                         {
                             GetLastMessage(_client.GetChatAsync(updateChatLastMessage.ChatId).Result);
