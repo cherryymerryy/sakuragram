@@ -32,7 +32,39 @@
                     <win:RepositionThemeTransition IsStaggeringEnabled="False" />
                 </win:StackPanel.ChildrenTransitions>
                 
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                           Text="unnecessary shit" />
                 
+                <controls:SettingsExpander Header="DC checker"
+                                           Description="In this card you can find out the ping of Telegram Data Centers">
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard Header="DC1"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE770;}">
+                            <TextBlock x:Name="TextBlockDC1Ping"
+                                       Text="0 ms"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="DC2"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE770;}">
+                            <TextBlock x:Name="TextBlockDC2Ping"
+                                       Text="0 ms"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="DC3"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE770;}">
+                            <TextBlock x:Name="TextBlockDC3Ping"
+                                       Text="0 ms"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="DC4"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE770;}">
+                            <TextBlock x:Name="TextBlockDC4Ping"
+                                       Text="0 ms"/>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard Header="DC5"
+                                               HeaderIcon="{ui:FontIcon Glyph=&#xE770;}">
+                            <TextBlock x:Name="TextBlockDC5Ping"
+                                       Text="0 ms"/>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
                 
             </StackPanel>
         </Grid>
