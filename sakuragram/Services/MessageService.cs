@@ -37,46 +37,44 @@ public class MessageService
     
     public string GetLastMessageContent(TdApi.Message message)
     {
-        var user = _client.ExecuteAsync(new TdApi.GetUser
-        {
-            UserId = message.SenderId switch
-            {
-                TdApi.MessageSender.MessageSenderUser u => u.UserId,
-                TdApi.MessageSender.MessageSenderChat c => c.ChatId,
-                _ => 0
-            }
-        }).Result;
-        
         var lastMessage = message.Content switch
         {
-            TdApi.MessageContent.MessageText messageText => $"{user.FirstName}: {messageText.Text.Text}",
-            
+            TdApi.MessageContent.MessageText messageText => $"{messageText.Text.Text}",
+            TdApi.MessageContent.MessageAnimation messageAnimation => 
+                $"GIF ({messageAnimation.Animation.Duration} sec), {messageAnimation.Caption.Text}",
             TdApi.MessageContent.MessageAudio messageAudio =>
-                $"{user.FirstName} Audio message ({messageAudio.Audio.Duration})",
-            
+                $"Audio message ({messageAudio.Audio.Duration} sec) {messageAudio.Caption.Text}",
             TdApi.MessageContent.MessageVoiceNote messageVoiceNote =>
-                $"{user.FirstName} Voice message ({messageVoiceNote.VoiceNote.Duration})",
-            
+                $"Voice message ({messageVoiceNote.VoiceNote.Duration} sec) {messageVoiceNote.Caption.Text}",
             TdApi.MessageContent.MessageVideo messageVideo =>
-                $"{user.FirstName} Video message ({messageVideo.Video.Duration} sec)",
-            
+                $"Video ({messageVideo.Video.Duration} sec)",
+            TdApi.MessageContent.MessageVideoNote messageVideoNote =>
+                $"Video message ({messageVideoNote.VideoNote.Duration} sec)",
             TdApi.MessageContent.MessagePhoto messagePhoto =>
-                $"{user.FirstName} Photo message ({messagePhoto.Photo.Minithumbnail.Width}x{messagePhoto.Photo.Minithumbnail.Height})",
-            
+                $"Photo, {messagePhoto.Caption.Text}",
             TdApi.MessageContent.MessageSticker messageSticker =>
-                $"{user.FirstName} {messageSticker.Sticker.Emoji} Sticker message",
-            TdApi.MessageContent.MessagePoll messagePoll => $"{user.FirstName}: {messagePoll.Poll.Question}",
-            
+                $"{messageSticker.Sticker.Emoji} Sticker message",
+            TdApi.MessageContent.MessagePoll messagePoll => $"📊 {messagePoll.Poll.Question.Text}",
             TdApi.MessageContent.MessagePinMessage messagePinMessage =>
-                $"{user.FirstName} pinned {_client.ExecuteAsync(new TdApi.GetMessage
-                {
-                    ChatId = message.ChatId,
-                    MessageId = messagePinMessage.MessageId
-                })}",
+                $"pinned",
             
-            TdApi.MessageContent.MessageGame messageGame => $"{user.FirstName} {messageGame.Game.Title}",
+            // Chat messages
+            TdApi.MessageContent.MessageChatAddMembers messageChatAddMembers => $"{messageChatAddMembers.MemberUserIds}",
+            TdApi.MessageContent.MessageChatChangeTitle messageChatChangeTitle => $"changed chat title to {messageChatChangeTitle.Title}",
+            TdApi.MessageContent.MessageChatChangePhoto => "updated group photo",
             
-            _ => throw new ArgumentOutOfRangeException()
+            TdApi.MessageContent.MessageChatDeleteMember messageChatDeleteMember => 
+                $"removed user {_client.GetUserAsync(userId: messageChatDeleteMember.UserId).Result.FirstName}",
+            TdApi.MessageContent.MessageChatDeletePhoto => $"deleted group photo",
+            
+            TdApi.MessageContent.MessageChatUpgradeFrom messageChatUpgradeFrom => 
+                $"{messageChatUpgradeFrom.Title} upgraded to supergroup",
+            TdApi.MessageContent.MessageChatUpgradeTo messageChatUpgradeTo => $"",
+            
+            TdApi.MessageContent.MessageChatJoinByLink => $"joined by link",
+            TdApi.MessageContent.MessageChatJoinByRequest => $"joined by request",
+            
+            _ => "Unsupported message type"
         };
         
         return lastMessage;
