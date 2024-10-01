@@ -15,7 +15,7 @@ namespace sakuragram
 		private NavigationViewItem _lastItem;
 		private static TdClient _client = App._client;
 		private static TdApi.User _user;
-		private NotificationService _notificationService;
+		private NotificationService _notificationService = new();
 		
 		private int _totalUnreadCount = 0;
 		
@@ -33,10 +33,9 @@ namespace sakuragram
 			#endif
 			
             ExtendsContentIntoTitleBar = true;
+            NavigationView.SelectedItem = NavigationView.MenuItems[0];
             NavigateToView("ChatsView");
             TrySetDesktopAcrylicBackdrop();
-            
-            _notificationService = new NotificationService();
             
             var chatsIds = _client.ExecuteAsync(new TdApi.GetChats{Limit = 100}).Result.ChatIds;
             foreach (var chatId in chatsIds)
@@ -58,7 +57,6 @@ namespace sakuragram
 			{
 				case TdApi.Update.UpdateNewMessage updateNewMessage:
 				{
-					//_notificationService.SendNotification(updateNewMessage.Message);
 					_totalUnreadCount += 1;
 					NavigationView.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
 						() => NavigationView.PaneTitle = $"{_user.FirstName} ({_totalUnreadCount})");
