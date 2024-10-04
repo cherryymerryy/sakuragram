@@ -15,8 +15,9 @@ namespace sakuragram
 		private NavigationViewItem _lastItem;
 		private static TdClient _client = App._client;
 		private static TdApi.User _user;
+		private static TdApi.ChatFolderInfo[] _folders = App._folders;
 		private NotificationService _notificationService = new();
-		
+
 		private int _totalUnreadCount = 0;
 		
 		public MainWindow()
@@ -48,6 +49,17 @@ namespace sakuragram
 			
 			_user = _client.GetMeAsync().Result;
 			NavigationView.PaneTitle = $"{_user.FirstName} ({_totalUnreadCount})";
+			
+			foreach (var chatFolderInfo in _folders)
+			{
+				var folder = new NavigationViewItem
+				{
+					Content = chatFolderInfo.Title,
+					Tag = "ChatsView"
+				};
+				NavigationView.MenuItems.Add(folder);
+			}
+			
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
 		}
 
@@ -77,22 +89,6 @@ namespace sakuragram
 							TdApi.ConnectionState.ConnectionStateConnectingToProxy => "Connecting to proxy...",
 							_ => "CherryMerryGram"
 						};
-					});
-					break;
-				}
-				case TdApi.Update.UpdateChatFolders updateChatFolders:
-				{
-					NavViewChats.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
-					{
-						foreach (var chatFolderInfo in updateChatFolders.ChatFolders)
-						{
-							var folder = new NavigationViewItem
-							{
-								Content = chatFolderInfo.Title,
-								Tag = "ChatsView"
-							};
-							NavViewChats.MenuItems.Add(folder);
-						}
 					});
 					break;
 				}

@@ -6,7 +6,6 @@
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     mc:Ignorable="d">
     <Page.Resources>
@@ -32,7 +31,17 @@
                     <win:RepositionThemeTransition IsStaggeringEnabled="False" />
                 </win:StackPanel.ChildrenTransitions>
                 
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                           Text="My folders" />
                 
+                <StackPanel x:Name="PanelUserFolders" />
+                <Button x:Name="ButtonCreateFolder" 
+                        Content="Create new folder"/>
+                
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                           Text="Recommended folders" />
+                
+                <StackPanel x:Name="PanelUserRecommendedFolders" />
                 
             </StackPanel>
         </Grid>

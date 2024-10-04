@@ -20,6 +20,7 @@ namespace sakuragram.Views
     public sealed partial class ChatsView : Page
     {
         private static TdClient _client = App._client;
+        private TdApi.Chats _addedChats;
         
         public Chat _currentChat;
         private bool _bInArchive = false;
@@ -162,10 +163,10 @@ namespace sakuragram.Views
                 _chatsIds.Clear();
                 _pinnedChats.Clear();
             });
-
-            var chats = await _client.GetChatsAsync(chatList, 10000);
             
-            foreach (var chatId in chats.ChatIds)
+            _addedChats = await _client.GetChatsAsync(chatList, 10000);
+            
+            foreach (var chatId in _addedChats.ChatIds)
             {
                 var chat = await _client.GetChatAsync(chatId);
                 
@@ -207,22 +208,6 @@ namespace sakuragram.Views
             _firstGenerate = false;
         }
 
-        private static async IAsyncEnumerable<TdApi.Chat> GetChats(TdApi.Chats chats)
-        {
-            foreach (var chatId in chats.ChatIds)
-            {
-                var chat = _client.ExecuteAsync(new TdApi.GetChat
-                {
-                    ChatId = chatId
-                }).Result;
-
-                if (chat.Type is TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypeBasicGroup or TdApi.ChatType.ChatTypePrivate)
-                {
-                    yield return chat;
-                }
-            }
-        }
-
         private async void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             if (TextBoxSearch.Text == "")
@@ -239,23 +224,24 @@ namespace sakuragram.Views
             
             ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () => ChatsList.Children.Clear());
             
-            var foundedChats = _client.ExecuteAsync(new TdApi.SearchChats
+            var foundedChats = await _client.ExecuteAsync(new TdApi.SearchChats
             {
                 Query = TextBoxSearch.Text,
                 Limit = 100
             });
 
-            var foundedMessages = _client.ExecuteAsync(new TdApi.SearchMessages()
+            var foundedMessages = await _client.ExecuteAsync(new TdApi.SearchMessages
             {
                 ChatList = new TdApi.ChatList.ChatListMain(),
                 Limit = 100,
                 OnlyInChannels = true
             });
             
-            var chats = GetChats(foundedChats.Result);
             
-            await foreach (var chat in chats)
+            foreach (var chatId in foundedChats.ChatIds)
             {
+                var chat = _client.GetChatAsync(chatId).Result;
+                
                 var chatEntry = new ChatEntry
                 {
                     _ChatsView = this,
@@ -265,10 +251,7 @@ namespace sakuragram.Views
                 };
                     
                 chatEntry.UpdateChatInfo();
-                ChatsList.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High, () =>
-                {
-                    ChatsList.Children.Add(chatEntry);
-                });
+                await DispatcherQueue.GetForCurrentThread().EnqueueAsync(() => ChatsList.Children.Add(chatEntry));
             }
         }
 
@@ -437,6 +420,15 @@ namespace sakuragram.Views
         private void NewGroup_OnClosed(ContentDialog sender, ContentDialogClosedEventArgs args)
         {
             _createGroupOpened = false;
+        }
+
+        private void ScrollViewer_OnViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
+        {
+            var scrollViewer = (ScrollViewer)sender;
+            if (scrollViewer.VerticalOffset + scrollViewer.ViewportHeight >= scrollViewer.ScrollableHeight)
+            {
+                for (int i = 0; i < 10; i++) ;
+            }
         }
     }
 }

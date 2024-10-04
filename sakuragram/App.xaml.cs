@@ -18,6 +18,7 @@ namespace sakuragram
         }
         
         public static TdClient _client;
+        public static TdApi.ChatFolderInfo[] _folders = [];
 		private static readonly ManualResetEventSlim ReadyToAuthenticate = new();
 
 		public static bool _authNeeded;
@@ -85,6 +86,11 @@ namespace sakuragram
 					_passwordNeeded = false;
 					ReadyToAuthenticate.Set();
 					break;
+				case TdApi.Update.UpdateChatFolders updateChatFolders:
+				{
+					_folders = updateChatFolders.ChatFolders;
+					break;
+				}
 			}
 		}
         

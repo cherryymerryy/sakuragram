@@ -45,7 +45,8 @@
                 <ScrollViewer HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollMode="Enabled" 
                               VerticalScrollBarVisibility="Auto"
-                              Height="Auto">
+                              Height="Auto"
+                              ViewChanging="ScrollViewer_OnViewChanging">
                     <StackPanel>
                         <StackPanel x:Name="PinnedChatsList" Width="350" Height="Auto"/>
                         <MenuFlyoutSeparator Margin="0, 4, 0, 4" />
