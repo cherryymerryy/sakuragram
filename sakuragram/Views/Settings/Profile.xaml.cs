@@ -7,6 +7,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
+using sakuragram.Services;
 using TdLib;
 
 namespace sakuragram.Views.Settings;
@@ -61,11 +62,13 @@ public partial class Profile : Page
         if (_currentUserFullInfo.PersonalChatId != 0)
         {
             _personalChat = await _client.GetChatAsync(chatId: _currentUserFullInfo.PersonalChatId);
-            CardConnectedChannel.Description = $"Connected channel: {_personalChat.Title}";
+            TextBlockConnectedChannel.Text = $"Connected channel: {_personalChat.Title}";
+            TextBlockConnectedChannel.Visibility = Visibility.Visible;
         }
         else
         {
             CardConnectedChannel.Description = "No connected channel";
+            TextBlockConnectedChannel.Visibility = Visibility.Visible;
         }
         _personalChats = await _client.GetSuitablePersonalChatsAsync();
         
@@ -90,52 +93,21 @@ public partial class Profile : Page
                     _currentUserFullInfo.Birthdate.Month, 
                     _currentUserFullInfo.Birthdate.Day
                 ));
-            CardDateOfBirth.Description = 
+            TextBlockBirthdate.Text = 
                 $"Date of birth: {_currentUserFullInfo.Birthdate.Day}.{_currentUserFullInfo.Birthdate.Month}.{_currentUserFullInfo.Birthdate.Year}";
+            TextBlockBirthdate.Visibility = Visibility.Visible;
         }
         else
         {
             ButtonRemoveDateOfBirth.IsEnabled = false;
             CardDateOfBirth.Description = "";
+            TextBlockBirthdate.Visibility = Visibility.Collapsed;
         }
         
-        UpdateProfilePhoto();
+        MediaService.GetUserPhoto(_currentUser, PersonPicture);
+        PersonPicture.Visibility = Visibility.Visible;
         
         _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
-    }
-    
-    private async void UpdateProfilePhoto()
-    {
-        if (_currentUser.ProfilePhoto == null)
-        {
-            PersonPicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                () => PersonPicture.DisplayName = _currentUser.FirstName + " " + _currentUser.LastName);
-            return;
-        }
-        
-        _profilePhoto = _currentUser.ProfilePhoto;
-        _profilePhotoFileId = _currentUser.ProfilePhoto.Small.Id;
-        if (_currentUser.ProfilePhoto.Small.Local.Path != "")
-        {
-            try
-            {
-                PersonPicture.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-                    () => PersonPicture.ProfilePicture = new BitmapImage(new Uri(_currentUser.ProfilePhoto.Small.Local.Path)));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-        else
-        {
-            var file = await _client.ExecuteAsync(new TdApi.DownloadFile
-            {
-                FileId = _profilePhotoFileId,
-                Priority = 1
-            });
-        }
     }
 
     private async void UpdateBirthDate()
@@ -220,6 +192,7 @@ public partial class Profile : Page
 
     private async Task SelectFile()
     {
+        PersonPicture.Visibility = Visibility.Collapsed;
         var folderPicker = new FileOpenPicker();
 
         var mainWindow = (Application.Current as App)?._mWindow;
@@ -257,6 +230,7 @@ public partial class Profile : Page
                 Priority = 1
             });
         }
+        PersonPicture.Visibility = Visibility.Visible;
     }
 
     private void ButtonDeleteAccount_OnClick(object sender, RoutedEventArgs e)
@@ -371,4 +345,11 @@ public partial class Profile : Page
         }
         ContentDialogChangeConnectedChannel.Hide();
     }
+
+    private static Visibility ChangeShimmersVisibility(Visibility vis) => vis switch
+    {
+        Visibility.Collapsed => Visibility.Visible,
+        Visibility.Visible => Visibility.Collapsed,
+        _ => throw new NotImplementedException()
+    };
 }
