@@ -54,6 +54,12 @@
                                Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
                 </StackPanel>
                 <StackPanel x:Name="StackPanelPollOptions" />
+                <Button x:Name="ButtonAnswer"
+                        Content="Vote"
+                        HorizontalContentAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Width="125"
+                        Click="ButtonAnswer_OnClick"/>
                 <StackPanel Orientation="Horizontal" 
                             HorizontalAlignment="Stretch">
                     <TextBlock x:Name="TextBlockReplies"

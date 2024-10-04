@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -12,6 +13,17 @@ namespace sakuragram.Views.Chats.Messages;
 public partial class ChatPollMessage : Page
 {
     private static TdClient _client = App._client;
+    private static TdApi.Poll _poll;
+    private static TdApi.FormattedText _explanation;
+
+    private static long _chatId;
+    private static long _messageId;
+    private static int _correctOptionId;
+    private static bool _isMultipleAnswers;
+    private static bool _isAnonymous;
+    private static bool _hasSelectedOption;
+    private static List<int> _pollOptionsIds = [];
+    
     private MediaService _mediaService = new MediaService();
 
     public ChatPollMessage()
@@ -25,6 +37,32 @@ public partial class ChatPollMessage : Page
         {
             case TdApi.Update.UpdatePoll updatePoll:
             {
+                if (updatePoll.Poll.Id == _poll.Id)
+                {
+                    DispatcherQueue.GetForCurrentThread().TryEnqueue(() =>
+                    {
+                        StackPanelPollOptions.Children.Clear();
+
+                        for (int i = 0; i < updatePoll.Poll.Options.Length; i++)
+                        {
+                            var pollOption = updatePoll.Poll.Options[i];
+                            GeneratePollOption(pollOption, i);
+                        }
+                    });
+                }
+                break;
+            }
+            case TdApi.Update.UpdatePollAnswer updatePollAnswer:
+            {
+                if (updatePollAnswer.PollId == _poll.Id)
+                {
+                    DispatcherQueue.GetForCurrentThread().TryEnqueue(() =>
+                    {
+                        StackPanelPollOptions.Children.Clear();
+                        
+                        UpdateMessage(_client.GetMessageAsync(chatId: _chatId, messageId: _messageId).Result);
+                    });
+                }
                 break;
             }
         }
@@ -34,6 +72,9 @@ public partial class ChatPollMessage : Page
     
     public void UpdateMessage(TdApi.Message message)
     {
+        _chatId = message.ChatId;
+        _messageId = message.Id;
+        
         var sender = message.SenderId switch
         {
             TdApi.MessageSender.MessageSenderUser u => u.UserId,
@@ -195,10 +236,13 @@ public partial class ChatPollMessage : Page
         {
             case TdApi.MessageContent.MessagePoll messagePoll:
             {
+                _poll = messagePoll.Poll;
+                _isAnonymous = messagePoll.Poll.IsAnonymous;
+                
                 PollType.Text = messagePoll.Poll.Type switch
                 {
-                    TdApi.PollType.PollTypeRegular => "Regular",
-                    TdApi.PollType.PollTypeQuiz => "Quiz",
+                    TdApi.PollType.PollTypeRegular => messagePoll.Poll.IsAnonymous ? "Anonymous poll" : "Poll",
+                    TdApi.PollType.PollTypeQuiz => messagePoll.Poll.IsAnonymous ? "Anonymous quiz" : "Quiz",
                     _ => "Unsupported poll type"
                 };
                 
@@ -224,10 +268,34 @@ public partial class ChatPollMessage : Page
                     PollTotalVoteCount.Visibility = Visibility.Collapsed;
                 }
                 
-                foreach (var pollOption in messagePoll.Poll.Options)
+                switch (messagePoll.Poll.Type)
                 {
-                    GeneratePollOption(pollOption);
+                    case TdApi.PollType.PollTypeRegular regular:
+                    {
+                        _isMultipleAnswers = regular.AllowMultipleAnswers;
+                        ButtonAnswer.Visibility = _isMultipleAnswers ? Visibility.Visible : Visibility.Collapsed;
+                        break;
+                    }
+                    case TdApi.PollType.PollTypeQuiz quiz:
+                    {
+                        _correctOptionId = quiz.CorrectOptionId;
+                        _explanation = quiz.Explanation;
+                        break;
+                    }
                 }
+                
+                for (int i = 0; i < messagePoll.Poll.Options.Length; i++)
+                {
+                    var pollOption = messagePoll.Poll.Options[i];
+                    if (pollOption.IsChosen)
+                    {
+                        _hasSelectedOption = true;
+                        _pollOptionsIds.Add(i);
+                    }
+                    GeneratePollOption(pollOption, i);
+                }
+                
+                ButtonAnswer.Visibility = _hasSelectedOption ? Visibility.Collapsed : Visibility.Visible;
                 break;
             }
         }
@@ -235,20 +303,66 @@ public partial class ChatPollMessage : Page
         _client.UpdateReceived += async (_, update) => { await ProcessUpdate(update); };
     }
 
-    private void GeneratePollOption(TdApi.PollOption pollOption)
+    private void GeneratePollOption(TdApi.PollOption pollOption, int id)
     {
-        var radioButton = new RadioButton();
-        radioButton.Click += RadioButtonPollOption_Click;
-        radioButton.IsChecked = pollOption.IsChosen;
-        
         var pollOptionText = new TextBlock();
         pollOptionText.Text = $"{pollOption.VotePercentage}% | {pollOption.Text.Text}";
         
-        radioButton.Content = pollOptionText;
-        StackPanelPollOptions.Children.Add(item: radioButton);
+        if (_isMultipleAnswers)
+        {
+            CheckBox checkBox = new();
+            checkBox.IsChecked = pollOption.IsChosen;
+            checkBox.Click += (sender, args) => CheckBoxPollOption_Click(sender, args, id);
+            
+            checkBox.Content = pollOptionText;
+            StackPanelPollOptions.Children.Add(checkBox);
+        }
+        else
+        {
+            RadioButton radioButton = new();
+            radioButton.IsChecked = pollOption.IsChosen;
+            radioButton.Click += (sender, args) => RadioButtonPollOption_Click(sender, args, id);
+            
+            radioButton.Content = pollOptionText;
+            StackPanelPollOptions.Children.Add(radioButton);
+        }
+        
+        _pollOptionsIds.Add(id);
     }
-    
-    private void RadioButtonPollOption_Click(object sender, RoutedEventArgs e)
+
+    private void CheckBoxPollOption_Click(object sender, RoutedEventArgs args, int id)
     {
+        if (_pollOptionsIds.Contains(id))
+        {
+            _pollOptionsIds.Remove(id);
+            if (_pollOptionsIds.Count <= 0) ButtonAnswer.Visibility = Visibility.Visible;
+        }
+        else _pollOptionsIds.Add(id);
+    }
+
+    private async void RadioButtonPollOption_Click(object sender, RoutedEventArgs e, int id)
+    {
+        _pollOptionsIds.Add(id);
+        
+        await _client.ExecuteAsync(new TdApi.SetPollAnswer
+        {
+            ChatId = _chatId,
+            MessageId = _messageId,
+            OptionIds = _pollOptionsIds.ToArray()
+        });
+        
+        _pollOptionsIds.Clear();
+    }
+
+    private async void ButtonAnswer_OnClick(object sender, RoutedEventArgs e)
+    {
+        await _client.ExecuteAsync(new TdApi.SetPollAnswer
+        {
+            ChatId = _chatId,
+            MessageId = _messageId,
+            OptionIds = _pollOptionsIds.ToArray()
+        });
+        
+        _pollOptionsIds.Clear();
     }
 }
