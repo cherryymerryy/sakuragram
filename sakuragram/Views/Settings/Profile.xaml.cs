@@ -208,7 +208,7 @@ public partial class Profile : Page
         
         if (newPhotoFile != null)
         {
-            var newPhoto = await _client.ExecuteAsync(new TdApi.SetProfilePhoto
+            await _client.ExecuteAsync(new TdApi.SetProfilePhoto
             {
                 Photo = new TdApi.InputChatPhoto.InputChatPhotoStatic
                 {
@@ -224,7 +224,7 @@ public partial class Profile : Page
             _profilePhoto = _currentUser.ProfilePhoto;
             _profilePhotoFileId = _profilePhoto.Small.Id;
             
-            var file = await _client.ExecuteAsync(new TdApi.DownloadFile
+            await _client.ExecuteAsync(new TdApi.DownloadFile
             {
                 FileId = _profilePhotoFileId,
                 Priority = 1
