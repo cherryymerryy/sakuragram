@@ -12,7 +12,7 @@
     VerticalContentAlignment="Stretch"
     KeyDown="ChatsView_OnKeyDown">
     
-    <Grid Padding="0, 50, 0, 0">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="350" />
             <ColumnDefinition Width="*" />
@@ -26,22 +26,34 @@
             </Grid.RowDefinitions>
             
             <StackPanel Grid.Row="0">
-                <TextBox x:Name="TextBoxSearch" PlaceholderText="Search" Width="350" Height="30" Margin="0, 0, 0, 4"
+                <TextBox x:Name="TextBoxSearch" 
+                         PlaceholderText="Search" 
+                         Width="Auto" 
+                         Height="30" 
+                         Margin="4"
                          TextChanged="TextBoxSearch_OnTextChanged"/>
                 <StackPanel Orientation="Horizontal" Margin="0, 0, 0, 4" HorizontalAlignment="Center">
-                    <Button x:Name="ButtonArchive" Width="170" Height="30"
+                    <Button x:Name="ButtonArchive" 
+                            Width="170"
+                            Height="30"
                             Click="ButtonArchive_OnClick">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock x:Name="ArchiveStatus" Text="Archive" Margin="0, 0, 5, 0" />
                             <InfoBadge x:Name="ArchiveUnreadChats" Value="0" />
                         </StackPanel>
                     </Button>
-                    <Button x:Name="ButtonSavedMessages" Content="Saved" Width="170" Height="30" Margin="5, 0, 0, 0"
+                    <Button x:Name="ButtonSavedMessages" 
+                            Content="Saved" 
+                            Width="170" 
+                            Height="30" 
+                            Margin="5, 0, 0, 0"
                             Click="ButtonSavedMessages_OnClick" />
                 </StackPanel>
+                <MenuFlyoutSeparator Margin="0, 0, 0, 4" />
             </StackPanel>
-            
-            <RelativePanel Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <RelativePanel Grid.Row="1" 
+                           VerticalAlignment="Stretch" 
+                           HorizontalAlignment="Stretch">
                 <ScrollViewer HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollMode="Enabled" 
                               VerticalScrollBarVisibility="Auto"

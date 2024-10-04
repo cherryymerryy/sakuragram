@@ -11,7 +11,7 @@ public class MediaService
 {
     private static TdClient _client = App._client;
     
-    public async void GetChatPhoto(TdApi.Chat chat, PersonPicture avatar)
+    public static void GetChatPhoto(TdApi.Chat chat, PersonPicture avatar)
     {
         if (chat.Photo == null)
         {
@@ -25,16 +25,16 @@ public class MediaService
         }
         else
         {
-            var file = await _client.ExecuteAsync(new TdApi.DownloadFile
+            var file = _client.ExecuteAsync(new TdApi.DownloadFile
             {
                 FileId = chat.Photo.Small.Id,
                 Priority = 1
-            }).WaitAsync(new CancellationToken());
+            }).Result;
             avatar.ProfilePicture = new BitmapImage(new Uri(file.Local.Path));
         }
     }
     
-    public async void GetUserPhoto(TdApi.User user, PersonPicture avatar)
+    public static void GetUserPhoto(TdApi.User user, PersonPicture avatar)
     {
         if (user.ProfilePhoto == null)
         {
@@ -48,11 +48,11 @@ public class MediaService
         }
         else
         {
-            var file = await _client.ExecuteAsync(new TdApi.DownloadFile
+            var file = _client.ExecuteAsync(new TdApi.DownloadFile
             {
                 FileId = user.ProfilePhoto.Small.Id,
                 Priority = 1
-            }).WaitAsync(new CancellationToken());
+            }).Result;
             avatar.ProfilePicture = new BitmapImage(new Uri(file.Local.Path));
         }
     }

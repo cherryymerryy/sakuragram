@@ -26,10 +26,13 @@ namespace sakuragram
 			#if DEBUG
 			{
 				Title = "sakuragram preview";
+				TitleBar.Subtitle = "preview";
+				Icon.ShowAsMonochrome = true;
 			}
 			#else
 			{
 				Title = "sakuragram";
+				Icon.ShowAsMonochrome = false;
 			}
 			#endif
 			

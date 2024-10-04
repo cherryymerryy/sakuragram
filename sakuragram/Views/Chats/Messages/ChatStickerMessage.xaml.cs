@@ -128,12 +128,12 @@ public partial class ChatStickerMessage : Page
         if (sender > 0) // if senderId > 0 then it's a user
         {
             var user = _client.GetUserAsync(userId: sender).Result;
-            _mediaService.GetUserPhoto(user, ProfilePicture);
+            MediaService.GetUserPhoto(user, ProfilePicture);
         }
         else // if senderId < 0 then it's a chat
         {
             var chat = _client.GetChatAsync(chatId: sender).Result;
-            _mediaService.GetChatPhoto(chat, ProfilePicture);
+            MediaService.GetChatPhoto(chat, ProfilePicture);
         }
         
         if (message.ForwardInfo != null)

@@ -51,7 +51,7 @@ namespace sakuragram.Views.Chats
                 {
                     if (updateChatPhoto.ChatId == ChatId)
                     {
-                        DispatcherQueue.TryEnqueue(() => _mediaService.GetChatPhoto(_chat, ChatEntryProfilePicture));
+                        DispatcherQueue.TryEnqueue(() => MediaService.GetChatPhoto(_chat, ChatEntryProfilePicture));
                     }
                     break;
                 }
@@ -100,8 +100,8 @@ namespace sakuragram.Views.Chats
             _chat = await _client.GetChatAsync(chatId: ChatId);
             TextBlockChatName.Text = _chat.Title;
 
-            _mediaService.GetChatPhoto(_chat, ChatEntryProfilePicture);
-            GetLastMessage(_chat); 
+            MediaService.GetChatPhoto(_chat, ChatEntryProfilePicture);
+            GetLastMessage(_chat);
             
             if (_chat.UnreadCount > 0)
             {

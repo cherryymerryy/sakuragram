@@ -144,7 +144,10 @@
                         <Grid>
                             <RelativePanel HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch">
-                                <Grid>
+                                <Grid RelativePanel.AlignRightWithPanel="True"
+                                      RelativePanel.AlignLeftWithPanel="True"
+                                      RelativePanel.AlignBottomWithPanel="True"
+                                      RelativePanel.AlignTopWithPanel="True">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="500*" />

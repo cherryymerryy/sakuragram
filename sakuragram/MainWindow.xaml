@@ -5,35 +5,54 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d">
-
 	
 	<Window.SystemBackdrop>
 		<DesktopAcrylicBackdrop />
 	</Window.SystemBackdrop>
 
-    <Grid>
-	    <NavigationView
-		    x:Name="NavigationView"
-			PaneDisplayMode="Left"
-			IsSettingsVisible="False"
-			IsBackEnabled="False"
-			IsBackButtonVisible="Collapsed"
-			ItemInvoked="NavView_ItemInvoked"
-			Loaded="NavView_Loaded"
-			SelectionChanged="NavView_SelectionChanged">
-			<NavigationView.MenuItems>
-				<NavigationViewItem x:Name="NavViewChats" Content="All chats" Tag="ChatsView" Icon="People">
-					<NavigationViewItem.InfoBadge>
-						<InfoBadge x:Name="UnreadMessagesCount" />
-					</NavigationViewItem.InfoBadge>
-				</NavigationViewItem>
-			</NavigationView.MenuItems>
-			<NavigationView.FooterMenuItems>
-				<NavigationViewItem x:Name="NavViewSettings" Content="Settings" Tag="SettingsView" Icon="Setting" />
-				<NavigationViewItem x:Name="NavViewHelp" Content="Help" Tag="HelpView" Icon="Help" />
-			</NavigationView.FooterMenuItems>
-			<Frame x:Name="ContentFrame" NavigationFailed="ContentFrame_NavigationFailed"/>
-		</NavigationView>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		
+		<controls:TitleBar x:Name="TitleBar"
+		                   Title="sakuragram"
+		                   AutoConfigureCustomTitleBar="False"
+		                   IsBackButtonVisible="False"
+		                   IsPaneButtonVisible="False">
+			<controls:TitleBar.Icon>
+				<BitmapIcon x:Name="Icon" 
+				            ShowAsMonochrome="False"
+				            UriSource="ms-appx:///Assets/LargeTile.scale-100.png" />
+			</controls:TitleBar.Icon>
+		</controls:TitleBar>
+		
+		<Grid Grid.Row="1">
+			<NavigationView
+				x:Name="NavigationView"
+				PaneDisplayMode="Left"
+				IsSettingsVisible="False"
+				IsBackEnabled="False"
+				IsBackButtonVisible="Collapsed"
+				ItemInvoked="NavView_ItemInvoked"
+				Loaded="NavView_Loaded"
+				SelectionChanged="NavView_SelectionChanged">
+				<NavigationView.MenuItems>
+					<NavigationViewItem x:Name="NavViewChats" Content="All chats" Tag="ChatsView" Icon="People">
+						<NavigationViewItem.InfoBadge>
+							<InfoBadge x:Name="UnreadMessagesCount" />
+						</NavigationViewItem.InfoBadge>
+					</NavigationViewItem>
+				</NavigationView.MenuItems>
+				<NavigationView.FooterMenuItems>
+					<NavigationViewItem x:Name="NavViewSettings" Content="Settings" Tag="SettingsView" Icon="Setting" />
+					<NavigationViewItem x:Name="NavViewHelp" Content="Help" Tag="HelpView" Icon="Help" />
+				</NavigationView.FooterMenuItems>
+				<Frame x:Name="ContentFrame" NavigationFailed="ContentFrame_NavigationFailed"/>
+			</NavigationView>
+		</Grid>
 	</Grid>
 </Window>

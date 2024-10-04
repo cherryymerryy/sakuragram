@@ -119,13 +119,13 @@ public partial class ChatVideoMessage : Page
         {
             var user = _client.GetUserAsync(userId: sender).Result;
             DisplayName.Text = user.FirstName + " " + user.LastName;
-            _mediaService.GetUserPhoto(user, ProfilePicture);
+            MediaService.GetUserPhoto(user, ProfilePicture);
         }
         else // if senderId < 0 then it's a chat
         {
             var chat = _client.GetChatAsync(chatId: sender).Result;
             DisplayName.Text = chat.Title;
-            _mediaService.GetChatPhoto(chat, ProfilePicture);
+            MediaService.GetChatPhoto(chat, ProfilePicture);
         }
         
         if (message.ReplyTo != null)

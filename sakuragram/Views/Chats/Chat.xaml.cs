@@ -218,7 +218,7 @@ namespace sakuragram.Views.Chats
             _chatId = _chat.Id;
             ChatTitle.Text = _chat.Title;
             
-            _mediaService.GetChatPhoto(_chat, ChatPhoto);
+            MediaService.GetChatPhoto(_chat, ChatPhoto);
 
             if (_chat.Background != null)
             {
