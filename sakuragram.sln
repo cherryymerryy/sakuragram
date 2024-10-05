@@ -5,6 +5,8 @@ VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sakuragram", "sakuragram\sakuragram.csproj", "{7768C2E0-6568-4B3A-995C-FEFDC278FEB7}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "sakugramInstaller", "sakugramInstaller\sakugramInstaller.vdproj", "{59F75A96-DA8C-4470-85CB-86A6D8529C1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -33,6 +35,12 @@ Global
 		{7768C2E0-6568-4B3A-995C-FEFDC278FEB7}.Release|x86.ActiveCfg = Release|x86
 		{7768C2E0-6568-4B3A-995C-FEFDC278FEB7}.Release|x86.Build.0 = Release|x86
 		{7768C2E0-6568-4B3A-995C-FEFDC278FEB7}.Release|x86.Deploy.0 = Release|x86
+		{59F75A96-DA8C-4470-85CB-86A6D8529C1C}.Debug|ARM64.ActiveCfg = Debug
+		{59F75A96-DA8C-4470-85CB-86A6D8529C1C}.Debug|x64.ActiveCfg = Debug
+		{59F75A96-DA8C-4470-85CB-86A6D8529C1C}.Debug|x86.ActiveCfg = Debug
+		{59F75A96-DA8C-4470-85CB-86A6D8529C1C}.Release|ARM64.ActiveCfg = Release
+		{59F75A96-DA8C-4470-85CB-86A6D8529C1C}.Release|x64.ActiveCfg = Release
+		{59F75A96-DA8C-4470-85CB-86A6D8529C1C}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

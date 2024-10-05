@@ -1,25 +1,61 @@
-﻿namespace sakuragram.Services;
+﻿using System;
+using System.Diagnostics;
+using System.Net;
+using Microsoft.UI.Xaml;
+
+namespace sakuragram.Services;
 
 public class UpdateManager
 {
-    private bool _bCanCheckForUpdates = true;
-    private bool _bUpdateAvailable = false;
-    private bool _bUpdateDownloaded = false;
-    private bool _bUpdateDownloading = false;
+    public string _newVersion;
     
-    public void CheckForUpdates()
+    [Obsolete("Obsolete")]
+    public bool CheckForUpdates()
     {
-        while (_bCanCheckForUpdates)
+        var newVersion = ThisAssembly.Git.BaseTag;
+        var currentVersion = Config.AppVersion;
+
+        newVersion = newVersion.Replace(".", "");
+        currentVersion = currentVersion.Replace(".", "");
+
+        if (Convert.ToInt32(newVersion) > Convert.ToInt32(currentVersion))
         {
-            // TODO: check for update
+            _newVersion = newVersion;
+            return true;
+        }
+        else
+        {
+            _newVersion = currentVersion;
+            return false;
         }
     }
-    
-    public void DownloadUpdate() { }
-    
-    public void Update() { }
-    
-    public void Restart() { }
-    
-    public void Shutdown() { }
+
+    public void InitScript()
+    {
+        string path = AppContext.BaseDirectory + @"\installUpdate.bat";
+        
+        Process process = new Process();
+        process.StartInfo.FileName = path;
+        process.StartInfo.Arguments = "";
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.CreateNoWindow = true;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.Verb = "runas";
+        process.Start();
+        Environment.Exit(1);
+    }
+
+    [Obsolete("Obsolete")]
+    public void DownloadUpdate()
+    {
+        WebClient client = new WebClient();
+        string path = AppContext.BaseDirectory + @"\sakuragram_Release_x64.msi";
+        client.DownloadFileCompleted += (sender, args) => { };
+        client.DownloadFileAsync(new Uri(Config.LinkForUpdate), path);
+    }
+
+    public void Update()
+    {
+        InitScript();
+    }
 }

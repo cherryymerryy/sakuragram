@@ -1,4 +1,5 @@
-﻿using Windows.Storage;
+﻿using System;
+using Windows.Storage;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -10,6 +11,7 @@ public partial class UpdateManager : Page
     private string _appName;
     private string _appLatestVersion;
     private string _appLatestVersionLink;
+    private static Services.UpdateManager _updateManager = new();
     
     public UpdateManager()
     {
@@ -19,7 +21,7 @@ public partial class UpdateManager : Page
         System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
         _appName = assembly.GetName().Name;
         _appLatestVersion = fvi.FileVersion;
-        _appLatestVersionLink = $"https://github.com/cherryymerryy/sakuragram/releases/tag/{_appLatestVersion}";
+        _appLatestVersionLink = $"https://github.com/{Config.GitHubRepo}/releases/tag/{_appLatestVersion}";
         
         TextBlockVersionInfo.Text = $"Current version: {_appLatestVersion}, TDLib 1.8.29";
 
@@ -51,12 +53,40 @@ public partial class UpdateManager : Page
         }
 
         #endregion
+        
+        CheckForUpdates();
     }
 
     private void ButtonCheckForUpdates_OnClick(object sender, RoutedEventArgs e)
     {
+        CheckForUpdates();
     }
 
+    private void CheckForUpdates()
+    {
+        try
+        {
+            ButtonCheckForUpdates.IsEnabled = false;
+            CardCheckForUpdates.Description = "Checking for updates...";
+            
+            if (_updateManager.CheckForUpdates())
+            {
+                CardCheckForUpdates.Description = $"New version available: {_updateManager._newVersion}";
+            }
+            else
+            {
+                CardCheckForUpdates.Description = $"Current version: {_appLatestVersion}";
+            }
+            
+            ButtonCheckForUpdates.IsEnabled = true;
+        }
+        catch (Exception e)
+        {
+            CardCheckForUpdates.Description = $"Error: {e.Message}";
+            throw;
+        }
+    }
+    
     #region setting parameters
 
     private void ToggleSwitch_OnToggled(object sender, RoutedEventArgs e)

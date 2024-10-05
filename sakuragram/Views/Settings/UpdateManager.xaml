@@ -50,7 +50,8 @@
                                   Toggled="ToggleSwitch_OnToggled"/>
                 </controls:SettingsCard>
 
-                <controls:SettingsCard Description="Check for updates on the selected branch"
+                <controls:SettingsCard x:Name="CardCheckForUpdates"
+                                       Description="Check for updates on the selected branch"
                                        Header="Check for updates"
                                        HeaderIcon="{ui:FontIcon Glyph=&#xE768;}">
                     <Button x:Name="ButtonCheckForUpdates"
