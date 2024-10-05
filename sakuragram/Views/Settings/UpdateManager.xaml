@@ -63,8 +63,8 @@
                            Text="About" />
 
                 <controls:SettingsExpander Description="© 2024. All rights reserved."
-                                           Header="CherryMerryGram"
-                                           HeaderIcon="{ui:BitmapIcon Source=ms-appx:///Assets/TestImages/CatAvatar.jpg}">
+                                           Header="{x:Bind _appName}"
+                                           HeaderIcon="{ui:BitmapIcon Source=ms-appx:///Assets/SplashScreen.scale-200.png}">
                     <TextBlock x:Name="Version" win:IsTextSelectionEnabled="True"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <controls:SettingsExpander.Items>
@@ -77,11 +77,15 @@
                                            Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
                                 <StackPanel Margin="-12,0,0,0"
                                             Orientation="Horizontal">
-                                    <HyperlinkButton Content="Channel" NavigateUri="https://t.me/cherrymerrygram" />
-                                    <HyperlinkButton Content="Forum" NavigateUri="https://t.me/cherrymerrygramchat" />
+                                    <HyperlinkButton Content="Channel" 
+                                                     NavigateUri="https://t.me/sakuragram" />
+                                    <HyperlinkButton Content="Forum" 
+                                                     NavigateUri="https://t.me/sakuragramchat" />
                                     <HyperlinkButton Content="Source code" 
-                                                     NavigateUri="https://github.com/cherryymerryy/CherryMerryGram" />
-                                    <HyperlinkButton x:Name="HyperlinkButtonLatestRelease" Content="Latest release" />
+                                                     NavigateUri="https://github.com/cherryymerryy/sakuragram" />
+                                    <HyperlinkButton x:Name="HyperlinkButtonLatestRelease" 
+                                                     Content="Latest release"
+                                                     NavigateUri="{x:Bind _appLatestVersionLink}" />
                                 </StackPanel>
                             </StackPanel>
                         </controls:SettingsCard>

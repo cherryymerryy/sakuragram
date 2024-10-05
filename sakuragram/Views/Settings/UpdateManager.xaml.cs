@@ -1,14 +1,15 @@
 ﻿using Windows.Storage;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using TdLib;
 
 namespace sakuragram.Views.Settings;
 
 public partial class UpdateManager : Page
 {
-    private static TdClient _client = App._client;
-    private ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
+    private readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
+    private string _appName;
+    private string _appLatestVersion;
+    private string _appLatestVersionLink;
     
     public UpdateManager()
     {
@@ -16,9 +17,11 @@ public partial class UpdateManager : Page
         
         System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
         System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-        string version = fvi.FileVersion;
+        _appName = assembly.GetName().Name;
+        _appLatestVersion = fvi.FileVersion;
+        _appLatestVersionLink = $"https://github.com/cherryymerryy/sakuragram/releases/tag/{_appLatestVersion}";
         
-        TextBlockVersionInfo.Text = $"Current version: {version}, TDLib 1.8.29";
+        TextBlockVersionInfo.Text = $"Current version: {_appLatestVersion}, TDLib 1.8.29";
 
         #region Settings
 
