@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using Microsoft.UI.Xaml;
@@ -8,6 +9,7 @@ namespace sakuragram.Services;
 public class UpdateManager
 {
     public string _newVersion;
+    public AsyncCompletedEventHandler _asyncCompletedEventHandler;
     
     [Obsolete("Obsolete")]
     public bool CheckForUpdates()
@@ -49,8 +51,8 @@ public class UpdateManager
     public void DownloadUpdate()
     {
         WebClient client = new WebClient();
-        string path = AppContext.BaseDirectory + @"\sakuragram_Release_x64.msi";
-        client.DownloadFileCompleted += (sender, args) => { };
+        string path = AppContext.BaseDirectory + @"\sakuragram_Release_x64.msi"; 
+        client.DownloadFileCompleted += _asyncCompletedEventHandler;
         client.DownloadFileAsync(new Uri(Config.LinkForUpdate), path);
     }
 

@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
+using sakuragram.Services;
 using sakuragram.Views;
 using TdLib;
 using TdLib.Bindings;
@@ -21,6 +22,8 @@ public partial class App : Application
 	public static TdApi.ChatFolderInfo[] _folders = [];
 	private static readonly ManualResetEventSlim ReadyToAuthenticate = new();
 
+	public static UpdateManager UpdateManager = new();
+	
 	public static bool _authNeeded;
 	public static bool _passwordNeeded;
         

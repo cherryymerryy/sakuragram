@@ -1,19 +1,20 @@
 ﻿using System;
+using System.ComponentModel;
 using Windows.Storage;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace sakuragram.Views.Settings;
 
-public partial class UpdateManager : Page
+public partial class UpdateSettings : Page
 {
     private readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
     private string _appName;
-    private string _appLatestVersion;
+    private readonly string _appLatestVersion;
     private string _appLatestVersionLink;
-    private static Services.UpdateManager _updateManager = new();
+    private static readonly Services.UpdateManager _updateManager = App.UpdateManager;
     
-    public UpdateManager()
+    public UpdateSettings()
     {
         InitializeComponent();
         
@@ -23,8 +24,6 @@ public partial class UpdateManager : Page
         _appLatestVersion = fvi.FileVersion;
         _appLatestVersionLink = $"https://github.com/{Config.GitHubRepo}/releases/tag/{_appLatestVersion}";
         
-        TextBlockVersionInfo.Text = $"Current version: {_appLatestVersion}, TDLib 1.8.29";
-
         #region Settings
 
         if (_localSettings != null)
@@ -39,7 +38,7 @@ public partial class UpdateManager : Page
                 ToggleSwitchAutoUpdate.IsOn = true;
                 _localSettings.Values["AutoUpdate"] = true;
             }
-        
+            
             if (_localSettings.Values["InstallBeta"] != null)
             {
                 bool installBetaValue = (bool)_localSettings.Values["InstallBeta"];
@@ -53,38 +52,6 @@ public partial class UpdateManager : Page
         }
 
         #endregion
-        
-        CheckForUpdates();
-    }
-
-    private void ButtonCheckForUpdates_OnClick(object sender, RoutedEventArgs e)
-    {
-        CheckForUpdates();
-    }
-
-    private void CheckForUpdates()
-    {
-        try
-        {
-            ButtonCheckForUpdates.IsEnabled = false;
-            CardCheckForUpdates.Description = "Checking for updates...";
-            
-            if (_updateManager.CheckForUpdates())
-            {
-                CardCheckForUpdates.Description = $"New version available: {_updateManager._newVersion}";
-            }
-            else
-            {
-                CardCheckForUpdates.Description = $"Current version: {_appLatestVersion}";
-            }
-            
-            ButtonCheckForUpdates.IsEnabled = true;
-        }
-        catch (Exception e)
-        {
-            CardCheckForUpdates.Description = $"Error: {e.Message}";
-            throw;
-        }
     }
     
     #region setting parameters

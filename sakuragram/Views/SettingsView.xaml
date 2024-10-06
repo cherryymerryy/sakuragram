@@ -28,38 +28,58 @@
                     Loaded="FrameworkElement_OnLoaded"
                     SelectionChanged="NavigationView_OnSelectionChanged">
         <NavigationView.MenuItems>
-            <NavigationViewItem x:Name="NavViewEditProfile" Content="Edit profile" Tag="Profile" Icon="Contact"/>
-            <NavigationViewItem x:Name="NavViewNotificationsAndSounds" Content="Notifications and Sounds" 
+            <NavigationViewItem x:Name="NavViewEditProfile" 
+                                Content="Edit profile" 
+                                Tag="Profile" 
+                                Icon="Contact"/>
+            <NavigationViewItem x:Name="NavViewNotificationsAndSounds" 
+                                Content="Notifications and Sounds" 
                                 Tag="NotificationsAndSounds" 
                                 Icon="Volume"/>
-            <NavigationViewItem x:Name="NavViewPrivacyAndSecurity" Content="Privacy and Security" 
+            <NavigationViewItem x:Name="NavViewPrivacyAndSecurity" 
+                                Content="Privacy and Security" 
                                 Tag="PrivacyAndSecurity" >
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xE72E;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem x:Name="NavViewChatSettings" Content="Chat settings" 
+            <NavigationViewItem x:Name="NavViewChatSettings" 
+                                Content="Chat settings" 
                                 Tag="ChatSettings"
                                 Icon="People"/>
-            <NavigationViewItem x:Name="NavViewFolders" Content="Folders" 
+            <NavigationViewItem x:Name="NavViewFolders" 
+                                Content="Folders" 
                                 Tag="Folders"
                                 Icon="Folder"/>
-            <NavigationViewItem x:Name="NavViewAdvanced" Content="Advanced" 
+            <NavigationViewItem x:Name="NavViewAdvanced" 
+                                Content="Advanced" 
                                 Tag="Advanced"
                                 Icon="List"/>
-            <NavigationViewItem x:Name="NavViewSpeakersAndCamera" Content="Speakers and Camera" 
+            <NavigationViewItem x:Name="NavViewSpeakersAndCamera" 
+                                Content="Speakers and Camera" 
                                 Tag="SpeakersAndCamera"
                                 Icon="Camera"/>
-            <NavigationViewItem x:Name="NavViewBatteryAndAnimations" Content="Battery and Animations" 
+            <NavigationViewItem x:Name="NavViewBatteryAndAnimations" 
+                                Content="Battery and Animations" 
                                 Tag="BatteryAndAnimations">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xE850;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem x:Name="NavViewUpdateManager" Content="Update settings" 
-                                Tag="UpdateManager"
+            <NavigationViewItem x:Name="NavViewUpdateSettings" 
+                                Content="Update settings" 
+                                Tag="UpdateSettings"
                                 Icon="Sync"/>
         </NavigationView.MenuItems>
+        <NavigationView.FooterMenuItems>
+            <NavigationViewItem x:Name="NavViewAbout"
+                                Content="About"
+                                Tag="About">
+                <NavigationViewItem.Icon>
+                    <BitmapIcon UriSource="ms-appx:///Assets/icons/folders/folder_new_chats.png" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.FooterMenuItems>
         <Frame x:Name="ContentFrame" />
     </NavigationView>
     
