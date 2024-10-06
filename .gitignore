@@ -368,3 +368,4 @@ FodyWeavers.xsd
 sakuragram/Config/Config.cs
 /sakuragram/.idea
 sakuragram/Config.cs
+sakuragram/build/*
