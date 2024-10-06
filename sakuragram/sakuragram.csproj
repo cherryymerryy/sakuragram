@@ -69,18 +69,10 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Remove="Views\ContextMenu\ContextMenu.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\..\Downloads\AyuGram Desktop\Light@2x.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\WebApp\WebAppView.cs">
-      <DependentUpon>WebAppView.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <WebView2EnableCsWinRTProjection>False</WebView2EnableCsWinRTProjection>
