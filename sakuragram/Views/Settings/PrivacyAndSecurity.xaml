@@ -96,7 +96,8 @@
                         <controls:SettingsCard Description="Users who add your number to their contact will see it on Telegram only if they are your contacts"
                                                Header="Who can see my phone number"
                                                HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
-                            <ComboBox SelectedIndex="0">
+                            <ComboBox x:Name="ComboBoxPhoneNumber"
+                                      SelectionChanged="ComboBoxPhoneNumber_OnSelectionChanged">
                                 <ComboBoxItem>Everybody</ComboBoxItem>
                                 <ComboBoxItem>My contacts</ComboBoxItem>
                                 <ComboBoxItem>Nobody</ComboBoxItem>
@@ -402,7 +403,7 @@
                 
                 <controls:SettingsCard Header="If away for..."
                                        HeaderIcon="{ui:FontIcon Glyph=&#xE799;}">
-                    <ComboBox SelectionChanged="Selector_OnSelectionChanged">
+                    <ComboBox SelectionChanged="DeleteIfAway_OnSelectionChanged">
                         <ComboBoxItem>1 month</ComboBoxItem>
                         <ComboBoxItem>3 month</ComboBoxItem>
                         <ComboBoxItem>6 month</ComboBoxItem>

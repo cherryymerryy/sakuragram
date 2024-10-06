@@ -29,7 +29,7 @@ public partial class PrivacyAndSecurity : Page
         CardActiveSessions.Description = $"There are currently {activeSessions.Sessions_.Length} active sessions";
     }
     
-    private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void DeleteIfAway_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
     }
 
@@ -72,5 +72,9 @@ public partial class PrivacyAndSecurity : Page
     {
         _client.TerminateAllOtherSessionsAsync();
         CardActiveSessions.Description = $"There are currently 1 active sessions";
+    }
+
+    private void ComboBoxPhoneNumber_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
     }
 }

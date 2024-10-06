@@ -58,10 +58,8 @@
                            Text="About" />
 
                 <controls:SettingsExpander Description="© 2024. All rights reserved."
-                                           Header="{x:Bind _appName}">
-                    <controls:SettingsExpander.HeaderIcon>
-                        <BitmapIcon UriSource="ms-appx:///Assets/icons/folders/folder_new_chats.png"/>
-                    </controls:SettingsExpander.HeaderIcon>
+                                           Header="{x:Bind _appName}"
+                                           HeaderIcon="{ui:FontIcon Glyph=&#xE8B8;}">
                     <TextBlock x:Name="Version" win:IsTextSelectionEnabled="True"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <controls:SettingsExpander.Items>

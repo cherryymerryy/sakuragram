@@ -76,7 +76,7 @@
                                 Content="About"
                                 Tag="About">
                 <NavigationViewItem.Icon>
-                    <BitmapIcon UriSource="ms-appx:///Assets/icons/folders/folder_new_chats.png" />
+                    <FontIcon Glyph="&#xE946;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
         </NavigationView.FooterMenuItems>

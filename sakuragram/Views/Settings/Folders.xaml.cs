@@ -1,6 +1,7 @@
 ﻿using System;
 using CommunityToolkit.WinUI;
 using CommunityToolkit.WinUI.Controls;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -21,12 +22,22 @@ public partial class Folders : Page
         foreach (var userFolder in _chatFolders)
         {
             string folderIconName = userFolder.Icon.Name.ToLower();
-            ImageSource folderIcon = new BitmapImage(new Uri($"ms-appx:///Assets/icons/folders/folder_{folderIconName}.png"));
+            var folderIcon = new ImageIcon {
+                Source = new BitmapImage(new Uri($"ms-appx:///Assets/icons/folders/folder_{folderIconName}@3.png")), 
+                Width = 72,
+                Height = 72,
+                MinWidth = 72,
+                MinHeight = 72,
+                MaxWidth = 72,
+                MaxHeight = 72,
+                Foreground = new SolidColorBrush(Colors.White)
+            };
+            TdApi.ChatFolder chatFolderInfo = _client.GetChatFolderAsync(userFolder.Id).Result;
 
             SettingsCard card = new();
             card.Header = userFolder.Title;
-            card.Description = _client.GetChatFolderAsync(userFolder.Id).Result.IncludedChatIds.Length + " chats";
-            // card.HeaderIcon = new ImageIcon {Source = folderIcon};
+            card.Description = chatFolderInfo.IncludedChatIds.Length + " chats";
+            card.HeaderIcon = folderIcon;
             
             PanelUserFolders.Children.Add(card);
         }
