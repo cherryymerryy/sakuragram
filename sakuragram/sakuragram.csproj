@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
@@ -6,7 +6,7 @@
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <RootNamespace>sakuragram</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64;ARM64</Platforms>
+    <Platforms>x64</Platforms>
     <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &gt;= 8">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &lt; 8">win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
@@ -21,12 +21,13 @@
 	<PackageProjectUrl>https://github.com/cherryymerryy/sakuragram</PackageProjectUrl>
 	<PackageLicenseUrl>https://github.com/cherryymerryy/sakuragram/blob/master/LICENSE.txt</PackageLicenseUrl>
 	<RepositoryUrl>https://github.com/cherryymerryy/sakuragram</RepositoryUrl>
-	<RepositoryType>public</RepositoryType>
+	<RepositoryType>git</RepositoryType>
 	<AssemblyVersion>1.3.0</AssemblyVersion>
 	<FileVersion>1.3.0</FileVersion>
+    <Version>1.3.0</Version>
 	<NeutralLanguage>en</NeutralLanguage>
-	<LangVersion>13</LangVersion>
-	<Version>1.3.0</Version>
+	<Configurations>Debug;Release;Beta</Configurations>
+	<BaseOutputPath>build\</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -84,6 +85,8 @@
   <PropertyGroup Label="Globals">
     <WebView2EnableCsWinRTProjection>False</WebView2EnableCsWinRTProjection>
     <PackageIcon>Light@2x.png</PackageIcon>
+    <PackageOutputPath />
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <!--
@@ -94,22 +97,17 @@
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	<OutputPath>build\debug\</OutputPath>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Beta|x64'">
+	    <OutputPath>build\beta\</OutputPath>
+	    <DebugType>embedded</DebugType>
+	    <Optimize>True</Optimize>
+    </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+	<OutputPath>build\release\</OutputPath>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 </Project>
