@@ -26,7 +26,9 @@
 			<controls:TitleBar.Icon>
 				<BitmapIcon x:Name="Icon" 
 				            ShowAsMonochrome="False"
-				            UriSource="ms-appx:///Assets/LargeTile.scale-100.png" />
+				            UriSource="ms-appx:///StoreLogo.scale-400.ico"
+				            Width="32"
+				            Height="32"/>
 			</controls:TitleBar.Icon>
 		</controls:TitleBar>
 		

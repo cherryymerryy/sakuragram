@@ -1,14 +1,20 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Threading.Tasks;
 using Windows.Storage;
+using CommunityToolkit.WinUI.Controls;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using Octokit;
+using Page = Microsoft.UI.Xaml.Controls.Page;
 
 namespace sakuragram.Views.Settings;
 
 public partial class About : Page
 {
+    private GitHubClient _githubClient = App._githubClient;
+    
     private readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
     private string _appName;
     private readonly string _appLatestVersion;
@@ -23,9 +29,27 @@ public partial class About : Page
         System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
         _appName = assembly.GetName().Name;
         _appLatestVersion = fvi.FileVersion;
-        _appLatestVersionLink = $"https://github.com/{Config.GitHubRepo}/releases/tag/{_appLatestVersion}";
+        _appLatestVersionLink = $"https://github.com/{Config.GitHubRepoOwner}/{Config.GitHubRepoName}/releases/tag/{_appLatestVersion}";
         
         TextBlockVersionInfo.Text = $"Current version: {_appLatestVersion}, TdLib {Config.TdLibVersion}";
+        
+        Task.Run(async () =>
+        {
+            var releases = await _githubClient.Repository.Release.GetAll(Config.GitHubRepoOwner, Config.GitHubRepoName)
+                .ConfigureAwait(false);
+            
+            foreach (var release in releases)
+            {
+                string releaseName = release.Prerelease ? "Pre-release" + release.Name : "Release" + release.Name;
+                string releaseBody = release.Body;
+
+                SettingsCard card = new();
+                card.Header = releaseName;
+                card.Description = releaseBody;
+
+                ExpanderReleases.Items.Add(card);
+            }
+        });
         
         _updateManager._asyncCompletedEventHandler += AsyncCompletedEventHandler;
         CheckForUpdates();
@@ -63,14 +87,14 @@ public partial class About : Page
         _updateManager.Update();
     }
 
-    private void CheckForUpdates()
+    private async void CheckForUpdates()
     {
         try
         {
             ButtonCheckForUpdates.IsEnabled = false;
             CardCheckForUpdates.Description = "Checking for updates...";
             
-            if (_updateManager.CheckForUpdates())
+            if (await _updateManager.CheckForUpdates())
             {
                 CardCheckForUpdates.Description = $"New version available: {ThisAssembly.Git.BaseTag}";
                 CardNewVersionAvailable.Visibility = Visibility.Visible;

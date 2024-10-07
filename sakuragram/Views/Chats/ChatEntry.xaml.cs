@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.WinUI;
 using Microsoft.UI;
@@ -22,12 +23,11 @@ namespace sakuragram.Views.Chats
         private static readonly TdClient _client = App._client;
         
         public TdApi.Chat _chat;
-        public TdApi.ChatPhotoInfo _chatPhoto;
         public long ChatId;
         private int _profilePhotoFileId;
         private bool _inArchive;
         
-        private MediaService _mediaService = new MediaService();
+        private MediaService _mediaService = new();
         
         public ChatEntry()
         {
@@ -122,22 +122,52 @@ namespace sakuragram.Views.Chats
             {
                 case TdApi.ChatType.ChatTypeSupergroup typeSupergroup:
                 {
-                    // var supergroup = _client.GetSupergroupAsync(
-                    //         supergroupId: typeSupergroup.SupergroupId).Result;
-                    // if (supergroup.IsForum)
-                    // {
-                    //     var topic = _client.ExecuteAsync(new TdApi.GetForumTopic
-                    //     {
-                    //         ChatId = ChatId,
-                    //         MessageThreadId = _chat.LastMessage.MessageThreadId
-                    //     }).Result;
-                    //     TextBlockForumName.Text = topic.Info.Name;
-                    //     TextBlockForumName.Visibility = Visibility.Visible;
-                    // }
-                    // else
-                    // {
-                    //     TextBlockForumName.Visibility = Visibility.Collapsed;
-                    // }
+                    var supergroup = await _client.ExecuteAsync(new TdApi.GetSupergroup
+                    {
+                        SupergroupId = typeSupergroup.SupergroupId
+                    }).ConfigureAwait(false);
+
+                    if (supergroup is { IsForum: true })
+                    {
+                        var message = await _client.GetMessageAsync(chatId: ChatId, messageId: _chat.LastMessage.Id)
+                            .ConfigureAwait(false);
+                        
+                        var topics = await _client.ExecuteAsync(new TdApi.GetForumTopics
+                        {
+                            ChatId = ChatId,
+                            Limit = 100,
+                            Query = "",
+                            OffsetMessageId = message.Id,
+                            OffsetMessageThreadId = message.MessageThreadId
+                        }).ConfigureAwait(false);
+
+                        if (message.IsTopicMessage)
+                        {
+                            var topic = await _client.ExecuteAsync(new TdApi.GetForumTopic
+                            {
+                                ChatId = ChatId,
+                                MessageThreadId = message.MessageThreadId
+                            }).ConfigureAwait(false);
+                            
+                            await DispatcherQueue.EnqueueAsync(() =>
+                            {
+                                TextBlockForumName.Text = topic.Info.Name;
+                                TextBlockForumName.Visibility = Visibility.Visible;
+                            });
+                        }
+                        else
+                        {
+                            await DispatcherQueue.EnqueueAsync(() =>
+                            {
+                                TextBlockForumName.Text = topics.Topics[0].Info.Name;
+                                TextBlockForumName.Visibility = Visibility.Visible;
+                            });
+                        }
+                    }
+                    else
+                    {
+                        await DispatcherQueue.EnqueueAsync(() => TextBlockForumName.Visibility = Visibility.Collapsed);
+                    }
                     break;
                 }
             }
@@ -148,24 +178,12 @@ namespace sakuragram.Views.Chats
                 dateTime = dateTime.AddSeconds(_chat.LastMessage.Date).ToLocalTime();
                 string sendTime = dateTime.ToShortTimeString();
 
-                TextBlockSendTime.Text = sendTime;
+                await DispatcherQueue.EnqueueAsync(() => TextBlockSendTime.Text = sendTime);
             }
             catch (Exception e)
             {
-                TextBlockSendTime.Text = e.Message;
+                await DispatcherQueue.EnqueueAsync(() => TextBlockSendTime.Text = e.Message);
             }
-            
-            // foreach (var chatList in _chat.ChatLists)
-            // {
-            //     _inArchive = chatList switch
-            //     {
-            //         TdApi.ChatList.ChatListMain => false,
-            //         TdApi.ChatList.ChatListArchive => true,
-            //         _ => _inArchive
-            //     };
-            // }
-
-            // ContextMenuArchive.Text = _inArchive ? "Unarchive" : "Archive";
             
             _client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
         }

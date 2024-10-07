@@ -2,7 +2,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
-using Microsoft.UI.Xaml;
+using System.Threading.Tasks;
+using Octokit;
 
 namespace sakuragram.Services;
 
@@ -10,29 +11,48 @@ public class UpdateManager
 {
     public string _newVersion;
     public AsyncCompletedEventHandler _asyncCompletedEventHandler;
+
+    private static async Task<string> GetLatestReleaseFromGitHub()
+    {
+        var github = new GitHubClient(new ProductHeaderValue(Config.AppName));
+        var credentials = new Credentials(Config.GitHubAuthToken);
+        github.Credentials = credentials;
+
+        var releases = await github.Repository.Release.GetAll(Config.GitHubRepoOwner, Config.GitHubRepoName).ConfigureAwait(false);
+        Release latestRelease = releases[0];
+        
+        return latestRelease.TagName;
+    }
     
     [Obsolete("Obsolete")]
-    public bool CheckForUpdates()
+    public async Task<bool> CheckForUpdates()
     {
-        var newVersion = ThisAssembly.Git.BaseTag;
+        var newVersion = await GetLatestReleaseFromGitHub();
         var currentVersion = Config.AppVersion;
 
-        newVersion = newVersion.Replace(".", "");
-        currentVersion = currentVersion.Replace(".", "");
-
-        if (Convert.ToInt32(newVersion) > Convert.ToInt32(currentVersion))
+        if (newVersion != null && newVersion != currentVersion)
         {
-            _newVersion = newVersion;
-            return true;
+            newVersion = newVersion.Replace(".", "");
+            currentVersion = currentVersion.Replace(".", "");
+
+            if (Convert.ToInt32(newVersion) > Convert.ToInt32(currentVersion))
+            {
+                _newVersion = newVersion;
+                return true;
+            }
+            else
+            {
+                _newVersion = currentVersion;
+                return false;
+            }
         }
         else
         {
-            _newVersion = currentVersion;
-            return false;
+            return false; 
         }
     }
 
-    public void InitScript()
+    private void InitScript()
     {
         string path = AppContext.BaseDirectory + @"\installUpdate.bat";
         

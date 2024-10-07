@@ -3,10 +3,12 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
+using Octokit;
 using sakuragram.Services;
 using sakuragram.Views;
 using TdLib;
 using TdLib.Bindings;
+using Application = Microsoft.UI.Xaml.Application;
 using TdLogLevel = TdLib.Bindings.TdLogLevel;
 
 namespace sakuragram;
@@ -19,6 +21,8 @@ public partial class App : Application
 	}
         
 	public static TdClient _client;
+	public static GitHubClient _githubClient;
+	
 	public static TdApi.ChatFolderInfo[] _folders = [];
 	private static readonly ManualResetEventSlim ReadyToAuthenticate = new();
 
@@ -40,6 +44,9 @@ public partial class App : Application
 		_client = new TdClient();
 		_client.Bindings.SetLogVerbosityLevel(TdLogLevel.Fatal);
 
+		_githubClient = new GitHubClient(new ProductHeaderValue(Config.AppName));
+		_githubClient.Credentials = new Credentials(Config.GitHubAuthToken);
+		
 		_client.UpdateReceived += async (_, update) => { await ProcessUpdates(update); };
 
 		ReadyToAuthenticate.Wait();

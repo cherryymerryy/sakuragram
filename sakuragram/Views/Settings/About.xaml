@@ -53,6 +53,9 @@
                             Click="ButtonNewVersionAvailable_OnClick"/>
                 </controls:SettingsCard>
                 
+                <controls:SettingsExpander x:Name="ExpanderReleases"
+                                           Header="Releases" />
+                
                 <!-- About section -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
                            Text="About" />

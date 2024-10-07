@@ -18,12 +18,6 @@ public partial class UpdateSettings : Page
     {
         InitializeComponent();
         
-        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-        System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-        _appName = assembly.GetName().Name;
-        _appLatestVersion = fvi.FileVersion;
-        _appLatestVersionLink = $"https://github.com/{Config.GitHubRepo}/releases/tag/{_appLatestVersion}";
-        
         #region Settings
 
         if (_localSettings != null)

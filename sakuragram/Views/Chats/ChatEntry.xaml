@@ -45,7 +45,8 @@
                                FontSize="10" 
                                MaxLines="1" 
                                TextTrimming="Clip" 
-                               Visibility="Collapsed"/>
+                               Visibility="Collapsed"
+                               Foreground="{StaticResource TextFillColorTertiaryBrush}"/>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock x:Name="TextBlockChatUsername"
                                    FontSize="10" 
