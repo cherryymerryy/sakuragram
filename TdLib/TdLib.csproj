@@ -1,0 +1,37 @@
+<!--
+SPDX-FileCopyrightText: 2024 tdsharp contributors <https://github.com/egramtel/tdsharp>
+
+SPDX-License-Identifier: MIT
+-->
+
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <PackageId>TDLib</PackageId>
+        <NoWarn>
+            MA0046; <!-- About parameter types for EventHandlers: properly wrapping those could add memory traffic -->
+            MA0055; <!-- "Do not use finalizer" -->
+            CS1591 <!-- Missing XML comment for publicly visible type or member -->
+        </NoWarn>
+        <PackageTags>telegram</PackageTags>
+        <Description>
+           .NET bindings for TDLib (Telegram Database Library): https://github.com/tdlib/td
+
+            This is the main binding library. For TL API, see TDLib.Api package.
+        </Description>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="ChangelogAutomation.MSBuild" Version="2.0.0" PrivateAssets="All" />
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.169">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="tdlib.native.win-x64" Version="1.8.29" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\TdLib.Api\TdLib.Api.csproj" />
+    </ItemGroup>
+</Project>

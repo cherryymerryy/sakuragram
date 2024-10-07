@@ -2,13 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Microsoft.UI;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
 using sakuragram.Services;
 using TdLib;
 
@@ -25,7 +23,7 @@ namespace sakuragram.Views.Chats.Messages
 
         public ReplyService _replyService;
         public MessageService _messageService;
-        private MediaService _mediaService = new MediaService();
+        private MediaService _mediaService = new();
 
         private bool _bIsSelected = false;
 
@@ -195,7 +193,7 @@ namespace sakuragram.Views.Chats.Messages
             
             TextBlockEdited.Visibility = message.EditDate != 0 ? Visibility.Visible : Visibility.Collapsed;
 
-            if (message.CanGetViewers && message.IsChannelPost)
+            if (message.InteractionInfo?.ViewCount > 0 && message.IsChannelPost)
             {
                 TextBlockViews.Text = message.InteractionInfo.ViewCount + " views";
                 TextBlockViews.Visibility = Visibility.Visible;

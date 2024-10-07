@@ -14,7 +14,7 @@ public partial class ChatDocumentMessage : Page
 {
     private static TdClient _client = App._client;
     private TdApi.MessageContent.MessageDocument _messageDocument;
-    private MediaService _mediaService;
+    private MediaService _mediaService = new();
 
     public ChatDocumentMessage()
     {
@@ -179,7 +179,7 @@ public partial class ChatDocumentMessage : Page
         
         TextBlockEdited.Visibility = message.EditDate != 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        if (message.CanGetViewers && message.IsChannelPost)
+        if (message.InteractionInfo?.ViewCount > 0 && message.IsChannelPost)
         {
             TextBlockViews.Text = message.InteractionInfo.ViewCount + " views";
             TextBlockViews.Visibility = Visibility.Visible;

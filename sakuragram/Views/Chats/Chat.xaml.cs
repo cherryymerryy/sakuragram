@@ -536,8 +536,7 @@ namespace sakuragram.Views.Chats
         {
             _client.ExecuteAsync(new TdApi.ReportChat
             {
-                ChatId = _chatId, 
-                Reason = new TdApi.ReportReason.ReportReasonCopyright()
+                ChatId = _chatId
             });
         }
 

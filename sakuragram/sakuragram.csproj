@@ -13,6 +13,7 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
 	<WindowsSdkPackageVersion>10.0.26100.38</WindowsSdkPackageVersion>
 	<ApplicationIcon>StoreLogo.scale-400.ico</ApplicationIcon>
@@ -54,10 +55,11 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240829007" />
     <Manifest Include="$(ApplicationManifest)" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="TDLib" Version="1.8.29" />
     <PackageReference Include="tdlib.native.win-x64" Version="1.8.29" />
+    <PackageReference Include="xunit" Version="2.9.2" />
   </ItemGroup>
 
   <!--
@@ -73,6 +75,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TdLib.Api\TdLib.Api.csproj" />
+    <ProjectReference Include="..\TdLib\TdLib.csproj" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <WebView2EnableCsWinRTProjection>False</WebView2EnableCsWinRTProjection>

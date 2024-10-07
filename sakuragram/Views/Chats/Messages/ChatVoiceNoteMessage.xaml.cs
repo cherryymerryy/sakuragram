@@ -17,7 +17,7 @@ public partial class ChatVoiceNoteMessage : Page
     private TdApi.MessageContent.MessageVoiceNote _messageVoiceNote;
     private MediaPlayerElement _mediaPlayerElement;
     private TimeSpan _position;
-    private MediaService _mediaService = new MediaService();
+    private MediaService _mediaService = new();
 
     public ChatVoiceNoteMessage()
     {
@@ -193,7 +193,7 @@ public partial class ChatVoiceNoteMessage : Page
         
         TextBlockEdited.Visibility = message.EditDate != 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        if (message.CanGetViewers && message.IsChannelPost)
+        if (message.InteractionInfo?.ViewCount > 0 && message.IsChannelPost)
         {
             TextBlockViews.Text = message.InteractionInfo.ViewCount + " views";
             TextBlockViews.Visibility = Visibility.Visible;

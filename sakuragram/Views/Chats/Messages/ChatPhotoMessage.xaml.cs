@@ -19,7 +19,7 @@ public partial class ChatPhotoMessage : Page
     private long _chatId;
     private int _mediaFileId;
     private List<Image> Photos = [];
-    private MediaService _mediaService = new MediaService();
+    private MediaService _mediaService = new();
     
     public ChatPhotoMessage()
     {

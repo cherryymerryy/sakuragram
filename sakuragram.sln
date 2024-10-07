@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sakuragram", "sakuragram\sa
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "sakugramInstaller", "sakugramInstaller\sakugramInstaller.vdproj", "{59F75A96-DA8C-4470-85CB-86A6D8529C1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TdLib", "TdLib\TdLib.csproj", "{B1BE765F-2AB0-484C-90BD-21F5BD4D9F55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TdLib.Api", "TdLib.Api\TdLib.Api.csproj", "{E9440D98-F196-4557-B363-AA4841C0F563}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Beta|x64 = Beta|x64
@@ -23,6 +27,18 @@ Global
 		{7768C2E0-6568-4B3A-995C-FEFDC278FEB7}.Release|x64.ActiveCfg = Release|x64
 		{7768C2E0-6568-4B3A-995C-FEFDC278FEB7}.Release|x64.Build.0 = Release|x64
 		{7768C2E0-6568-4B3A-995C-FEFDC278FEB7}.Release|x64.Deploy.0 = Release|x64
+		{B1BE765F-2AB0-484C-90BD-21F5BD4D9F55}.Beta|x64.ActiveCfg = Debug|Any CPU
+		{B1BE765F-2AB0-484C-90BD-21F5BD4D9F55}.Beta|x64.Build.0 = Debug|Any CPU
+		{B1BE765F-2AB0-484C-90BD-21F5BD4D9F55}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B1BE765F-2AB0-484C-90BD-21F5BD4D9F55}.Debug|x64.Build.0 = Debug|Any CPU
+		{B1BE765F-2AB0-484C-90BD-21F5BD4D9F55}.Release|x64.ActiveCfg = Release|Any CPU
+		{B1BE765F-2AB0-484C-90BD-21F5BD4D9F55}.Release|x64.Build.0 = Release|Any CPU
+		{E9440D98-F196-4557-B363-AA4841C0F563}.Beta|x64.ActiveCfg = Debug|Any CPU
+		{E9440D98-F196-4557-B363-AA4841C0F563}.Beta|x64.Build.0 = Debug|Any CPU
+		{E9440D98-F196-4557-B363-AA4841C0F563}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E9440D98-F196-4557-B363-AA4841C0F563}.Debug|x64.Build.0 = Debug|Any CPU
+		{E9440D98-F196-4557-B363-AA4841C0F563}.Release|x64.ActiveCfg = Release|Any CPU
+		{E9440D98-F196-4557-B363-AA4841C0F563}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

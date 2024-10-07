@@ -15,7 +15,7 @@ public partial class ChatStickerMessage : Page
     private static TdClient _client = App._client;
     private TdApi.MessageContent _messageMediaContent;
     private int _mediaFileId;
-    private MediaService _mediaService;
+    private MediaService _mediaService = new();
     
     public ChatStickerMessage()
     {

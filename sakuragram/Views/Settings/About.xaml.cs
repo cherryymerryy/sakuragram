@@ -25,7 +25,7 @@ public partial class About : Page
         _appLatestVersion = fvi.FileVersion;
         _appLatestVersionLink = $"https://github.com/{Config.GitHubRepo}/releases/tag/{_appLatestVersion}";
         
-        TextBlockVersionInfo.Text = $"Current version: {_appLatestVersion}, TDLib 1.8.29";
+        TextBlockVersionInfo.Text = $"Current version: {_appLatestVersion}, TdLib {Config.TdLibVersion}";
         
         _updateManager._asyncCompletedEventHandler += AsyncCompletedEventHandler;
         CheckForUpdates();

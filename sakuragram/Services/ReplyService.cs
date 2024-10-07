@@ -18,7 +18,6 @@ public class ReplyService
             ChatId = _chatId,
             ReplyTo = new TdApi.InputMessageReplyTo.InputMessageReplyToMessage
             {
-                ChatId = _chatId,
                 MessageId = _messageId
             },
             InputMessageContent = new TdApi.InputMessageContent.InputMessageText

@@ -6,7 +6,6 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media.Imaging;
 using sakuragram.Services;
 using TdLib;
 
@@ -20,7 +19,7 @@ public partial class ChatVideoMessage : Page
     private int _mediaFileId;
     private bool _isPlaying = false;
     private TimeSpan _pausedVideoPosition;
-    private MediaService _mediaService = new MediaService();
+    private MediaService _mediaService = new();
 
     public ChatVideoMessage()
     {
@@ -240,7 +239,7 @@ public partial class ChatVideoMessage : Page
 
         TextBlockEdited.Visibility = message.EditDate != 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        if (message.CanGetViewers && message.IsChannelPost)
+        if (message.InteractionInfo?.ViewCount > 0 && message.IsChannelPost)
         {
             TextBlockViews.Text = message.InteractionInfo.ViewCount + " views";
             TextBlockViews.Visibility = Visibility.Visible;

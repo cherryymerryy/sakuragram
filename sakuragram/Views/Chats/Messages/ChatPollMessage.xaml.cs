@@ -24,7 +24,7 @@ public partial class ChatPollMessage : Page
     private static bool _hasSelectedOption;
     private static List<int> _pollOptionsIds = [];
     
-    private MediaService _mediaService = new MediaService();
+    private MediaService _mediaService = new();
 
     public ChatPollMessage()
     {
@@ -207,7 +207,7 @@ public partial class ChatPollMessage : Page
         
         TextBlockEdited.Visibility = message.EditDate != 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        if (message.CanGetViewers && message.IsChannelPost)
+        if (message.InteractionInfo?.ViewCount > 0 && message.IsChannelPost)
         {
             TextBlockViews.Text = message.InteractionInfo.ViewCount + " views";
             TextBlockViews.Visibility = Visibility.Visible;

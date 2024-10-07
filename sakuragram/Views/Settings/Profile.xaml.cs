@@ -23,7 +23,8 @@ public partial class Profile : Page
     
     private int _profilePhotoFileId = 0;
     private int _personalChatIdToSet = 0;
-    
+    private readonly MediaService _mediaService = new();
+
     public Profile()
     {
         InitializeComponent();
