@@ -181,8 +181,19 @@ namespace sakuragram.Views
                             _pinnedChats.Add(chat.Id);
                             break;
                         }
+                        case TdApi.ChatList.ChatListFolder chatListFolder:
+                        {
+                            if (App._folderId != -1)
+                            {
+                                chatListFolder.ChatFolderId = App._folderId;
+                                _pinnedChats.Add(chat.Id);
+                            }
+                            break;
+                        }
                     }
                 }
+                
+                if (_pinnedChats.Count == 0) Separator.Visibility = Visibility.Collapsed;
                 
                 await DispatcherQueue.GetForCurrentThread().EnqueueAsync(() =>
                 {
@@ -281,7 +292,15 @@ namespace sakuragram.Views
 
         private void ChatList_OnLoaded(object sender, RoutedEventArgs e)
         {
-            GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+            if (App._folderId != -1)
+            {
+                GenerateChatEntries(new TdApi.ChatList.ChatListFolder{ChatFolderId = App._folderId});
+            }
+            else
+            {
+                GenerateChatEntries(new TdApi.ChatList.ChatListMain());
+                App._folderId = -1;
+            }
         }
 
         private void ButtonNewMessage_OnClick(object sender, RoutedEventArgs e)

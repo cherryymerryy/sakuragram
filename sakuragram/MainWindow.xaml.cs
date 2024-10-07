@@ -16,29 +16,32 @@ namespace sakuragram
 		private static TdClient _client = App._client;
 		private static TdApi.User _user;
 		private static TdApi.ChatFolderInfo[] _folders = App._folders;
-		private NotificationService _notificationService = new();
 
-		private int _totalUnreadCount = 0;
+		private int _totalUnreadCount;
 		
 		public MainWindow()
 		{
 			InitializeComponent();
+			
 			#if DEBUG
 			{
-				Title = "sakuragram preview";
-				TitleBar.Subtitle = "preview";
-				Icon.ShowAsMonochrome = true;
+				Title = "sakuragram debug";
+				TitleBar.Subtitle = "debug";
 			}
-			#else
+			#elif BETA
 			{
-				Title = "sakuragram";
-				Icon.ShowAsMonochrome = false;
+				Title = "sakuragram beta";
+				TitleBar.Subtitle = "beta";
+			}
+			#elif RELEASE
+			{
+				Icon.Title = "sakuragram";
 			}
 			#endif
 			
             ExtendsContentIntoTitleBar = true;
             NavigationView.SelectedItem = NavigationView.MenuItems[0];
-            NavigateToView("ChatsView");
+            NavigateToView("ChatsView", null);
             TrySetDesktopAcrylicBackdrop();
             
             var chatsIds = _client.ExecuteAsync(new TdApi.GetChats{Limit = 100}).Result.ChatIds;
@@ -58,7 +61,8 @@ namespace sakuragram
 				var folder = new NavigationViewItem
 				{
 					Content = chatFolderInfo.Title,
-					Tag = "ChatsView"
+					Tag = "ChatsView",
+					Name = $"{chatFolderInfo.Title}_{chatFolderInfo.Id}"
 				};
 				NavigationView.MenuItems.Add(folder);
 			}
@@ -126,11 +130,11 @@ namespace sakuragram
 
 			var clickedView = item.Tag.ToString();
 
-			if (!NavigateToView(clickedView)) return;
+			if (!NavigateToView(clickedView, item)) return;
 			_lastItem = item;
 		}
 
-		private bool NavigateToView(string clickedView)
+		private bool NavigateToView(string clickedView, NavigationViewItem item)
 		{
 			var view = Assembly.GetExecutingAssembly().GetType($"sakuragram.Views.{clickedView}");
 
@@ -138,6 +142,27 @@ namespace sakuragram
 				return false;
 
 			ContentFrame.Navigate(view, null, new EntranceNavigationTransitionInfo());
+
+			if (clickedView == "ChatsView" && item != null)
+			{
+				foreach (var folder in _folders)
+				{
+					if (item.Name == $"{folder.Title}_{folder.Id}")
+					{
+						App._folderId = folder.Id;
+						break;
+					}
+					else if (item.Name == "NavViewChats")
+					{
+						App._folderId = -1;
+						break;
+					}
+					else
+					{
+						continue;
+					}
+				}
+			}
 
 			NavigationView.PaneDisplayMode = clickedView switch
 			{

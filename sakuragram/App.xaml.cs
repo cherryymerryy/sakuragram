@@ -26,6 +26,8 @@ public partial class App : Application
 	
 	public static bool _authNeeded;
 	public static bool _passwordNeeded;
+
+	public static int _folderId = -1;
         
 	private void PrepareTelegramApi()
 	{

@@ -338,49 +338,18 @@ namespace sakuragram.Views.Chats
         {
             await DispatcherQueue.GetForCurrentThread().EnqueueAsync(async () =>
             {
-                int offset = -99;
-                int limit = 100;
-                List<long> addedMessages = new(); 
-
                 var firstMessages = await _client.ExecuteAsync(new TdApi.GetChatHistory
                 {
                     ChatId = chatId,
-                    Offset = offset,
-                    Limit = limit,
+                    Limit = 100,
+                    Offset = -1,
                     OnlyLocal = false
                 });
                 
-                foreach (var message in firstMessages.Messages_)
+                foreach (var message in firstMessages.Messages_.Reverse())
                 {
-                    if (addedMessages.Contains(message.Id)) continue;
                     GenerateMessageByType(message);
-                    addedMessages.Add(message.Id);
                     _lastMessageId = message.Id;
-                }
-                
-                while (true)
-                {
-                    var messages = await _client.ExecuteAsync(new TdApi.GetChatHistory
-                    {
-                        ChatId = chatId,
-                        Offset = offset,
-                        Limit = limit,
-                        FromMessageId = _lastMessageId,
-                        OnlyLocal = false
-                    });
-
-                    if (messages.Messages_.Length == 0)
-                        break;
-
-                    foreach (var message in messages.Messages_)
-                    {
-                        if (addedMessages.Contains(message.Id)) continue;
-                        GenerateMessageByType(message);
-                        addedMessages.Add(message.Id);
-                        _lastMessageId = message.Id;
-                    }
-
-                    offset += 1;
                 }
             });
         }
@@ -399,7 +368,8 @@ namespace sakuragram.Views.Chats
                 }
                 case TdApi.MessageContent.MessageChatChangeTitle or TdApi.MessageContent.MessagePinMessage 
                     or TdApi.MessageContent.MessageGiftedPremium
-                    or TdApi.MessageContent.MessageGameScore or TdApi.MessageContent.MessageChatBoost:
+                    or TdApi.MessageContent.MessageGameScore or TdApi.MessageContent.MessageChatBoost 
+                    or TdApi.MessageContent.MessageUnsupported:
                 {
                     var changeTitleMessage = new ChatServiceMessage();
                     MessagesList.Children.Add(changeTitleMessage);
