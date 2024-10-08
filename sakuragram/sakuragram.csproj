@@ -98,14 +98,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 	<OutputPath>build\debug\</OutputPath>
     <DebugType>embedded</DebugType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Beta|x64'">
 	    <OutputPath>build\beta\</OutputPath>
 	    <DebugType>embedded</DebugType>
 	    <Optimize>True</Optimize>
+	    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 	<OutputPath>build\release\</OutputPath>
     <DebugType>embedded</DebugType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 </Project>
