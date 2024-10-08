@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 using CommunityToolkit.WinUI.Controls;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Octokit;
 using Page = Microsoft.UI.Xaml.Controls.Page;
@@ -16,8 +15,7 @@ public partial class About : Page
     private GitHubClient _githubClient = App._githubClient;
     
     private readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
-    private string _appName;
-    private readonly string _appLatestVersion;
+    private string _appName = Config.AppName;
     private string _appLatestVersionLink;
     private static readonly Services.UpdateManager _updateManager = App.UpdateManager;
     
@@ -25,13 +23,9 @@ public partial class About : Page
     {
         InitializeComponent();
         
-        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-        System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-        _appName = assembly.GetName().Name;
-        _appLatestVersion = fvi.FileVersion;
-        _appLatestVersionLink = $"https://github.com/{Config.GitHubRepoOwner}/{Config.GitHubRepoName}/releases/tag/{_appLatestVersion}";
+        _appLatestVersionLink = $"https://github.com/{Config.GitHubRepoOwner}/{Config.GitHubRepoName}/releases/tag/{Config.AppVersion}";
         
-        TextBlockVersionInfo.Text = $"Current version: {_appLatestVersion}, TdLib {Config.TdLibVersion}";
+        TextBlockVersionInfo.Text = $"Current version: {Config.AppVersion}, TdLib {Config.TdLibVersion}";
         
         Task.Run(async () =>
         {
@@ -101,7 +95,7 @@ public partial class About : Page
             }
             else
             {
-                CardCheckForUpdates.Description = $"Current version: {_appLatestVersion}";
+                CardCheckForUpdates.Description = $"Current version: {Config.AppVersion}";
             }
             
             ButtonCheckForUpdates.IsEnabled = true;
