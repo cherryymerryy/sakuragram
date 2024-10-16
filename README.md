@@ -1,4 +1,6 @@
-# sakuragram
+# [MOVED TO ANOTHER REPOSITORY](https://github.com/sakuragram/desktop)
+
+## sakuragram
 
 Custom Telegram Desktop client based on TDLib ([tdsharp](https://github.com/egramtel/tdsharp), [tdlib](https://github.com/tdlib/td)) and WinUI 3 ([WinUI](https://github.com/microsoft/microsoft-ui-xaml), [CommunityToolKit](https://github.com/CommunityToolkit/Windows))
 
